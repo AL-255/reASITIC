@@ -6,14 +6,22 @@ at ``.github/workflows/docs.yml``.
 """
 from __future__ import annotations
 
+import importlib
+import importlib.util
 import os
 import sys
 from datetime import datetime
 from pathlib import Path
 
-# Make the in-tree package importable without a prior `pip install`.
+# Prefer the *installed* reasitic over the in-tree source: only the
+# installed package has the compiled Cython ``_kernel`` extension next
+# to its ``.py`` files, while the ``src/`` checkout has only the
+# ``.pyx``/``.pxd`` Cython sources.  If the installed wheel is missing
+# (e.g. an offline doc-only checkout), fall back to ``src/`` so the
+# docstrings still render even though autodoc may skip the C kernel.
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT / "src"))
+if importlib.util.find_spec("reasitic") is None:
+    sys.path.insert(0, str(ROOT / "src"))
 
 try:
     from reasitic import __version__ as _pkg_version
