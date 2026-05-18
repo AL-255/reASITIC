@@ -1,0 +1,36 @@
+include README.md
+include LICENSE
+include pyproject.toml
+include setup.py
+
+# Cython sources + C declarations
+recursive-include src/reasitic *.pyx *.pxd *.c
+
+# Vendored C kernels (the canonical, self-contained source tree)
+recursive-include vendor/recomp *.c *.h *.sed
+
+# Sphinx documentation source
+recursive-include docs *.rst *.py *.md *.txt Makefile
+recursive-include docs/_static *
+recursive-include docs/_templates *
+exclude docs/_build
+
+# Tech-file fixtures used by the test suite (and by the example in
+# README.md).  Keeping them in the wheel makes `pytest tests/` work
+# straight out of a `pip install`.
+recursive-include tests *.py
+recursive-include tests/data *.tek
+
+# Validation golds.  Keep these in the sdist so anyone running the
+# tests off a tarball can reproduce the gates documented in README.md.
+recursive-include tests/data/validation *.json
+# Touchstone S-parameter sweeps + ASITIC stable / sweep logs that
+# the LRQ/S2P regression tests load alongside the JSONs.
+recursive-include tests/data/validation/analysis *.s2p *.log
+# Layout goldens (CIF / GDS) for the geometry vertex tests.
+recursive-include tests/data/validation/layouts *.cif *.gds
+
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so
+global-exclude .*.swp

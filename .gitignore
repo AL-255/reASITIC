@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Cython-generated
+src/reasitic/_kernel.c
+src/reasitic/*.so
+
+# Build artefacts
+/build/
+/dist/
+/*.egg-info/
+src/*.egg-info/
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Test caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Sphinx build output
+docs/_build/
+docs/api/generated/
