@@ -89,23 +89,19 @@ _DEFAULT_TOL = 0.05
 # tolerance.
 _ABS_FLOOR_UM2 = 50.0
 
-# Known-failing cases.  These are documented in CLAUDE.md as
-# geometry fidelity gaps that pre-date the XOR test:
+# Known-failing cases.  Documented in CLAUDE.md as geometry fidelity
+# gaps that pre-date the XOR test:
 #
 # * BALUN secondaries: the secondary winding's "internal LL" is
 #   placed at YORG + W in our geometry kernel, but the binary's
 #   stored shape origin uses the unshifted YORG.  That ~W vertical
 #   offset propagates into the metal-1 footprint.
-# * SYMSQ centre-tap parallelogram: the binary's stored long-edge
-#   CL differs from the closed-form W·L; the residual surfaces as
-#   a few-percent via-cluster + metal-2 offset.
 #
 # Listing them as ``xfail`` (non-strict) keeps the gate green while
 # the geometry kernel converges on bit-faithful output.
 _XFAIL_STEMS = {
     "balun_bicmos_L180_W8_S3_N2_m3_m2_secondary",
     "balun_cmos_L180_W8_S3_N2_m5_m4_secondary",
-    "symsq_cmos_L300_W12_S4_N3_ILEN30_m5",
 }
 
 

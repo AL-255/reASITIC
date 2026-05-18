@@ -645,6 +645,35 @@ def _polygon_record_to_poly(
     )
 
 
+def _via_cluster_dimension(W: float, via_w: float, via_s: float, op: float) -> int:
+    """Return the number of vias per side in the W-wide cluster.
+
+    Mirrors the ASITIC binary's ``cmd_square_build_geometry`` formula:
+
+    .. math::  n = \\left\\lfloor (W - 2 \\cdot \\mathrm{op} + s) /
+                  (w + s) \\right\\rfloor
+
+    On 64-bit IEEE-754 the expression ``(12 - 0.4 + 1.2) / 1.6`` rounds
+    down to ``7.999999999999999`` and ``math.floor`` returns 7 -- but
+    the binary's x87 80-bit arithmetic produces exactly 8.  Add a small
+    epsilon so the Python port matches the binary's via count.
+
+    Verified against goldens:
+
+    * ``sq_170 / W=10, BiCMOS via3``: 10.5 / 2.25 = 4.666... -> 4
+    * ``trans_200 / W=8, BiCMOS via3``: 8.5 / 2.25 = 3.777... -> 3
+    * ``symsq_300 / W=12, CMOS via4``: 12.8 / 1.6 = 8.0 (exact) -> 8
+    """
+    pitch = via_w + via_s
+    raw = (W - 2.0 * op + via_s) / pitch
+    # The epsilon must be small enough not to round up a genuine
+    # 7.9 -> 8 result but large enough to absorb the worst-case
+    # double-precision drift ulp(8) ~= 1.8e-15.  1e-9 is a safe margin
+    # while staying tight against the next-integer boundary for any
+    # realistic via-spacing geometry.
+    return max(1, math.floor(raw + 1e-9))
+
+
 def _square_layout_polygons(
     shape: Shape,
     tech: Tech,
@@ -821,12 +850,7 @@ def _square_access_polygons(
 
     overplot = max(via_rec.overplot1, via_rec.overplot2)
     pitch = via_rec.width + via_rec.space
-    # Use floor to match the C binary's via-count convention
-    # (asitic_repl.c: cmd_square_build_geometry's via cluster sizing
-    # gives n = floor((W - 2·op + via_s) / (via_w + via_s))).
-    # Verified against gold sq_170 (W=10 → n=4) and trans_200x8x3x3
-    # (W=8 → n=3).
-    n = max(1, math.floor((W - 2.0 * overplot + via_rec.space) / pitch))
+    n = _via_cluster_dimension(W, via_rec.width, via_rec.space, overplot)
     span = (n - 1) * via_rec.space + n * via_rec.width
     z = 0.0
     via_metal = len(tech.metals) + via_idx
@@ -2379,7 +2403,7 @@ def _symsq_layout_polygons(shape: Shape, tech: Tech) -> list[Polygon]:
         if via_rec is not None:
             overplot = max(via_rec.overplot1, via_rec.overplot2)
             vp = via_rec.width + via_rec.space
-            n_vias = max(1, math.floor((W - 2.0 * overplot + via_rec.space) / vp))
+            n_vias = _via_cluster_dimension(W, via_rec.width, via_rec.space, overplot)
             cluster_span = n_vias * via_rec.width + (n_vias - 1) * via_rec.space
             pad_h = cluster_span + 2.0 * overplot
             u_arm_bot = Y + L * 0.5 + ILEN
@@ -3324,7 +3348,7 @@ def _balun_primary_layout_polygons(shape: Shape, tech: Tech) -> list[Polygon]:
         if via_rec is not None:
             overplot = max(via_rec.overplot1, via_rec.overplot2)
             vp = via_rec.width + via_rec.space
-            n_vias = max(1, math.floor((W - 2.0 * overplot + via_rec.space) / vp))
+            n_vias = _via_cluster_dimension(W, via_rec.width, via_rec.space, overplot)
             cluster_span = n_vias * via_rec.width + (n_vias - 1) * via_rec.space
             pad_h = cluster_span + 2.0 * overplot
             u_arm_bot = Y + L * 0.5 + ILEN
