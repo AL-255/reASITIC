@@ -63,6 +63,7 @@ jobs:
           node tests/loaded-port.mjs
           node tests/worker-loaded-port.mjs
           node tests/pi3.mjs
+          node tests/quality-sweep.mjs
           node tests/portable-extended-shunts.mjs
           node tests/portable-extended-ports.mjs
           node tests/portable-folded-ports.mjs

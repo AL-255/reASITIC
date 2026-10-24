@@ -1,4 +1,9 @@
 const number=value=>value===null?'':Object.is(value,-0)?'-0':String(value);
+export const networkQualityLabels=Object.freeze({quality_first:'Port 1 Q',quality_second:'Port 2 Q',quality_differential:'Differential Q'});
+export function networkQualitySamples(samples,definition='quality_first'){
+  if(!Object.hasOwn(networkQualityLabels,definition))throw Error('Select port 1, port 2 or differential Q.');
+  return samples.map(sample=>({frequency_hz:sample.frequency_hz,quality:sample.pi?.[definition]??null}));
+}
 export function networkMatrixCSV(result){
   if(!result?.matrix)throw Error('Run the combined network before exporting its admittance.');
   // Original write_two_port_record labels y22 as port 1 and emits y21 twice.

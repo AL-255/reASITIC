@@ -172,22 +172,31 @@ self.onmessage=async({data})=>{
       }
       return;
     }
-    if(action==='port-sweep'){
-      const target=data.port_kind??'network';if(!['network','transformer','three-port'].includes(target))throw Error('Select a network, transformer or three-port sweep.');
+    if(action==='port-sweep'||action==='quality-sweep'){
+      const direct=action==='quality-sweep';
+      if(direct&&((data.model!==undefined&&data.model!=='PI2')||(data.port_kind!==undefined&&data.port_kind!=='network')))throw Error('The quality sweep repeats direct PI2 analyses. Select PI2 and a network winding.');
+      const target=direct?'network':data.port_kind??'network';if(!['network','transformer','three-port'].includes(target))throw Error('Select a network, transformer or three-port sweep.');
       if(!processTechnology||!hasLayout)throw Error('Generate a layout before running a port sweep.');
       const range=['start_ghz','stop_ghz','step_ghz'].map(key=>{if(typeof data[key]!=='number')throw Error('Enter start, stop and step frequencies in GHz.');return frequency(data,data[key]);});
       const limit=portSampleBudget(kernel,data.sample_limit);
       const plan=JSON.parse(kernel.UTF8ToString(kernel._port_frequency_schedule(...range,limit)));if(plan.error)throw Error(plan.error);
+      // A typed PI2 command stores its frequency in the original binary32
+      // argument word. Native port commands instead keep the loop's saved
+      // double. Preserve each command's own input precision.
+      const frequencies=direct?plan.frequencies_hz.map(hz=>frequency(data,hz/1e9)):plan.frequencies_hz;
+      if(direct&&new Set(frequencies).size!==frequencies.length)throw Error('Q sweep frequencies collapse at original PI2 input precision; increase the step.');
       if(target==='three-port'&&data.backing&&plan.frequencies_hz.length>1)throw Error('A native-state capture is valid at one frequency. Clear the capture to sweep the numerical three-port model.');
       const solvePort=target==='three-port'?solveThreePort:target==='transformer'?solveTransformer:solveNetwork,field=target==='three-port'?'three_port':target;
-      for(const [index,hz] of plan.frequencies_hz.entries()){
+      for(const [index,hz] of frequencies.entries()){
         if(task!==epoch)return;let result;
-        try{result=target==='network'?solveNetwork(data,hz,undefined,true):await solvePort(data,hz,task);}catch(error){throw Error(`Port sample ${index+1}/${plan.frequencies_hz.length} at ${hz} Hz: ${error.message}`);}
+        // Repeated PI2 commands retain the omitted-ground mesh semantics.
+        // The historical 2PORTGND sweep acquires/reset its reference instead.
+        try{result=target==='network'?solveNetwork(data,hz,undefined,!direct):await solvePort(data,hz,task);}catch(error){throw Error(`Port sample ${index+1}/${plan.frequencies_hz.length} at ${hz} Hz: ${error.message}`);}
         if(task!==epoch)return;
         if(target!=='three-port')rememberTwoPort(target,result);
         const done=index===plan.frequencies_hz.length-1;
         const summary=portSampleSummary(result);
-        postMessage({id:data.id,[field]:done?result:summary,port_sweep:{index,total:plan.frequencies_hz.length,done,target},warnings:[result.dispatch?.warning,kernel.UTF8ToString(kernel._last_warnings())].filter(Boolean).join('\n')});
+        postMessage({id:data.id,[field]:done?result:summary,port_sweep:{index,total:plan.frequencies_hz.length,done,target,...(direct?{command:'PI2'}:{})},warnings:[result.dispatch?.warning,kernel.UTF8ToString(kernel._last_warnings())].filter(Boolean).join('\n')});
         if(!done)await new Promise(resolve=>setTimeout(resolve,0));
       }
       return;

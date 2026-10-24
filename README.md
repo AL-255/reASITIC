@@ -184,6 +184,34 @@ An independent 80-digit physical DC/area calculation and Q equation, two shunt
 controls, 71 retained-intermediate witnesses, worker parity and recovery checks
 are included in `tests/conductor-metrics.mjs`.
 
+The filament plot's conductor-only Q is `Im(Z)/Re(Z)` without distributed
+capacitance. Both this quantity and the original low-frequency `Q` command can
+keep increasing with frequency. Use **Sweep PI2 Q** in the combined-network
+panel for the complete port quality factors, including capacitance and substrate
+effects. The plot and Q card select port 1, port 2 or differential Q explicitly;
+negative post-resonance values remain visible. A maximum at the range boundary
+prompts extending the sweep instead of claiming a physical peak.
+
+This sweep repeats direct original `PI2` analyses, including each command's
+native frequency normalization. It preserves the selected ground semantics;
+the separate native port-command sweep still follows
+`2PORTGND`/`2PORTX` reference acquisition and dispatch. No fitted rolloff or
+fixed peak frequency is added. Twenty-eight fresh original processes compare
+LF Q, complete LMAT impedances and PI2 Q across 1–20 GHz for two CMOS coils.
+For the 180 µm, three-turn M5 coil, original port-1 Q is 8.735 at 5 GHz,
+9.294 at 7.5 GHz and 5.273 at 10 GHz on the captured mesh. Its conductor-only Q
+instead rises from 10.711 to 16.066 to 21.421. Peak position varies with geometry,
+process, mesh and port definition. `tests/quality-sweep.mjs` checks these original
+curves, native stage matrices, independent 80-digit circuit reductions, worker
+streaming and source preservation. `tools/capture_quality_sweep.py` regenerates
+the reference captures.
+
+The starting 100×90 µm, two-turn M4 coil peaks later on the same CMOS stack:
+original port-1 Q is 5.441 at 20 GHz, 4.615 at 30 GHz and 0.195 at 40 GHz with
+50/1.5/0.5 µm filament cells and a 256×256 FFT. Production WASM checks at
+20/40 GHz also agree with independent 80-digit circuit reductions. A 5–10 GHz
+peak is therefore not a universal requirement of the CMOS technology file.
+
 The original `COUPLING` conductor estimate is available alongside L, R(f) and Q.
 Select two windings to report the mutual inductance in nH and coupling coefficient.
 It uses the original segment-pair estimate and self-inductance normalization;
@@ -332,7 +360,7 @@ or wrap large values into another winding, eddy mode or budget. Winding and
 substrate indices must refer to the current layout and technology. The C++
 `solver_limits()` export supplies the storage and work limits to JavaScript;
 the native and WASM builds share the same dense-matrix storage policy.
-`tests/worker-integer-controls.mjs` rejects 569 malformed controls across thirteen
+`tests/worker-integer-controls.mjs` rejects 623 malformed controls across fourteen
 solver, resonance and sweep paths, checks exact results after rejection, and
 verifies that requests preserve the source geometry.
 

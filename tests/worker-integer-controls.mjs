@@ -24,6 +24,7 @@ try{
     ['3PORT',{...base,action:'three-port'},['ground'],true,true],
     ['SELFRES',{...base,action:'resonance',start_ghz:1,end_ghz:2,step_ghz:.1,mode:'single',sample_budget:1},['winding','ground'],true,true],
     ...['network','transformer','three-port'].map(target=>['sweep '+target,{...base,action:'port-sweep',port_kind:target,model:'PI2',start_ghz:1,stop_ghz:1,step_ghz:1,sample_limit:1},target==='transformer'?['primary','secondary','ground']:target==='three-port'?['ground']:['winding','ground'],true,true]),
+    ['PI2 Q sweep',{...base,action:'quality-sweep',model:'PI2',start_ghz:1,stop_ghz:1,step_ghz:1,sample_limit:1},['winding','ground'],true,true],
   ];
   for(const [name,request,roles,filaments,eddy]of definitions){
     const expected=clean(await checked(request));let count=0;
@@ -36,7 +37,7 @@ try{
       for(const bad of [0,-1,1.5,limits.green_evaluations+1,2**32+250000,NaN,Infinity,'250000',1n])await invalid({eddy:{...base.eddy,evaluation_limit:bad}},/integer Green evaluation budget/);
       for(const evaluation_limit of [1,limits.green_evaluations])assert.deepEqual(clean(await checked({...request,eddy:{...base.eddy,evaluation_limit}})),expected,name+' valid budget boundary changed a disabled-eddy model');
     }
-    if(request.action==='port-sweep')for(const bad of [0,1.5,limits.port_samples+1,2**32+1,NaN,Infinity,'1',1n])await invalid({sample_limit:bad},/integer port sample limit/);
+    if(request.action==='port-sweep'||request.action==='quality-sweep')for(const bad of [0,1.5,limits.port_samples+1,2**32+1,NaN,Infinity,'1',1n])await invalid({sample_limit:bad},/integer port sample limit/);
     if(request.action==='three-port'||request.port_kind==='three-port')for(const bad of [.75,2**32+index('A'),NaN,Infinity,'1',1n])await invalid({windings:[bad,index('B'),index('C')]},/three distinct winding/);
     if(request.model==='PI4')for(const bad of [.75,2**32+index('P1'),NaN,Infinity,'1',1n])await invalid({pads:[bad,index('P2')]},/pad records/);
     assert.deepEqual(clean(await checked(request)),expected,name+' rejected request changed the following result');assert.deepEqual(clean((await checked({action:'edit',commands:'UNSELECT'})).layout),clean(layout),name+' changed source geometry');reports.push({name,rejected:count,recoveryExact:true,sourcePreserved:true});
