@@ -7,7 +7,7 @@ from pathlib import Path
 import re,json
 from implicit_stores import expose
 ROOT=Path(__file__).resolve().parents[1]
-SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver_no_eddy','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver']
+SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology']
 
 def translate(name,s):
     # Loads/stores of finite double values. Signaling NaN status is not exposed.
@@ -52,6 +52,11 @@ def translate(name,s):
     s=s.replace('asm volatile("fstpl %0" : "=m"(out) : "t"(value) : "st");','out=x87::binary64(value);')
     for output,input_ in [('result','value'),('value','fraction')]:
         s=s.replace(f'asm("fmulp" : "=t"({output}) : "0"({input_}),"u"(sign) : "st(1)");',f'{output}={input_}*sign;')
+    s=s.replace('asm("fld1; fxch; fyl2xp1" : "=t"(logarithm) : "0"(delta) : "st(1)");','logarithm=x87::log2p1(delta);')
+    s=s.replace('asm("fld1; fxch; fyl2x" : "=t"(logarithm) : "0"((long double)x) : "st(1)");','logarithm=x87::log2(static_cast<long double>(x));')
+    if name=='eddy':
+        begin=s.index('int rounded_integer(');end=s.index('const ConductorSegment* next_segment',begin)
+        s=s[:begin]+'int rounded_integer(long double value,unsigned short mode) { return x87::truncate_int(x87::binary64(mode==0x0800u?x87::ceil(value):x87::floor(value))); }\n'+s[end:]
     s=s.replace('asm("fyl2x" : "=t"(logarithm) : "0"(base),"u"(1.0L) : "st(1)");','logarithm=x87::log2(base);')
     if re.search(r'\basm\s*(?:volatile)?\s*\(',s):raise ValueError(f'Untranslated assembly in {name}')
     s=s.replace('#include "x87.hpp"','#include "x87_port.hpp"')
@@ -66,6 +71,10 @@ def source(name):
         # Exclude unrelated command dispatch to avoid pulling in the whole host.
         s=(ROOT/'vendor/asitic/src/analysis_commands.cpp').read_text()
         return s[:s.index('long double shape_coupling_estimate(')]+'}\n'
+    if name=='eddy':
+        s=(ROOT/'vendor/asitic/src/eddy.cpp').read_text()
+        s=s.replace('namespace asitic {','namespace asitic {\nbool eddy_aborted();',1)
+        return s.replace('    return green_integral(', '    if(eddy_aborted())return 0.L;\n    return green_integral(',1)
     if name=='potential_solver':
         s=(ROOT/'vendor/asitic/src/potential_solver.cpp').read_text()
         s=s.replace('namespace asitic {','namespace asitic {\nvoid record_capacitance_totals(double,double);',1)
@@ -88,12 +97,6 @@ def source(name):
     if name=='input_normalization':
         s=(ROOT/'vendor/asitic/src/technology_text.cpp').read_text()
         return s[:s.index('namespace {')]+'}\n'
-    if name=='solver_no_eddy':
-        # Retain the original no-eddy entry and its complete driver. Removing
-        # the unused eddy entry makes the null eddy argument constant, so the
-        # compiler eliminates the as-yet-unbound substrate branch.
-        s=(ROOT/'vendor/asitic/src/solver.cpp').read_text()
-        return s[:s.index('bool solve_inductance(const ShapeFilamentList&')]+'}\n'
     return (ROOT/'vendor/asitic/src'/(name+'.cpp')).read_text()
 
 def generate(clang=None):
@@ -105,7 +108,7 @@ def generate(clang=None):
     proof={}
     for name in SOURCES:
         native=source(name)
-        if name.startswith('shape_') or name=='native_creators' or name in ('legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver'):
+        if name.startswith('shape_') or name=='native_creators' or name in ('legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology'):
             native,proof[name]=expose(name,native,clang)
         (target/(name+'.cpp')).write_text(translate(name,native))
     evidence=ROOT/'build/evidence';evidence.mkdir(exist_ok=True)

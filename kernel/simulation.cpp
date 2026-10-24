@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include "eddy_runtime.hpp"
 #include "json.hpp"
 #include "asitic/shape_construction.hpp"
 #include "asitic/numerics.hpp"
@@ -62,8 +63,8 @@ bool bounded_clone(const GeometryShape& shape,double cell,double trigger,int max
 namespace reasitic {
 void release_simulation_result() { free(simulation_result);simulation_result=nullptr; }
 }
-extern "C" const char* simulate(int winding,double frequency,double length_cell,double width_cell,
-                                 double thickness_cell,double subdivision_trigger,int filament_limit) {
+static const char* simulate_impl(int winding,double frequency,double length_cell,double width_cell,
+                                 double thickness_cell,double subdivision_trigger,int filament_limit,reasitic::EddySession* eddy) {
     reasitic::release_simulation_result();reasitic::clear_diagnostics();
     const auto engine=reasitic::engine_view();
     if(winding<0 || !__builtin_isfinite(frequency) || frequency<=0 ||
@@ -99,7 +100,9 @@ extern "C" const char* simulate(int winding,double frequency,double length_cell,
     if(context.filament_count>filament_limit)
         return "{\"error\":\"Cross-section mesh exceeds the selected filament limit; increase width/thickness cells or the limit\"}";
     ComplexMatrix matrix{};InductanceRunOptions options{{width_cell,500,engine.metals},thickness_cell,engine.metal_count,engine.vias,true};
-    if(!solve_inductance_without_eddy(shape->filaments,matrix,frequency,options,memory,engine.warnings))
+    const bool solved=eddy?solve_inductance(shape->filaments,matrix,frequency,options,reasitic::eddy_options(*eddy,engine),memory,engine.warnings):solve_inductance_without_eddy(shape->filaments,matrix,frequency,options,memory,engine.warnings);
+    if(eddy && eddy->exceeded)return "{\"error\":\"Eddy evaluation budget exceeded; reduce the mesh size or increase the Green budget\"}";
+    if(!solved)
         return "{\"error\":\"Original filament solver could not produce an impedance matrix\"}";
     double real=0,imag=0;
     for(int i=0;i<matrix.rows;++i)for(int j=0;j<matrix.columns;++j) {
@@ -118,6 +121,7 @@ extern "C" const char* simulate(int winding,double frequency,double length_cell,
     out+=sprintf(out,",\"frequency_hz\":%.17g,\"conductors\":%d,\"filaments\":%d,\"resistance\":%.17g,\"reactance\":%.17g,\"inductance_h\":%.17g,\"series_q\":",frequency,context.group_count,context.filament_count,real,imag,inductance);
     const double q=x87::binary64(Real(imag)/real);
     out+=__builtin_isfinite(q)?sprintf(out,"%.17g",q):sprintf(out,"null");
+    if(eddy){out+=sprintf(out,",\"eddy\":");out=reasitic::eddy_metadata(out,*eddy);}
     out+=sprintf(out,",\"mesh\":{\"length\":%.17g,\"width\":%.17g,\"thickness\":%.17g,\"subdivision_trigger\":%.17g},\"matrix\":[",length_cell,width_cell,thickness_cell,subdivision_trigger);
     for(int i=0;i<matrix.rows;++i) {
         out+=sprintf(out,"%s[",i?",":"");
@@ -125,4 +129,14 @@ extern "C" const char* simulate(int winding,double frequency,double length_cell,
         out+=sprintf(out,"]");
     }
     sprintf(out,"]}");return simulation_result;
+}
+
+extern "C" const char* simulate(int winding,double frequency,double length_cell,double width_cell,double thickness_cell,double subdivision_trigger,int filament_limit) {
+    return simulate_impl(winding,frequency,length_cell,width_cell,thickness_cell,subdivision_trigger,filament_limit,nullptr);
+}
+extern "C" const char* simulate_eddy(int winding,double frequency,double length_cell,double width_cell,double thickness_cell,double subdivision_trigger,int filament_limit,int mode,int count,int first,int second,int budget) {
+    auto* session=static_cast<reasitic::EddySession*>(calloc(1,sizeof(reasitic::EddySession)));if(!session)return "{\"error\":\"Unable to allocate Eddy workspace\"}";
+    reasitic::EddyScope scope(session);reasitic::clear_diagnostics();
+    if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid eddy mode, layers or evaluation budget\"}";
+    return simulate_impl(winding,frequency,length_cell,width_cell,thickness_cell,subdivision_trigger,filament_limit,session);
 }

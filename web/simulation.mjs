@@ -3,16 +3,19 @@ export function frequencySweep(startGHz,endGHz,count,logarithmic=true) {
         throw Error('Use a positive increasing frequency range and 2–101 samples.');
     return Array.from({length:count},(_,i)=>i===0?startGHz:i===count-1?endGHz:logarithmic?startGHz*(endGHz/startGHz)**(i/(count-1)):startGHz+(endGHz-startGHz)*i/(count-1));
 }
+const eddyColumns=['eddy_mode','eddy_layer_count','eddy_layers','green_evaluations','quadpack_diagnostics'];
+const eddyValues=e=>e?[e.mode,e.layer_count,e.indices.join(';'),e.evaluations,e.quadrature_status.reduce((a,b)=>a+b,0)]:['','','','',''];
 const number=value=>value===null?'':Object.is(value,-0)?'-0':String(value);
 export function matrixCSV(result) {
     if(!result?.matrix)throw Error('Solve a sample before downloading its matrix.');
-    const rows=['frequency_hz,row,column,real_ohm,imag_ohm'];
-    result.matrix.forEach((row,i)=>row.forEach((z,j)=>rows.push([result.frequency_hz,i,j,...z].map(number).join(','))));
+    const rows=[['frequency_hz','row','column','real_ohm','imag_ohm',...(result.eddy?eddyColumns:[])].join(',')];
+    result.matrix.forEach((row,i)=>row.forEach((z,j)=>rows.push([result.frequency_hz,i,j,...z,...(result.eddy?eddyValues(result.eddy):[])].map(number).join(','))));
     return rows.join('\n')+'\n';
 }
 export function sweepCSV(samples) {
     if(!samples.length)throw Error('Run a simulation before downloading results.');
-    return ['frequency_hz,inductance_h,resistance_ohm,reactance_ohm,series_q,filaments,conductors',...samples.map(s=>[s.frequency_hz,s.inductance_h,s.resistance,s.reactance,s.series_q,s.filaments,s.conductors].map(number).join(','))].join('\n')+'\n';
+    const eddy=samples.some(s=>s.eddy);
+    return [['frequency_hz','inductance_h','resistance_ohm','reactance_ohm','series_q','filaments','conductors',...(eddy?eddyColumns:[])].join(','),...samples.map(s=>[s.frequency_hz,s.inductance_h,s.resistance,s.reactance,s.series_q,s.filaments,s.conductors,...(eddy?eddyValues(s.eddy):[])].map(number).join(','))].join('\n')+'\n';
 }
 export function plotSeries(samples,key,logarithmic=true) {
     const data=samples.filter(s=>Number.isFinite(s.frequency_hz) && s.frequency_hz>0 && Number.isFinite(s[key])).toSorted((a,b)=>a.frequency_hz-b.frequency_hz);

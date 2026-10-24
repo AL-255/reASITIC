@@ -1,0 +1,16 @@
+This application includes the IBM Accurate Mathematical Library scalar sin/cos
+and range reduction from GNU C Library 2.36, copyright (C) 2001–2022 Free
+Software Foundation, Inc. It is licensed under LGPL version 2.1 or later.
+COPYING.LIB and COPYING are provided beside this notice.
+
+Upstream: https://sourceware.org/git/glibc.git (tag glibc-2.36)
+Source mirror: https://github.com/bminor/glibc/tree/glibc-2.36/sysdeps/ieee754/dbl-64
+
+Unmodified numerical sources, provenance hashes, compatibility headers and
+rebuild/relink scripts for this application are available at:
+https://github.com/AL-255/reASITIC/tree/main/vendor/glibc-math
+https://github.com/AL-255/reASITIC/blob/main/tools/port_libm.py
+https://github.com/AL-255/reASITIC/blob/main/tools/build.py
+
+The browser runtime adapters omit errno and floating exception flag side effects.
+Native i386 libm explicitly selects 53-bit precision; WASM uses IEEE binary64.

@@ -8,3 +8,7 @@ assert.ok(sweepCSV([a,b]).includes('10000000000,-1e-9,-2,6,,2,2'));
 const plot=plotSeries([b,a],'inductance_h');assert.equal(plot.points[0].sample,a);assert.equal(plot.points[1].sample,b);assert.equal(plot.points[0].x,0);assert.equal(plot.points[1].x,1);assert.ok(plot.yRange[0]<0 && plot.yRange[1]>0,'Signed native results were clipped');
 assert.equal(plotSeries([a],'resistance').points[0].x,.5);assert.equal(plotSeries([b],'series_q'),null);
 console.log('Simulation data: frequency grids, SI-unit CSVs, signed zero, null Q, sample ordering and unclipped signed plots pass');
+
+const eddy={mode:1,layer_count:2,indices:[0,1],evaluations:566,quadrature_status:[0,0,0,0,0,1,0,0]};
+assert.match(matrixCSV({frequency_hz:1e9,matrix:[[[.5,-0]]],eddy}),/1000000000,0,0,0.5,-0,1,2,0;1,566,1/);
+assert.match(sweepCSV([{frequency_hz:1e9,inductance_h:1e-9,resistance:-1,reactance:.2,series_q:-.2,filaments:1,conductors:1,eddy}]),/eddy_mode,eddy_layer_count,eddy_layers,green_evaluations,quadpack_diagnostics/);

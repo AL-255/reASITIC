@@ -22,9 +22,11 @@ to a shared layout to construct independent ground conductors and coil assemblie
 new devices require unique names and the same technology. Rejected additions,
 including late export failures, preserve the previous layout and solver state. Parameters use micrometres. The original `RESIS` DC resistance, `INDUCTANCE` conductor estimate and `RESISHF`
 high-frequency resistance paths run inside the C++ kernel. These are the original
-conductor estimates; the original no-eddy LMAT filament solver is available in the workbench.
+conductor estimates; the original LMAT filament solver is available in the workbench,
+with disabled eddy currents, native shape selection, or segment folding.
 The original layered CAP solver is also available, with substrate conductivity
-and permittivity. Eddy-current and combined circuit/network simulation are still being integrated. GDSII uses native ribbon boundaries, real via cuts and
+and permittivity. The original eddy Green kernels, QUADPACK integration and
+matrix stamping are integrated. Combined circuit/network simulation remains outstanding. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
 ```sh
@@ -41,6 +43,13 @@ node tests/capacitance.mjs
 node tests/capacitance-data.mjs
 node tests/capacitance-grids.mjs
 node tests/worker-capacitance.mjs
+node tests/eddy.mjs
+node tests/eddy-runtime.mjs
+node tests/eddy-lifecycle.mjs
+node tests/worker-eddy.mjs
+node tests/eddy-math-diagnostics.mjs        # records 3 unresolved finite differences
+# Completion gate; currently fails on those known differences:
+# node tests/eddy-math-diagnostics.mjs --strict
 node tests/lmat.mjs
 node tests/original-lmat.mjs
 node tests/lmat-lifecycle.mjs
@@ -55,7 +64,7 @@ python3 -m http.server 8766 --directory dist
 ```
 
 The native build deliberately keeps x87 instructions. It needs i386 glibc at
-`/lib/i386-linux-gnu/libc.so.6` and `/lib/ld-linux.so.2`. Production uses only
+`/lib/i386-linux-gnu/libc.so.6`, `/lib/i386-linux-gnu/libm.so.6` and `/lib/ld-linux.so.2`. Production uses only
 WebAssembly, without Python, the native executable, or a remote simulation API.
 
 Current measured evidence:
@@ -78,9 +87,23 @@ Current measured evidence:
   raw Green-table payloads match their FNV-1a-64 fingerprints. Every reference
   case repeats the original executable with a fresh cache, including one-cell whole-chip and 256×256
   FFT spiral, refined/distinct grounds, capacitor plates, and rotated wires.
+- Thirteen eddy cases reproduce the original executable: twelve finite LMAT
+  solves match 2,268 printed matrix components, and one original nonfinite case
+  is consistently rejected. All 2,554 native numeric fields and 39,089 Green
+  evaluation samples/values match exactly through trace fingerprints, including
+  the original nonconvergence diagnostics and finite partial results.
+- All 2,118 i386 libm sin/cos probes match both binary64 and raw binary80 return
+  words. Pinned glibc 2.36 scalar numerical sources supply these callbacks; the
+  recovered Green runtime calls libm, rather than the x87 FSIN instruction.
 - All 681 hardware-x87 instruction/arithmetic cases match their consumed
   binary64 outputs. Nine raw binary80 differences are recorded separately;
   this remains a limit on universal microcode identity.
+- A separate 533-case QUADPACK error-power diagnostic finds three finite
+  one-ULP binary64 discrepancies at extreme inputs. Hardware FYL2X differs from
+  mathematically nearest binary80 in these cases. No empirical rounding rule
+  or per-input correction is substituted. The differences are retained in
+  `build/evidence/eddy-math-diagnostics.json`; `--strict` is a failing completion
+  gate until they are resolved. Exact full-goal identity is not established.
 - All 96 recovered scalar/frequency/grid/angle parser cases match i386 exactly,
   including the original negative-angle normalization behavior.
 - Both transformer windings match the unchanged i386 solver. Rejected meshes
@@ -88,9 +111,10 @@ Current measured evidence:
   retain a bounded heap. An independent gdstk reader validates 33 GDS exports.
 
 These are bounded tests, not universal parity claims. All listed exact
-comparisons are required CI gates. The source translator rejects unknown
+comparisons are required CI gates. The explicitly unresolved error-power
+measurement is uploaded separately and does not claim a passing identity check. The source translator rejects unknown
 assembly. Native Clang AST ranges expose implicit long-double-to-double stores
-in creator and layered-potential units; the build retains an expression/offset report. This preserves
+in creator, layered-potential, Green, quadrature and eddy units; the build retains an expression/offset report. This preserves
 original narrowing boundaries without changing vendor sources. Arithmetic and square root use Berkeley SoftFloat binary80;
 logarithms, trig and exponent fractions use binary128 guard evaluation with
 native x87 constants, followed by the original binary80 stores. This avoids
@@ -126,7 +150,7 @@ and native fault cases are rejected before matrix indexing. There is no
 persistent browser table cache yet; fine grids can take tens of seconds. The
 original nonsquare indexing is preserved with sufficient zero backing storage;
 original-executable parity is currently measured on square FFT grids only.
-Eddy effects and combined network/port metrics remain outstanding.
+Combined network/port metrics remain outstanding.
 
 The worker protocol is tested with actual WASM startup, original wire matrices,
 streamed frequency samples, cancellation and error recovery. Scientific export
@@ -136,12 +160,32 @@ remains outstanding because no browser was available in this session.
 `simulate(winding, frequency_hz, length_cell, width_cell, thickness_cell,
 subdivision_trigger, filament_limit)` exports the complete impedance matrix,
 L/R/X and conductor series Q. Mesh dimensions are micrometres; the subdivision
-trigger retains the original CCELL interaction. The original no-eddy driver is
-compiled without its unused full-eddy entry so the compiler can eliminate that
-unbound branch; no electromagnetic formula is replaced. Counts are produced by
-the original routines. A configurable 1–1024 filament budget rejects oversized
+trigger retains the original CCELL interaction. The complete original solver
+is compiled, and the legacy API retains its original no-eddy entry. Counts are
+produced by the original routines. A configurable 1–1024 filament budget rejects oversized
 requests without silently coarsening the mesh. The original source geometry is
 preserved, and via cut counts are retained.
+
+`simulate_eddy(winding, frequency_hz, length_cell, width_cell, thickness_cell,
+subdivision_trigger, filament_limit, mode, layer_count, first_layer, second_layer,
+evaluation_limit)` adds the original substrate calculation. Modes 0/1/2 mean
+disabled/native shape selection/segment folding. The first two repeated `.tek`
+EDDY entries select substrate layers; a single entry `EDDY=0` selects layer zero.
+Original packed square stamping, reflection/oscillating kernels, layer sorting,
+and longitudinal corrections are retained, including native quirks. Up to ten
+million Green evaluations are allowed by the C++ API; the UI defaults to 250,000.
+Budget exhaustion returns an error and discards partial matrices. Native finite
+partial integration results remain visible with their QUADPACK diagnostics;
+nonfinite matrices return errors. Per-solve state is released on success or
+failure. Matrix/sweep CSVs retain model, layers, evaluation counts and diagnostic
+counts. Worker and scalar-probe checks cover recovery, immutable geometry and
+bounded repeated allocations.
+
+The portable glibc callbacks preserve the numerical C sources unchanged and adapt
+runtime headers only. They do not expose errno or floating exception flags.
+LGPL notices and licenses are available under `dist/licenses/glibc-math`; source
+hashes and rebuild/relink scripts are in `vendor/glibc-math` and
+`tools/port_libm.py`. No native libm binary is shipped to the browser.
 
 Regenerate the independent original executable fixtures with:
 
@@ -149,12 +193,14 @@ Regenerate the independent original executable fixtures with:
 python3 tools/capture_lmat.py --reference ~/github/asitic-re
 python3 tools/capture_creators.py --reference ~/github/asitic-re
 python3 tools/capture_capacitance.py --reference ~/github/asitic-re
+python3 tools/capture_eddy.py --reference ~/github/asitic-re
 ```
 
 These test-only commands require the original executable's legacy runtime DSOs;
 `--library-path` selects them. The executable hash is pinned. Raw paired logs, BSAVE files, CAP cache files and
 matrices are retained under `build/original-lmat`, `build/original-creators` and
-`build/original-capacitance`.
+`build/original-capacitance`; eddy logs and matrices are under
+`build/original-eddy` with the original executable and libm hashes pinned.
 
 Creator input is bounded to native fixed buffers, 64 turns, 256 sides/via rows
 or columns, and a 32 MiB creation allocation budget. Invalid commands recover
@@ -163,8 +209,9 @@ valid descriptor values are passed unchanged to the original builders. Native
 unwritten parser/history and mesh words use explicit zero initial state, rather
 than claiming process-independent parity for uninitialized bytes.
 
-Next required work includes broader original-executable creator/input coverage, original eddy and
-combined circuit/network solvers, coupled-winding and multiport metrics, and original-executable end-to-end
+Next required work includes resolving the measured hardware rounding differences,
+broader original-executable creator/input coverage, combined circuit/network
+solvers, coupled-winding and multiport metrics, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.
 

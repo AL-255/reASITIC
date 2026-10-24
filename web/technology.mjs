@@ -1,13 +1,14 @@
 export function parseTechnology(text) {
-  const blocks={chip:[],layer:[],metal:[],via:[]};let current;
+  const blocks={chip:[],layer:[],metal:[],via:[]},eddyLayers=[],warnings=[];let current,currentKind;
   for(const raw of text.split(/\r?\n/)) {
     const line=raw.split(';')[0].trim();if(!line)continue;
     const section=line.match(/^<(chip|layer|metal|via)>\s*(\d+)?$/i);
-    if(section){const kind=section[1].toLowerCase();if(section[2]!==undefined && +section[2]!==blocks[kind].length)throw Error('Technology indices must be consecutive');current={};blocks[kind].push(current);continue;}
+    if(section){const kind=section[1].toLowerCase();if(section[2]!==undefined && +section[2]!==blocks[kind].length)throw Error('Technology indices must be consecutive');current={};currentKind=kind;blocks[kind].push(current);continue;}
     const split=line.indexOf('=');if(!current || split<0)throw Error('Invalid technology line: '+line);
     const key=line.slice(0,split).trim().toLowerCase(),value=line.slice(split+1).trim();
     current[key]=['name','color','techfile','techpath'].includes(key)?value:Number(value);
     if(typeof current[key]==='number' && !Number.isFinite(current[key]))throw Error('Invalid technology number');
+    if(currentKind==='chip' && key==='eddy'){if(!Number.isInteger(current[key]) || current[key]<0)throw Error('Invalid eddy layer index');if(eddyLayers.length<2)eddyLayers.push(current[key]);else warnings.push('Only the first two EDDY layer entries are used, as in native ASITIC.');}
   }
   if(!blocks.layer.length || blocks.layer.length>32 || blocks.layer.some(layer=>!Number.isFinite(layer.t) || layer.t<=0))throw Error('Technology needs 1–32 layers with positive thickness');
   if(!blocks.metal.length || blocks.metal.length>32 || blocks.via.length>32)throw Error('Technology needs 1–32 metals and at most 32 vias');
@@ -24,7 +25,8 @@ export function parseTechnology(text) {
   if(!(domain.x>0 && domain.y>0 && Number.isInteger(domain.cells_x) && Number.isInteger(domain.cells_y) && domain.cells_x>0 && domain.cells_y>0))throw Error('Invalid chip dimensions or FFT cells');
   const dielectric=blocks.layer.map(layer=>({permittivity:layer.eps??11.7,resistivity:layer.rho}));
   if(dielectric.some(layer=>!(layer.permittivity>0 && layer.resistivity>0)))throw Error('Layer permittivity and resistivity must be positive');
-  return {metals,vias,domain,dielectric,substrate:blocks.layer.map(layer=>layer.t),source:text};
+  if(eddyLayers.some(i=>i>=blocks.layer.length))throw Error('Eddy layer index is outside the substrate stack');
+  return {metals,vias,domain,dielectric,eddy_layers:eddyLayers,warnings,substrate:blocks.layer.map(layer=>layer.t),source:text};
 }
 export function configureKernel(kernel,technology) {
   kernel._reset_technology();

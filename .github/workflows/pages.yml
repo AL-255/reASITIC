@@ -44,6 +44,10 @@ jobs:
           node tests/capacitance-data.mjs
           node tests/capacitance-grids.mjs
           node tests/worker-capacitance.mjs
+          node tests/eddy.mjs
+          node tests/eddy-runtime.mjs
+          node tests/eddy-lifecycle.mjs
+          node tests/worker-eddy.mjs
           node tests/lmat.mjs
           node tests/original-lmat.mjs
           node tests/lmat-lifecycle.mjs
@@ -53,6 +57,8 @@ jobs:
           node tests/simulation-data.mjs
           node tests/retained-math.mjs
           python tests/gds_reader.py
+      - name: Record unresolved hardware error-power rounding differences
+        run: node tests/eddy-math-diagnostics.mjs
       - name: Retain fidelity evidence, including known x87 differences
         if: always()
         uses: actions/upload-artifact@v4

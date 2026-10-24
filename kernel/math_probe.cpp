@@ -1,3 +1,4 @@
+#include "asitic/quadrature.hpp"
 // Test boundary for comparing software results with actual x87 instructions.
 #ifdef __EMSCRIPTEN__
 #include "x87_port.hpp"
@@ -23,7 +24,17 @@ extern "C" const char* probe_math(int operation,double a,double b,double c) {
         if(c==3)input=Real(a)*b;
     }
     Real value;
-    switch(operation) {
+    if(operation>=10 && operation<=15) {
+        Real logarithm;const Real delta=input-Real(1);
+#ifdef __EMSCRIPTEN__
+        logarithm=x87::abs(delta)<=Real(0x1.28f5c28f5c28fp-2L)?x87::log2p1(delta):x87::log2(input);
+#else
+        if(x87::abs(delta)<=Real(0x1.28f5c28f5c28fp-2L))asm("fld1; fxch; fyl2xp1":"=t"(logarithm):"0"(delta):"st(1)");
+        else asm("fld1; fxch; fyl2x":"=t"(logarithm):"0"(input):"st(1)");
+#endif
+        const Real exponent=logarithm*Real(1.5),integer=x87::round(exponent),fraction=exponent-integer,part=x87::pow2m1(fraction);
+        value=operation==10?logarithm:operation==11?exponent:operation==12?fraction:operation==13?part:operation==14?part+1:x87::scale(part+1,integer);
+    } else switch(operation) {
         case 0:value=x87::sqrt(input);break;
         case 1:value=x87::log(input);break;
         case 2:value=x87::log1p(input);break;
@@ -33,6 +44,7 @@ extern "C" const char* probe_math(int operation,double a,double b,double c) {
         case 6:value=x87::exp(input);break;
         case 7:value=x87::pow2m1(input);break;
         case 8:value=input;break;
+        case 9:value=asitic::quadpack::error_power(x87::binary64(input));break;
         default:return "{\"error\":\"Unknown math probe\"}";
     }
     unsigned words[3]{};

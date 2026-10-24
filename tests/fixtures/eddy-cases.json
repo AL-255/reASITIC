@@ -1,0 +1,211 @@
+{
+  "cases": [
+    {
+      "name": "wire-reflection",
+      "id": 2,
+      "keywords": "NAME=A:LEN=40:WID=5:METAL=M1:XORG=10:YORG=20",
+      "layers": [
+        0
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "wire-two-layer",
+      "id": 2,
+      "keywords": "NAME=A:LEN=40:WID=5:METAL=M1:XORG=10:YORG=20",
+      "layers": [
+        0,
+        1
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "wire-cross-section",
+      "id": 2,
+      "keywords": "NAME=A:LEN=40:WID=5:METAL=M1:XORG=10:YORG=20",
+      "layers": [
+        0,
+        1
+      ],
+      "frequency_ghz": 2,
+      "cells": [
+        1000,
+        2,
+        0.25,
+        1000
+      ]
+    },
+    {
+      "name": "wire-subdivision",
+      "id": 2,
+      "keywords": "NAME=A:LEN=40:WID=5:METAL=M1:XORG=10:YORG=20",
+      "layers": [
+        0,
+        1
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        10,
+        1000,
+        1000,
+        10
+      ]
+    },
+    {
+      "name": "square-reflection",
+      "id": 0,
+      "keywords": "NAME=A:LEN=80:WID=70:W=3:S=2:N=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100",
+      "layers": [
+        0
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "square-two-layer",
+      "id": 0,
+      "keywords": "NAME=A:LEN=80:WID=70:W=3:S=2:N=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100",
+      "layers": [
+        0,
+        1
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "square-refined",
+      "id": 0,
+      "keywords": "NAME=A:LEN=80:WID=70:W=3:S=2:N=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100",
+      "layers": [
+        0,
+        1
+      ],
+      "frequency_ghz": 2,
+      "cells": [
+        20,
+        2,
+        0.5,
+        50
+      ]
+    },
+    {
+      "name": "polygon-two-layer",
+      "id": 1,
+      "keywords": "NAME=A:RAD=50:SIDES=6:W=3:S=2:N=1.5:METAL=M4:XORG=100:YORG=100",
+      "layers": [
+        0,
+        1
+      ],
+      "frequency_ghz": 2,
+      "cells": [
+        1000,
+        1000,
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "symmetric-with-vias",
+      "id": 16,
+      "keywords": "NAME=A:LEN=100:ILEN=15:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100",
+      "layers": [
+        0,
+        1
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "ring-two-layer",
+      "id": 22,
+      "keywords": "NAME=A:RAD=40:W=3:GAP=20:SIDES=16:METAL=M4:XORG=100:YORG=100",
+      "layers": [
+        0,
+        1
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "transformer-secondary",
+      "id": 3,
+      "keywords": "PNAME=P:SNAME=S:LEN=100:WID=90:W=3:S=2:NP=1.5:NS=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100",
+      "winding_name": "S",
+      "layers": [
+        0,
+        1
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "rotated-negative-phase",
+      "id": 2,
+      "keywords": "NAME=A:LEN=40:WID=5:METAL=M3:XORG=100:YORG=100:ORIENT=-37:PHASE=-1",
+      "layers": [
+        0,
+        1
+      ],
+      "frequency_ghz": 0.1,
+      "cells": [
+        20,
+        1000,
+        1000,
+        20
+      ]
+    },
+    {
+      "name": "rotated-short-segments",
+      "id": 2,
+      "keywords": "NAME=A:LEN=40:WID=5:METAL=M3:XORG=100:YORG=100:ORIENT=-37:PHASE=-1",
+      "layers": [
+        0,
+        1
+      ],
+      "frequency_ghz": 0.1,
+      "cells": [
+        10,
+        1000,
+        1000,
+        20
+      ]
+    }
+  ]
+}

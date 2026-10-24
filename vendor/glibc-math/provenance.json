@@ -1,0 +1,43 @@
+{
+  "upstream": "https://sourceware.org/git/glibc.git",
+  "mirror": "https://github.com/bminor/glibc",
+  "ref": "glibc-2.36",
+  "files": {
+    "s_sin.c": {
+      "sha256": "9aa66cb2c44f976d41c3b14e6daa9708066a6d341fca6d1842b959e4f127905f",
+      "upstream_path": "sysdeps/ieee754/dbl-64/s_sin.c"
+    },
+    "sincostab.c": {
+      "sha256": "1da08546d74c8efd2524c39bd57d26d81fcb7c8f8a920b61ad116fa41bfde218",
+      "upstream_path": "sysdeps/ieee754/dbl-64/sincostab.c"
+    },
+    "usncs.h": {
+      "sha256": "c78fb520931e863618a60dc28206d5393f884ede9cbaffa3758b8dbc11553ee3",
+      "upstream_path": "sysdeps/ieee754/dbl-64/usncs.h"
+    },
+    "mydefs.h": {
+      "sha256": "41a661cdcb78709a3f3ca149b7a66ddccec62fffd4131ca727a959207e9c8891",
+      "upstream_path": "sysdeps/ieee754/dbl-64/mydefs.h"
+    },
+    "branred.c": {
+      "sha256": "9d6ffd558a1155a5a42917ae0398c00a80482fbcbc752005fdb79761bf09cacc",
+      "upstream_path": "sysdeps/ieee754/dbl-64/branred.c"
+    },
+    "branred.h": {
+      "sha256": "aecb3c4102bbe2d41b31f77dfd7ffbb6f7af41e5747964d7018ffc4d27a23975",
+      "upstream_path": "sysdeps/ieee754/dbl-64/branred.h"
+    },
+    "COPYING.LIB": {
+      "sha256": "dc626520dcd53a22f727af3ee42c770e56c97a64fe3adb063799d8ab032fe551",
+      "upstream_path": "COPYING.LIB"
+    },
+    "COPYING": {
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "upstream_path": "COPYING"
+    },
+    "dla.h": {
+      "sha256": "59719bac1e77b95cbc64dc6f9999d8d79b31d2b45018eb1f0c6638600587c33d",
+      "upstream_path": "sysdeps/ieee754/dbl-64/dla.h"
+    }
+  }
+}

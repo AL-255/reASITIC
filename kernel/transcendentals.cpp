@@ -73,6 +73,12 @@ SoftReal log(SoftReal input) {
     if((input.value.signExp&0x7fff)==0x7fff)return input;
     return retain(f128_mul(native_ln2(),logarithm2(input)));
 }
+SoftReal log2p1(SoftReal input) {
+    // FYL2XP1 with multiplier one, retaining the same guard series used by
+    // the existing log1p instruction implementation without an LN2 product.
+    const Q x=wide(input),z=f128_div(x,f128_add(integer(2),x));
+    return retain(f128_div(odd_series(z),ln2));
+}
 SoftReal log2(SoftReal input) {
     if(is_nan(input))return input;
     if(!input.value.signif)return R(extF80_div(R(-1).value,R(0).value));

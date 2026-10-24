@@ -8,6 +8,7 @@ SoftReal atan2(SoftReal,SoftReal);
 SoftReal log(SoftReal);
 SoftReal log1p(SoftReal);
 SoftReal log2(SoftReal);
+SoftReal log2p1(SoftReal);
 SoftReal pow2m1(SoftReal);
 SoftReal tan(SoftReal);
 inline SoftReal load_float_word(unsigned word) { float value;__builtin_memcpy(&value,&word,4);return SoftReal(value); }

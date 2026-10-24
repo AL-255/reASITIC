@@ -9,7 +9,13 @@ function solve(data,hz) {
   const mesh=data.mesh??{};
   const cells=[mesh.length??50,mesh.width??1.5,mesh.thickness??.5,mesh.subdivision_trigger??mesh.length??50];
   const parsed=data.nativeInput?cells.map(value=>kernel._normalize_value(Number(value),7,data.grid??.1,data.snap===false?0:1)):cells;
-  const result=JSON.parse(kernel.UTF8ToString(kernel._simulate(data.winding??0,hz,...parsed,data.filament_limit??256)));
+  let pointer;
+  if(data.eddy){
+    const e=data.eddy,layers=e.layers??processTechnology?.eddy_layers??[];
+    if(!Array.isArray(layers) || layers.length>2 || layers.some(i=>!Number.isInteger(i) || i<0))throw Error('Select up to two substrate layers.');
+    pointer=kernel._simulate_eddy(data.winding??0,hz,...parsed,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000);
+  }else pointer=kernel._simulate(data.winding??0,hz,...parsed,data.filament_limit??256);
+  const result=JSON.parse(kernel.UTF8ToString(pointer));
   if(result.error)throw Error(result.error);return result;
 }
 self.onmessage=async({data})=>{
