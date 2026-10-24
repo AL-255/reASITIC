@@ -216,8 +216,39 @@ jobs:
         with:
           name: numerical-budget-${{ matrix.model }}
           path: build/evidence
+  analysis-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: '6.0.6'
+          actions-cache-folder: emsdk-cache
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python tools/build.py
+      - name: Verify strict original-simulator accuracy policy
+        run: node tests/analysis-accuracy-policy.mjs
+      - name: Compare 50 production WASM cases with the frozen original blob
+        run: node tests/analysis-200.mjs --shard ${{ matrix.shard }} --shards 4
+      - name: Retain every original-versus-recompiled metric
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: analysis-200-${{ matrix.shard }}
+          path: build/evidence/analysis-200-*.json
+          if-no-files-found: error
   deploy:
-    needs: [build, numerical-budget-audit]
+    needs: [build, numerical-budget-audit, analysis-regression]
     runs-on: ubuntu-latest
     permissions:
       contents: read

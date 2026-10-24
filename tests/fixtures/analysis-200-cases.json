@@ -1,0 +1,4806 @@
+{
+  "schema": 1,
+  "description": "20 coil/process configurations x 10 frequencies; conductor estimates, LMAT and direct PI2; fixed input corpus, not filtered by recomp results",
+  "cases": [
+    {
+      "id": "cmos-starting-square-0.25ghz",
+      "technology": "CMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-starting-square-1ghz",
+      "technology": "CMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-starting-square-2ghz",
+      "technology": "CMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-starting-square-3ghz",
+      "technology": "CMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-starting-square-5ghz",
+      "technology": "CMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-starting-square-7.5ghz",
+      "technology": "CMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-starting-square-10ghz",
+      "technology": "CMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-starting-square-15ghz",
+      "technology": "CMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-starting-square-20ghz",
+      "technology": "CMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-starting-square-40ghz",
+      "technology": "CMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-wide-square-0.25ghz",
+      "technology": "CMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-wide-square-1ghz",
+      "technology": "CMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-wide-square-2ghz",
+      "technology": "CMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-wide-square-3ghz",
+      "technology": "CMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-wide-square-5ghz",
+      "technology": "CMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-wide-square-7.5ghz",
+      "technology": "CMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-wide-square-10ghz",
+      "technology": "CMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-wide-square-15ghz",
+      "technology": "CMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-wide-square-20ghz",
+      "technology": "CMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-wide-square-40ghz",
+      "technology": "CMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-polygon-0.25ghz",
+      "technology": "CMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-polygon-1ghz",
+      "technology": "CMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-polygon-2ghz",
+      "technology": "CMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-polygon-3ghz",
+      "technology": "CMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-polygon-5ghz",
+      "technology": "CMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-polygon-7.5ghz",
+      "technology": "CMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-polygon-10ghz",
+      "technology": "CMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-polygon-15ghz",
+      "technology": "CMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-polygon-20ghz",
+      "technology": "CMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-polygon-40ghz",
+      "technology": "CMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-square-0.25ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-square-1ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-square-2ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-square-3ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-square-5ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-square-7.5ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-square-10ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-square-15ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-square-20ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-square-40ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-polygon-0.25ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-polygon-1ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-polygon-2ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-polygon-3ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-polygon-5ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-polygon-7.5ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-polygon-10ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-polygon-15ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-polygon-20ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-symmetric-polygon-40ghz",
+      "technology": "CMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M5:METAL2=M4:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-rotated-wire-0.25ghz",
+      "technology": "CMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=M1:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-rotated-wire-1ghz",
+      "technology": "CMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=M1:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-rotated-wire-2ghz",
+      "technology": "CMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=M1:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-rotated-wire-3ghz",
+      "technology": "CMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=M1:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-rotated-wire-5ghz",
+      "technology": "CMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=M1:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-rotated-wire-7.5ghz",
+      "technology": "CMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=M1:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-rotated-wire-10ghz",
+      "technology": "CMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=M1:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-rotated-wire-15ghz",
+      "technology": "CMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=M1:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-rotated-wire-20ghz",
+      "technology": "CMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=M1:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-rotated-wire-40ghz",
+      "technology": "CMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=M1:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-ring-0.25ghz",
+      "technology": "CMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-ring-1ghz",
+      "technology": "CMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-ring-2ghz",
+      "technology": "CMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-ring-3ghz",
+      "technology": "CMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-ring-5ghz",
+      "technology": "CMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-ring-7.5ghz",
+      "technology": "CMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-ring-10ghz",
+      "technology": "CMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-ring-15ghz",
+      "technology": "CMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-ring-20ghz",
+      "technology": "CMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-ring-40ghz",
+      "technology": "CMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M5:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-multi-metal-square-0.25ghz",
+      "technology": "CMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-multi-metal-square-1ghz",
+      "technology": "CMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-multi-metal-square-2ghz",
+      "technology": "CMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-multi-metal-square-3ghz",
+      "technology": "CMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-multi-metal-square-5ghz",
+      "technology": "CMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-multi-metal-square-7.5ghz",
+      "technology": "CMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-multi-metal-square-10ghz",
+      "technology": "CMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-multi-metal-square-15ghz",
+      "technology": "CMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-multi-metal-square-20ghz",
+      "technology": "CMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-multi-metal-square-40ghz",
+      "technology": "CMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-planar-transformer-0.25ghz",
+      "technology": "CMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-planar-transformer-1ghz",
+      "technology": "CMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-planar-transformer-2ghz",
+      "technology": "CMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-planar-transformer-3ghz",
+      "technology": "CMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-planar-transformer-5ghz",
+      "technology": "CMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-planar-transformer-7.5ghz",
+      "technology": "CMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-planar-transformer-10ghz",
+      "technology": "CMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-planar-transformer-15ghz",
+      "technology": "CMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-planar-transformer-20ghz",
+      "technology": "CMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-planar-transformer-40ghz",
+      "technology": "CMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M5:EXIT=M4:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-balun-0.25ghz",
+      "technology": "CMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-balun-1ghz",
+      "technology": "CMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-balun-2ghz",
+      "technology": "CMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-balun-3ghz",
+      "technology": "CMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-balun-5ghz",
+      "technology": "CMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-balun-7.5ghz",
+      "technology": "CMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-balun-10ghz",
+      "technology": "CMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-balun-15ghz",
+      "technology": "CMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-balun-20ghz",
+      "technology": "CMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "cmos-balun-40ghz",
+      "technology": "CMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M5:METAL2=M4:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-starting-square-0.25ghz",
+      "technology": "BiCMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M3:EXIT=M2:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-starting-square-1ghz",
+      "technology": "BiCMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M3:EXIT=M2:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-starting-square-2ghz",
+      "technology": "BiCMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M3:EXIT=M2:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-starting-square-3ghz",
+      "technology": "BiCMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M3:EXIT=M2:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-starting-square-5ghz",
+      "technology": "BiCMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M3:EXIT=M2:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-starting-square-7.5ghz",
+      "technology": "BiCMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M3:EXIT=M2:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-starting-square-10ghz",
+      "technology": "BiCMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M3:EXIT=M2:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-starting-square-15ghz",
+      "technology": "BiCMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M3:EXIT=M2:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-starting-square-20ghz",
+      "technology": "BiCMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M3:EXIT=M2:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-starting-square-40ghz",
+      "technology": "BiCMOS",
+      "geometry": "starting-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M3:EXIT=M2:XORG=0:YORG=0",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        50,
+        1.5,
+        0.5
+      ],
+      "contact_mesh": [
+        50,
+        20
+      ],
+      "fft": [
+        256,
+        256
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-wide-square-0.25ghz",
+      "technology": "BiCMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-wide-square-1ghz",
+      "technology": "BiCMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-wide-square-2ghz",
+      "technology": "BiCMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-wide-square-3ghz",
+      "technology": "BiCMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-wide-square-5ghz",
+      "technology": "BiCMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-wide-square-7.5ghz",
+      "technology": "BiCMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-wide-square-10ghz",
+      "technology": "BiCMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-wide-square-15ghz",
+      "technology": "BiCMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-wide-square-20ghz",
+      "technology": "BiCMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-wide-square-40ghz",
+      "technology": "BiCMOS",
+      "geometry": "wide-square",
+      "creator_id": 0,
+      "command": "SQUARE NAME=A:LEN=220:WID=240:W=16:S=8:N=2:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-polygon-0.25ghz",
+      "technology": "BiCMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-polygon-1ghz",
+      "technology": "BiCMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-polygon-2ghz",
+      "technology": "BiCMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-polygon-3ghz",
+      "technology": "BiCMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-polygon-5ghz",
+      "technology": "BiCMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-polygon-7.5ghz",
+      "technology": "BiCMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-polygon-10ghz",
+      "technology": "BiCMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-polygon-15ghz",
+      "technology": "BiCMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-polygon-20ghz",
+      "technology": "BiCMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-polygon-40ghz",
+      "technology": "BiCMOS",
+      "geometry": "polygon",
+      "creator_id": 1,
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=8:W=16:S=8:N=1.5:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-square-0.25ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-square-1ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-square-2ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-square-3ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-square-5ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-square-7.5ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-square-10ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-square-15ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-square-20ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-square-40ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-square",
+      "creator_id": 16,
+      "command": "SYMSQ NAME=A:LEN=200:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-polygon-0.25ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-polygon-1ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-polygon-2ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-polygon-3ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-polygon-5ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-polygon-7.5ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-polygon-10ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-polygon-15ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-polygon-20ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-symmetric-polygon-40ghz",
+      "technology": "BiCMOS",
+      "geometry": "symmetric-polygon",
+      "creator_id": 17,
+      "command": "SYMPOLY NAME=A:RAD=110:SIDES=8:ILEN=32:W=16:S=8:N=2:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-rotated-wire-0.25ghz",
+      "technology": "BiCMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=MSUB:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-rotated-wire-1ghz",
+      "technology": "BiCMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=MSUB:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-rotated-wire-2ghz",
+      "technology": "BiCMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=MSUB:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-rotated-wire-3ghz",
+      "technology": "BiCMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=MSUB:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-rotated-wire-5ghz",
+      "technology": "BiCMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=MSUB:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-rotated-wire-7.5ghz",
+      "technology": "BiCMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=MSUB:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-rotated-wire-10ghz",
+      "technology": "BiCMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=MSUB:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-rotated-wire-15ghz",
+      "technology": "BiCMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=MSUB:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-rotated-wire-20ghz",
+      "technology": "BiCMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=MSUB:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-rotated-wire-40ghz",
+      "technology": "BiCMOS",
+      "geometry": "rotated-wire",
+      "creator_id": 2,
+      "command": "WIRE NAME=A:LEN=160:WID=32:METAL=MSUB:XORG=150:YORG=150:ORIENT=37:PHASE=-1",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        40,
+        8,
+        0.25
+      ],
+      "contact_mesh": [
+        40,
+        16
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-ring-0.25ghz",
+      "technology": "BiCMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-ring-1ghz",
+      "technology": "BiCMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-ring-2ghz",
+      "technology": "BiCMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-ring-3ghz",
+      "technology": "BiCMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-ring-5ghz",
+      "technology": "BiCMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-ring-7.5ghz",
+      "technology": "BiCMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-ring-10ghz",
+      "technology": "BiCMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-ring-15ghz",
+      "technology": "BiCMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-ring-20ghz",
+      "technology": "BiCMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-ring-40ghz",
+      "technology": "BiCMOS",
+      "geometry": "ring",
+      "creator_id": 22,
+      "command": "RING NAME=A:RAD=100:W=16:GAP=30:SIDES=16:METAL=M3:XORG=256:YORG=256",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-multi-metal-square-0.25ghz",
+      "technology": "BiCMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-multi-metal-square-1ghz",
+      "technology": "BiCMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-multi-metal-square-2ghz",
+      "technology": "BiCMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-multi-metal-square-3ghz",
+      "technology": "BiCMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-multi-metal-square-5ghz",
+      "technology": "BiCMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-multi-metal-square-7.5ghz",
+      "technology": "BiCMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-multi-metal-square-10ghz",
+      "technology": "BiCMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-multi-metal-square-15ghz",
+      "technology": "BiCMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-multi-metal-square-20ghz",
+      "technology": "BiCMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-multi-metal-square-40ghz",
+      "technology": "BiCMOS",
+      "geometry": "multi-metal-square",
+      "creator_id": 18,
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=16:S=8:N=1.5:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-planar-transformer-0.25ghz",
+      "technology": "BiCMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-planar-transformer-1ghz",
+      "technology": "BiCMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-planar-transformer-2ghz",
+      "technology": "BiCMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-planar-transformer-3ghz",
+      "technology": "BiCMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-planar-transformer-5ghz",
+      "technology": "BiCMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-planar-transformer-7.5ghz",
+      "technology": "BiCMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-planar-transformer-10ghz",
+      "technology": "BiCMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-planar-transformer-15ghz",
+      "technology": "BiCMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-planar-transformer-20ghz",
+      "technology": "BiCMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-planar-transformer-40ghz",
+      "technology": "BiCMOS",
+      "geometry": "planar-transformer",
+      "creator_id": 3,
+      "command": "TRANS PNAME=A:SNAME=B:LEN=220:WID=200:WP=16:WS=12:S=8:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100",
+      "winding": "A",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-balun-0.25ghz",
+      "technology": "BiCMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 0.25,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-balun-1ghz",
+      "technology": "BiCMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 1,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-balun-2ghz",
+      "technology": "BiCMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 2,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-balun-3ghz",
+      "technology": "BiCMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 3,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-balun-5ghz",
+      "technology": "BiCMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-balun-7.5ghz",
+      "technology": "BiCMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 7.5,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-balun-10ghz",
+      "technology": "BiCMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 10,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-balun-15ghz",
+      "technology": "BiCMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 15,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-balun-20ghz",
+      "technology": "BiCMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 20,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    },
+    {
+      "id": "bicmos-balun-40ghz",
+      "technology": "BiCMOS",
+      "geometry": "balun",
+      "creator_id": 5,
+      "command": "BALUN NAME=A:LEN=220:W1=16:W2=12:S=8:N=3:METAL=M3:METAL2=M2:XORG=100:YORG=100",
+      "winding": "A-P",
+      "frequency_ghz": 40,
+      "mesh": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_mesh": [
+        1000,
+        1000
+      ],
+      "fft": [
+        64,
+        64
+      ],
+      "eddy": false,
+      "maxnw": 500
+    }
+  ]
+}

@@ -10,6 +10,57 @@ The original models and reported results are checked against the executable.
 Production accuracy is checked independently of processor instruction rounding;
 the recovered instruction sequence remains available for historical audits.
 
+The frozen `tests/fixtures/original-analysis-200.json.gz` regression corpus holds
+200 original-simulator analysis cases: ten designs in both sample CMOS and BiCMOS
+processes, each at 0.25, 1, 2, 3, 5, 7.5, 10, 15, 20 and 40 GHz. Coverage includes
+the default CMOS coil, larger square, polygon, symmetric square/polygon, rotated
+wire, ring, multi-metal square, planar transformer and balun winding. These cases
+check 19 values each: five conductor estimates, four LMAT impedance/inductance/Q
+values, and ten direct PI2 model/port-Q/resonance values. Eddy currents are disabled
+in this corpus; existing dedicated eddy and other model suites remain separate.
+
+The reference comes from two fresh processes of the pinned original executable
+per case (400 runs), with identical repeated numeric results and stage-file hashes.
+Read-only GDB breakpoints observe binary64 reporting arguments before console
+rounding; LMAT aggregates come from the original 20-decimal matrix files. The blob
+includes those raw report words, console reports, normalized frequencies and stage
+hashes. Its SHA-256 manifest also pins the input definitions; the blob pins the
+capture script, original executable and technology files. No recompiled output
+is used to generate reference results.
+
+CI builds the production WASM kernel and compares all 3,800 metrics in four
+50-case jobs. Every finite nonzero reference requires
+`abs(actual-reference)/abs(reference) < 0.001` (strictly below 0.1%). A reference
+zero requires exact numeric zero; an undefined result requires matching `null`.
+There are no case exclusions, absolute-error floors, averaged pass criteria or
+CPU-specific tolerances. A missing result or failed solve fails its case.
+Deployment requires all four jobs to pass, and each job uploads every metric,
+relative error and failure as an artifact. CI never needs the original executable
+or GDB for this comparison.
+
+Run the comparison after building WASM with `python3 tools/build.py`:
+
+```sh
+node tests/analysis-accuracy-policy.mjs
+node tests/analysis-200.mjs
+# The same complete corpus split across four independent jobs:
+node tests/analysis-200.mjs --shard 0 --shards 4 # repeat for shards 1, 2, 3
+```
+
+To regenerate the reference using the original simulator and its legacy i386
+runtime, install GDB with Python support and run:
+
+```sh
+python3 tools/generate_analysis_200.py
+python3 tools/capture_analysis_200.py --reference ~/github/asitic-re
+# Add --library-path /path/to/legacy/DSOs if needed.
+```
+
+The recorder retains raw inputs, GDB observations, logs, caches and matrices below
+`build/original-analysis-200/capture-*`. Commit both the gzip blob and its manifest
+when intentionally updating the corpus. `--case ID` selects a single local
+comparison for investigation; CI rejects this option.
+
 No original executable is needed by the deployed application. The C++ sources are
 the math kernel. JavaScript handles the interface and GDSII serialization.
 

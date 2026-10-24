@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "case_count": 200,
+  "blob": "original-analysis-200.json.gz",
+  "blob_sha256": "762bfb4276ac6656c24d02cfaaabb27f70d655e6ee53678d3028932789e3b806",
+  "uncompressed_sha256": "74ddd3f08273b4f3432f8aa6dc527c7ee138aee8b3facd0ae7bdb6629f4d5377",
+  "definitions_sha256": "a1d67cba68df62d46b114f96ed83feac3ca01112284adb908a2a133956f1a33a",
+  "relative_error_limit": 0.001,
+  "comparison": "Every finite nonzero metric: abs(actual-reference)/abs(reference) < 0.001; reference zero: exact numeric zero; undefined reference: matching null; no case exclusions"
+}
