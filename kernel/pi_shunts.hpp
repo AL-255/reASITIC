@@ -5,6 +5,11 @@ namespace reasitic {
 // y11,y12,y21,y22, in the original struct order. Output is
 // s11,s12,s21,s22; each complex cell stores real,imaginary components.
 bool two_port_scattering(const double* admittance,double* scattering);
+// Original three-port conversions from a row-major impedance matrix.
+// Output swaps the first two ports, as ASITIC does. Scattering evaluates
+// (gZ-I)*(gZ+I)^-1; admittance evaluates Z^-1. Coefficients remain exact
+// through the 3x3 cofactors and determinant until IEEE binary64 division.
+bool three_port_conversion(const double* impedance,bool scattering,double* output);
 // Original 2PZIN port order: port 1 drives y22. Capacitor 1 shunts y22,
 // capacitor 2 shunts y11. Evaluate the loaded nodal equations with exact
 // dyadic coefficients and one IEEE binary64 division per result component.

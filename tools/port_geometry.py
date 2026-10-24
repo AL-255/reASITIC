@@ -157,6 +157,22 @@ using namespace asitic;
         old='runtime.construction.geometry.memory.arrays.get(static_cast<unsigned>(delta)*4u)'
         assert s.count(old)==1
         return s.replace(old,'runtime.construction.geometry.memory.arrays.get((static_cast<unsigned>(delta)+1u)*sizeof(GeometryShape*))')
+    if name=='three_port_transforms':
+        s=(ROOT/'vendor/asitic/src/three_port_transforms.cpp').read_text()
+        for kind in ['admittance','scattering']:
+            signature='void convert_three_port_'+kind+'('
+            begin=s.index('{',s.index(signature))+1
+            guard="""
+#ifdef __EMSCRIPTEN__
+    if(!reasitic::reference_numerics()){
+        double values[18],converted[18];__builtin_memcpy(values,&input,sizeof(values));
+        if(!reasitic::three_port_conversion(values,SCATTERING,converted))for(int i=0;i<18;++i)converted[i]=__builtin_nan("");
+        static_assert(sizeof(output)==sizeof(converted));__builtin_memcpy(&output,converted,sizeof(output));return;
+    }
+#endif
+""".replace('SCATTERING','true' if kind=='scattering' else 'false')
+            s=s[:begin]+guard+s[begin:]
+        return '#include "pi_shunts.hpp"\n#include "numerical_policy.hpp"\n'+s
     if name=='two_port_output':
         s=(ROOT/'vendor/asitic/src/two_port_output.cpp').read_text()
         signature='TwoPortScattering convert_two_port_scattering(const TwoPortAdmittance& y) {'

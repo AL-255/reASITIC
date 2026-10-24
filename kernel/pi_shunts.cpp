@@ -88,6 +88,36 @@ bool solve(Values& a,Values& rhs,Complex* solution,int m,int columns=1){
 
 }
 namespace reasitic {
+bool three_port_conversion(const double* impedance,bool scattering,double* output){
+    if(!impedance||!output)return false;
+    for(int i=0;i<18;++i)if(!__builtin_isfinite(impedance[i]))return false;
+    Context c;Values a(c,9),adjugate(c,9);if(!a.data||!adjugate.data)return false;
+    const double unity[]={1,0},reference[]={0x1.47ae147ae147bp-6,0},twice[]={2,0};
+    const Complex one(c,unity),g(c,reference),two(c,twice);
+    for(int i=0;i<3;++i)for(int j=0;j<3;++j){
+        const Complex z(c,impedance+2*(3*i+j));a[3*i+j]=scattering?exact_product(z,g):z;
+        if(scattering&&i==j)a[3*i+j]=exact_sum(a[3*i+j],one);
+    }
+    for(int i=0;i<3;++i)for(int j=0;j<3;++j){
+        int rows[2],columns[2],r=0,s=0;for(int k=0;k<3;++k){if(k!=j)rows[r++]=k;if(k!=i)columns[s++]=k;}
+        auto cofactor=exact_sum(exact_product(a[3*rows[0]+columns[0]],a[3*rows[1]+columns[1]]),exact_product(a[3*rows[0]+columns[1]],a[3*rows[1]+columns[0]]),true);
+        adjugate[3*i+j]=(i+j)%2?negate(cofactor):cofactor;
+    }
+    Complex determinant(c);for(int j=0;j<3;++j)determinant=exact_sum(determinant,exact_product(a[j],adjugate[3*j]));
+    if(c.status&BF_ST_MEM_ERROR)return false;
+    const int order[]={1,0,2};
+    for(int i=0;i<3;++i)for(int j=0;j<3;++j){
+        auto numerator=adjugate[3*order[i]+order[j]];
+        if(scattering){
+            // (A-2I)*A^-1 = I-2*A^-1. Keep this subtraction in the
+            // numerator, before division, so a small reflected component
+            // is not lost by subtracting rounded inverse entries from I.
+            numerator=exact_sum(i==j?determinant:Complex(c),exact_product(two,numerator),true);
+        }
+        if(!binary64_quotient(numerator,determinant,output+2*(3*i+j)))return false;
+    }
+    return true;
+}
 bool two_port_scattering(const double* admittance,double* scattering){
     if(!admittance||!scattering)return false;
     for(int i=0;i<8;++i)if(!__builtin_isfinite(admittance[i]))return false;
@@ -352,4 +382,11 @@ extern "C" const char* probe_scattering(const double* admittance){
     if(!reasitic::two_port_scattering(admittance,values))return "{\"error\":\"Use a finite 2x2 admittance\"}";
     char* out=output;out+=sprintf(out,"{\"scattering_matrix\":[");
     for(int i=0;i<2;++i){out+=sprintf(out,"%s[",i?",":"");for(int j=0;j<2;++j){out+=sprintf(out,"%s[",j?",":"");for(int k=0;k<2;++k){const double value=values[4*i+2*j+k];if(k)out+=sprintf(out,",");out+=__builtin_isfinite(value)?sprintf(out,"%.17g",value):sprintf(out,"null");}out+=sprintf(out,"]");}out+=sprintf(out,"]");}sprintf(out,"]}");return output;
+}
+
+extern "C" const char* probe_three_conversion(const double* impedance,int scattering){
+    static char output[2048];double values[18];
+    if((scattering!=0&&scattering!=1)||!reasitic::three_port_conversion(impedance,scattering!=0,values))return "{\"error\":\"Use a finite 3x3 impedance and conversion mode 0 or 1\"}";
+    char* out=output;out+=sprintf(out,"{\"matrix\":[");
+    for(int i=0;i<3;++i){out+=sprintf(out,"%s[",i?",":"");for(int j=0;j<3;++j){out+=sprintf(out,"%s[",j?",":"");for(int k=0;k<2;++k){const double value=values[2*(3*i+j)+k];if(k)out+=sprintf(out,",");out+=__builtin_isfinite(value)?sprintf(out,"%.17g",value):sprintf(out,"null");}out+=sprintf(out,"]");}out+=sprintf(out,"]");}sprintf(out,"]}");return output;
 }

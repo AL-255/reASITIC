@@ -27,6 +27,12 @@ for(const item of cases){
   const native=JSON.parse(execFileSync('build/native-geometry',['--three',...v.creators.flatMap(c=>[c.id,c.keywords]),v.ground,hz,...cells,...v.grid,v.eddy_mode,v.layers.length,v.layers[0]??0,v.layers[1]??0,250000].map(String),{encoding:'utf8',maxBuffer:16*1024*1024}));assert.ok(!native.error,native.error);assert.equal(native.node_count,n);
   const scale=Math.max(...reference.impedance_matrix.flat(2).map(Math.abs));let error=0;
   actual.impedance_matrix.flat(2).forEach((value,i)=>{const expected=reference.impedance_matrix.flat(2)[i];close(value,expected,scale,item.name+' independent nodal impedance '+i);close(value,native.impedance_matrix.flat(2)[i],scale,item.name+' native/WASM '+i);error=Math.max(error,Math.abs(value-expected));});
+  const conversionErrors={};
+  for(const key of ['admittance_matrix','scattering_matrix']){
+    const expected=reference.conversion[key].flat(2),converted=actual[key].flat(2),magnitude=Math.max(...expected.map(Math.abs));let maximum=0;
+    converted.forEach((value,i)=>{assert.ok(Number.isFinite(value),item.name+' '+key+' finite');maximum=Math.max(maximum,Math.abs(value-expected[i]));});
+    assert.ok(maximum<=magnitude*1e-14,item.name+' independent '+key+' conversion');conversionErrors[key]=maximum/magnitude;
+  }
   for(const [key,expected]of Object.entries(reference.model)){
     const magnitude=Math.max(...expected.filter(v=>v!==null).map(Math.abs),1e-300);
     actual.model[key].forEach((value,i)=>{if(expected[i]===null)assert.equal(value,null);else close(value,expected[i],magnitude,item.name+' model '+key+' '+i);});
@@ -37,7 +43,7 @@ for(const item of cases){
   try{assert.deepEqual(solve(),actual,item.name+' depends on neighboring allocations');}finally{junk.forEach(p=>kernel._free(p));}
   kernel._set_reference_numerics(1);assert.match(solve().error,/backing/,'Historical overread still requires its actual process-state input');kernel._set_reference_numerics(0);assert.deepEqual(solve(),actual,'Historical policy contaminated production');
   const after=createGeometry(kernel,2,'NAME=VERIFY:LEN=20:WID=4:METAL=M2:XORG=450:YORG=450','',{append:true});assert.deepEqual(after.shapes.slice(1),before.shapes,item.name+' mutated source geometry');
-  reports.push({name:item.name,nodes:n,maximumAbsoluteImpedanceError:error,referenceDigits:reference.decimal_digits});
+  reports.push({name:item.name,nodes:n,conversionErrors,maximumAbsoluteImpedanceError:error,referenceDigits:reference.decimal_digits});
 }
-mkdirSync('build/evidence',{recursive:true});writeFileSync('build/evidence/portable-three-port.json',JSON.stringify({cases:reports.length,reference:'80-decimal-digit independent Schur-complement solve; no native process backing',relativeTolerance:1e-10,sourceImmutable:true,allocationIndependent:true,reports},null,2)+'\n');
-console.log(`Portable three-port: ${reports.length} separate-reference cases agree with an independent 80-digit nodal reduction and native C++, with matrix dimensions, allocation independence, policy recovery and immutable geometry verified`);
+mkdirSync('build/evidence',{recursive:true});writeFileSync('build/evidence/portable-three-port.json',JSON.stringify({cases:reports.length,reference:'80-decimal-digit independent Schur-complement solve; no native process backing',relativeTolerance:1e-10,conversionRelativeTolerance:1e-14,sourceImmutable:true,allocationIndependent:true,reports},null,2)+'\n');
+console.log(`Portable three-port: ${reports.length} separate-reference cases agree with an independent 80-digit nodal reduction and native C++, with S/Y conversions, matrix dimensions, allocation independence, policy recovery and immutable geometry verified`);

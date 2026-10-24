@@ -19,6 +19,7 @@ extern "C" const char* probe_math(int,double,double,double);
 extern "C" const char* solver_limits();
 extern "C" const char* probe_potential_contact(int,int);
 extern "C" const char* probe_two_port_output(const double*,const double*,int,double);
+extern "C" const char* probe_three_port_conversion(const double*,int);
 extern "C" double normalize_value(double,int,double,int);
 extern "C" int printf(const char*,...);
 extern "C" const char* probe_green(int,int,int,double,double,double,double,int);
@@ -48,6 +49,7 @@ extern "C" int set_max_width_cells(int);
 extern "C" const char* edit_geometry(const char*,double,double,double,int);
 extern "C" const char* self_resonance_plan(double,double,double,int,int,int,int,const double*,int);
 extern "C" int main(int argc,char** argv,char**) {
+    if(argc==4 && __builtin_strcmp(argv[1],"--three-conversion")==0){auto* file=fopen(argv[3],"rb");if(!file)return 2;double values[18];const bool read=fread(values,8,18,file)==18;fclose(file);if(!read)return 2;puts(probe_three_port_conversion(values,atoi(argv[2])));return 0;}
     if(argc==2 && __builtin_strcmp(argv[1],"--solver-limits")==0){puts(solver_limits());return 0;}
     if(argc==4 && __builtin_strcmp(argv[1],"--potential-contact")==0){puts(probe_potential_contact(atoi(argv[2]),atoi(argv[3])));return 0;}
     if(argc==6 && __builtin_strcmp(argv[1],"--fft-budget")==0){printf("%d\n",reasitic::potential_grid_fits(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),atoi(argv[5])!=0)?1:0);return 0;}

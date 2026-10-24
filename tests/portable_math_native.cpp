@@ -12,7 +12,18 @@ extern "C" const char* probe_folded_ports(const double*,const double*,int,const 
 extern "C" const char* probe_pi_impedance(const double*);
 extern "C" const char* loaded_port_impedance(const double*,double,double,int,double,double,double);
 extern "C" const char* probe_scattering(const double*);
+extern "C" const char* probe_three_conversion(const double*,int);
 int main(int argc,char** argv){
+    if(argc==4&&(!std::strcmp(argv[1],"--three-conversion")||!std::strcmp(argv[1],"--three-conversion-rounding"))){
+        const int mode=atoi(argv[2]);auto* file=fopen(argv[3],"rb");if(!file)return 2;double v[18];const bool read=fread(v,8,18,file)==18;fclose(file);if(!read)return 2;
+        if(!std::strcmp(argv[1],"--three-conversion")){puts(probe_three_conversion(v,mode));return 0;}
+        const int saved=fegetround(),modes[]={FE_TONEAREST,FE_DOWNWARD,FE_UPWARD,FE_TOWARDZERO};double baseline[18],actual[18];int index=0;bool identical=true;
+        for(int rounding:modes){
+            if(fesetround(rounding)||!reasitic::three_port_conversion(v,mode!=0,actual)){identical=false;break;}
+            if(index++==0)memcpy(baseline,actual,sizeof(actual));else if(memcmp(baseline,actual,sizeof(actual)))identical=false;
+        }
+        fesetround(saved);puts(identical?"{\"rounding_modes\":4,\"identical\":true}":"{\"error\":\"Host rounding mode changed three-port conversion\"}");return identical?0:1;
+    }
     if(argc==3&&(!std::strcmp(argv[1],"--scattering")||!std::strcmp(argv[1],"--scattering-rounding"))){
         auto* file=fopen(argv[2],"rb");if(!file)return 2;double v[8];const bool read=fread(v,8,8,file)==8;fclose(file);if(!read)return 2;
         if(!std::strcmp(argv[1],"--scattering")){puts(probe_scattering(v));return 0;}

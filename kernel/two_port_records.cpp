@@ -1,8 +1,11 @@
 #include "two_port_records.hpp"
 #include "asitic/port_output.hpp"
+#include "asitic/three_port_transforms.hpp"
 #include "json.hpp"
 extern "C" int sprintf(char*,const char*,...);
 extern "C" int vsnprintf(char*,unsigned,const char*,__builtin_va_list);
+extern "C" void* calloc(unsigned,unsigned);
+extern "C" void free(void*);
 namespace {
 struct Buffer { char data[4096]{};unsigned used=0; };
 int print(void* user,const char* format,...) {
@@ -13,6 +16,16 @@ int print(void* user,const char* format,...) {
 char* complex_json(char* out,asitic::ComplexValue z) {
     out+=sprintf(out,"[");out+=__builtin_isfinite(z.real)?sprintf(out,"%.17g",z.real):sprintf(out,"null");out+=sprintf(out,",");out+=__builtin_isfinite(z.imag)?sprintf(out,"%.17g",z.imag):sprintf(out,"null");return out+sprintf(out,"]");
 }
+}
+extern "C" const char* probe_three_port_conversion(const double* values,int scattering){
+    static char output[2048];
+    if(!values||(scattering!=0&&scattering!=1))return "{\"error\":\"Supply a finite 3x3 impedance and conversion mode 0 or 1\"}";
+    for(int i=0;i<18;++i)if(!__builtin_isfinite(values[i]))return "{\"error\":\"Supply a finite 3x3 impedance\"}";
+    const asitic::SolverMemory memory{{[](unsigned n,void*)->void*{return calloc(1,n);},nullptr},[](void* p,void*){free(p);}};
+    asitic::ThreePortImpedance z;__builtin_memcpy(&z,values,sizeof(z));asitic::ThreePortAdmittance y{};asitic::ThreePortScattering s{};
+    if(scattering)asitic::convert_three_port_scattering(z,s,memory);else asitic::convert_three_port_admittance(z,y,memory);
+    asitic::ComplexValue cells[9];if(scattering)__builtin_memcpy(cells,&s,sizeof(cells));else __builtin_memcpy(cells,&y,sizeof(cells));
+    char* out=output;out+=sprintf(out,"{\"matrix\":[");for(int i=0;i<3;++i){out+=sprintf(out,"%s[",i?",":"");for(int j=0;j<3;++j){if(j)out+=sprintf(out,",");out=complex_json(out,cells[3*i+j]);}out+=sprintf(out,"]");}sprintf(out,"]}");return output;
 }
 namespace reasitic {
 char* two_port_json(char* out,const asitic::TwoPortAdmittance& y,const double* bank,bool transformer,double frequency,bool include_model) {

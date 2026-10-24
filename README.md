@@ -418,6 +418,23 @@ subnormal inputs and the largest finite binary64 branch. Native/WASM results
 match bit for bit in all four host rounding modes; historical mode retains the
 original cancellation failure and original record comparisons.
 
+Three-port S and Y conversion likewise keeps its 3x3 cofactors and determinant
+exact through the final binary64 quotient. S uses the equivalent form
+`I - 2*(I + gZ)^-1`, with the subtraction performed in the exact numerator.
+This preserves the identity term for large, nearly rank-one impedances and
+avoids multiplying rounded inverse and identity matrices. The original port
+swap and native record formatting remain unchanged. A singular impedance has
+undefined Y entries; S can still be finite. Historical mode retains the
+original ignored inversion failures for diagnostic comparison.
+`tests/portable-three-conversion.mjs` checks 114 S/Y reductions of 57 circuits
+against exact rational Gaussian elimination, including traveling-wave
+boundaries and exact lossless-network unitarity. Cases include four captured
+original impedance matrices, asymmetric ports, rank-one matrices, subnormal
+values and extreme component scales. Native/WASM bits agree in all four host
+rounding modes. The nine physical cases in `tests/portable-three-port.mjs`
+also compare their converted matrices with an independent 80-digit reference
+at a `1e-14` matrix-norm tolerance.
+
 Loaded input impedance (`2PZIN`) uses the same two-port circuit and original port
 order: port 1 drives `y22`, capacitor 1 shunts `y22`, and capacitor 2 shunts `y11`.
 For drive/other diagonal entries `a,b`, cross entries `c,d` and load `Z`,
@@ -502,6 +519,7 @@ node tests/portable-gmd.mjs
 node tests/portable-error-power.mjs
 node tests/portable-pi-shunts.mjs
 node tests/portable-scattering.mjs
+node tests/portable-three-conversion.mjs
 node tests/loaded-port.mjs
 node tests/worker-loaded-port.mjs
 node tests/portable-extended-shunts.mjs
