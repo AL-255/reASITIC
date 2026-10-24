@@ -12,6 +12,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 50
+    outputs:
+      release: ${{ steps.browser-release.outputs.release }}
     steps:
       - uses: actions/checkout@v4
       - uses: mymindstorm/setup-emsdk@v14
@@ -31,12 +33,21 @@ jobs:
           sudo apt-get install -y g++-multilib libc6:i386 libcairo2
           pip install gdstk==1.0.2 mpmath==1.3.0 CairoSVG==2.9.1
       - run: python tools/build.py
+      - name: Record browser release
+        id: browser-release
+        run: |
+          python - <<'PY'
+          import json, os
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('release=' + json.load(open('dist/build.json'))['release'] + '\n')
+          PY
       - name: Verify immutable browser release and stale-page recovery
         run: |
           node tests/kernel-factory.mjs
           node tests/optimizer-startup.mjs
           node --experimental-vm-modules tests/site-package.mjs
           node --experimental-vm-modules tests/app-process-loading.mjs
+          node tests/deployment.mjs
       - run: python tools/build_native.py
       - name: Verify integer controls before WASM conversion
         run: node tests/worker-integer-controls.mjs
@@ -208,11 +219,24 @@ jobs:
     needs: [build, numerical-budget-audit]
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
       - uses: actions/deploy-pages@v4
         id: deployment
+      - name: Verify the published browser release
+        run: node tools/verify_deployment.mjs --url "${{ steps.deployment.outputs.page_url }}" --expected-release "${{ needs.build.outputs.release }}" --wait-for-release-ms 120000
+      - name: Retain deployment verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-evidence
+          path: build/evidence/deployment.json

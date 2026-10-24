@@ -1182,4 +1182,20 @@ node tests/kernel-factory.mjs
 node tests/optimizer-startup.mjs
 node --experimental-vm-modules tests/site-package.mjs
 node --experimental-vm-modules tests/app-process-loading.mjs
+node tests/deployment.mjs
+```
+
+After deployment, CI also checks the files actually served by Pages against the
+release SHA produced by its build. The audit downloads and verifies every
+manifest file, checks executable MIME types, and runs the downloaded worker and
+WASM without a mutable-root fallback. All 37 original creator cases cover the
+twelve families on both process stacks, exact physical geometry and GDS bytes;
+CAP tables and PI2 stage matrices/metrics are checked against original captures.
+Reported decimals are checked at their original rounding resolution, including
+decimal midpoint boundaries; the one-branch resistance also equals its physical
+DC resistance exactly. The evidence records the URL, release, bytes and results.
+These delivery/execution checks do not replace rendered browser QA.
+
+```sh
+node tools/verify_deployment.mjs
 ```
