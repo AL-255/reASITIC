@@ -42,6 +42,8 @@ jobs:
           node tests/host-rounding-test.mjs
           node tests/two-port-output.mjs
           node tests/port-schedule.mjs
+          node tests/automatic-cells.mjs
+          node tests/worker-automatic-cells.mjs
           node tests/port-sweep.mjs
           node tests/worker-port-sweep.mjs
           node tests/portable-three-port.mjs

@@ -38,6 +38,28 @@ results, cancellation, combined native records and sweep metrics/S CSV exports.
 Original 3PORT provides three-winding models and S/Y/Z conversion. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
+Automatic cell sizing (AUTOCELL) applies to LMAT, CAP, PI2, PIX, PI4,
+CALCTRANS and 3PORT, including each saved sweep frequency. The recovered C++ rule
+uses the last technology metal: longitudinal size is `alpha * c / (4 f)`;
+width and thickness are `beta * skin_depth`. Both are converted to micrometres.
+The same longitudinal and width limits feed capacitance contacts. Alpha and beta
+use the original scalar parser; calculated limits bypass dimension parsing and
+grid snapping. Manual values are retained when switching modes. Results show the
+actual automatic cell sizes. Invalid meshes, FFT contact collapse and exceeded
+budgets are rejected without changing the requested discretization.
+
+`tests/automatic-cells.mjs` checks fourteen raw five-limit updates and two complete
+S sweep files captured twice from the unmodified executable. It also compares
+164 native/WASM evaluations and independent 150-digit wavelength/skin-depth
+references across technology changes and wide frequency scales. Exact historical
+S records use the explicit reference arithmetic mode; production S results retain
+eight significant digits on these cases. Worker checks cover all solver paths,
+per-frequency updates, direct-double equivalence, an independent nodal reduction
+of a subdivided three-port mesh, and recovery after invalid cells.
+`tools/capture_automatic_cells.py` regenerates the native captures using read-only
+entry/return observations; `tools/reference_automatic_cells.py` is the independent
+physics oracle.
+
 Production numerics use deterministic software arithmetic. The rectangular
 cross-section integral is normalized by geometry scale, keeps guard precision
 through its cancelling terms, and rounds to binary64 once. It starts at binary128
@@ -79,6 +101,8 @@ node tests/portable-simulation.mjs
 node tests/portable-pad.mjs
 node tests/two-port-output.mjs
 node tests/port-schedule.mjs
+node tests/automatic-cells.mjs
+node tests/worker-automatic-cells.mjs
 node tests/port-sweep.mjs
 node tests/worker-port-sweep.mjs
 node tests/portable-three-port.mjs
@@ -500,6 +524,7 @@ Regenerate the independent original executable fixtures with:
 
 ```sh
 python3 tools/capture_lmat.py --reference ~/github/asitic-re
+python3 tools/capture_automatic_cells.py --reference ~/github/asitic-re # requires GDB
 python3 tools/capture_creators.py --reference ~/github/asitic-re
 python3 tools/capture_capacitance.py --reference ~/github/asitic-re
 python3 tools/capture_eddy.py --reference ~/github/asitic-re
@@ -527,8 +552,8 @@ valid descriptor values are passed unchanged to the original builders. Native
 unwritten parser/history and mesh words use explicit zero initial state, rather
 than claiming process-independent parity for uninitialized bytes.
 
-Next recreation work includes native automatic-cell controls, broader
-original-executable creator/input coverage, additional validation of stable full-network metrics, and original-executable
+Next recreation work includes broader original-executable creator/input coverage,
+additional validation of stable full-network metrics, and original-executable
 end-to-end parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.
 
