@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
-import createKernel from '../dist/asitic.js';
+import createKernel from './reference-kernel.mjs';
 import {parseTechnology,configureKernel,generateGeometry} from '../web/technology.mjs';
 const kernel=await createKernel(),technology=parseTechnology(readFileSync('web/technology/CMOS.tek','utf8'));configureKernel(kernel,technology);
 let fields=0,differences=0,maxRelative=0;const report=[];

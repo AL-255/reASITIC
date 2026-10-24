@@ -27,9 +27,15 @@
     "extF80_to_i32.c": "2ed8fb1142bcc11c08bc4509c031b902cc7cc946411bc06c7f288ea13f024334",
     "f128_add.c": "7658142caede2acccf4a113ebceabfb360faf6240f75a58861b2495d9297239a",
     "f128_div.c": "7e9a2e9928e50dea1ef229572787d59da5ebff4b99036fe2cfe4ba3e68ca48ff",
+    "f128_lt.c": "6a3b47d24b84053f8b7188565419e40e38d7afff21860a6fe93f1f8f99d33914",
     "f128_mul.c": "ac69a80c88c3e8d00c9eef048a1a578ca77bcf3e44b2354885b7503b54a6cfc7",
+    "f128_roundToInt.c": "d3718776bba5b4b4af8790f217816d2b271e2247d0cd4db1ec555e70cb4dcccf",
+    "f128_sqrt.c": "61769141d5a849d967703480b7b90cd96a72715413eaf2b76d813c54ca76578f",
     "f128_to_extF80.c": "57088348f05d8cec20d334767ca4a0e28ff2d59aee03b2133fea0073b753ad7f",
+    "f128_to_f64.c": "ed88bf4d0592b9acba03cf8a736797f6f0630523682a3050f8b02ea2043e5132",
+    "f128_to_i32.c": "aebbdc19c6f36012ea48c9b20b9c2821507eab7a4ae2286dca422c870bc76f75",
     "f64_to_extF80.c": "c0c8f0718013eadf6cfacb4d62d898f28ac9713b4217af90d36fa38bd6e16f6a",
+    "f64_to_f128.c": "247cc939189101ab88d9c687d81928220c9606c8ecf0d48376bf52c4f5cd74ee",
     "i32_to_f128.c": "0d4240ed90d0aef5892e479007c91e930ad7c6cf93b6f96c205b2627cefb672b",
     "include/internals.h": "63263638b47b676f7af2f6a84951f8981d3c7c8e9982642a09504a30ee377844",
     "include/opts-GCC.h": "e84858affe5a15d41a0f7a3df87fa4bc15aac31e6eab79e1c607b3fcf72b1ccf",
@@ -82,5 +88,18 @@
     "s_subMagsExtF80.c": "af2eac0e3b2fefc54bb5e15611be9cb6c0b2948cab7ebb9e0cd9501523c868bd",
     "s_subMagsF128.c": "32b9f48c8d48c8b13797fe5e231f19de2bbe9c7af571f3884742b27b649802e1",
     "softfloat_state.c": "144bf8e17786a7189eca6bd3c44b12bf1b5fbf68ee65be44e8b3bdb9d1493564"
+  },
+  "additional_binary128": {
+    "repository": "https://github.com/ucb-bar/berkeley-softfloat-3",
+    "commit": "497c81c1f5016dc6ef5b3219ece2f3c261d4d8f1",
+    "files": [
+      "f64_to_f128.c",
+      "f128_to_f64.c",
+      "f128_sqrt.c",
+      "f128_lt.c",
+      "f128_roundToInt.c",
+      "f128_to_i32.c"
+    ],
+    "compatibility": "Existing f128_add.c matches apart from its trailing blank line"
   }
 }

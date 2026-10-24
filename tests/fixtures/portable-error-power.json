@@ -1,0 +1,5206 @@
+{
+  "reference": "mpmath sqrt(exact binary64 input cubed), 200 decimal digits",
+  "mpmath_version": "1.3.0",
+  "cases": [
+    {
+      "input": 0.0,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": -0.0,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 5e-324,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.2250738585072014e-308,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.967488138091792e-197,
+      "value": 2.4990414265605273e-295,
+      "overflow": false
+    },
+    {
+      "input": 7.604978072193256e-141,
+      "value": 6.632037134127288e-211,
+      "overflow": false
+    },
+    {
+      "input": 4.694408367036838e-155,
+      "value": 3.2164092271408175e-232,
+      "overflow": false
+    },
+    {
+      "input": 0.1,
+      "value": 0.0316227766016838,
+      "overflow": false
+    },
+    {
+      "input": 0.5,
+      "value": 0.3535533905932738,
+      "overflow": false
+    },
+    {
+      "input": 1.0,
+      "value": 1.0,
+      "overflow": false
+    },
+    {
+      "input": 0.9999999999999999,
+      "value": 0.9999999999999999,
+      "overflow": false
+    },
+    {
+      "input": 1.0000000000000002,
+      "value": 1.0000000000000004,
+      "overflow": false
+    },
+    {
+      "input": 2.0,
+      "value": 2.8284271247461903,
+      "overflow": false
+    },
+    {
+      "input": 1e+100,
+      "value": 1e+150,
+      "overflow": false
+    },
+    {
+      "input": 1e+200,
+      "value": 9.999999999999999e+299,
+      "overflow": false
+    },
+    {
+      "input": 1.7976931348623157e+308,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 43291044225.0,
+      "value": 9007351116674624.0,
+      "overflow": false
+    },
+    {
+      "input": 43291876489.0,
+      "value": 9007610865436764.0,
+      "overflow": false
+    },
+    {
+      "input": 68717903881.0,
+      "value": 1.801378004126922e+16,
+      "overflow": false
+    },
+    {
+      "input": 68718952449.0,
+      "value": 1.8014192351838208e+16,
+      "overflow": false
+    },
+    {
+      "input": 1.5152395568168655e-179,
+      "value": 5.8982333339948176e-269,
+      "overflow": false
+    },
+    {
+      "input": 2.4394351845181627e+67,
+      "value": 1.20485261665744e+101,
+      "overflow": false
+    },
+    {
+      "input": 0.007251390123418885,
+      "value": 0.0006174928113913065,
+      "overflow": false
+    },
+    {
+      "input": 1.104566369705452e-151,
+      "value": 3.6710282319318334e-227,
+      "overflow": false
+    },
+    {
+      "input": 2.7391739793444123e-56,
+      "value": 4.533456221251501e-84,
+      "overflow": false
+    },
+    {
+      "input": 2.5346424722637484e+305,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.876434637083399e-104,
+      "value": 4.878448948816967e-156,
+      "overflow": false
+    },
+    {
+      "input": 1.7074394462689056e+190,
+      "value": 2.2310945009636565e+285,
+      "overflow": false
+    },
+    {
+      "input": 4.434544272154214e+161,
+      "value": 2.9530683059756654e+242,
+      "overflow": false
+    },
+    {
+      "input": 5.13598349500201e+118,
+      "value": 1.1639529600852733e+178,
+      "overflow": false
+    },
+    {
+      "input": 1.7794496362763773e+224,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.2178515393198995e+39,
+      "value": 1.825361999176298e+59,
+      "overflow": false
+    },
+    {
+      "input": 8.54941743653459e-180,
+      "value": 2.4997972381129507e-269,
+      "overflow": false
+    },
+    {
+      "input": 6.841404391777739e-121,
+      "value": 5.65871593570988e-181,
+      "overflow": false
+    },
+    {
+      "input": 1.3231856871044102e-231,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.241257505051051e-132,
+      "value": 2.8092902237502797e-197,
+      "overflow": false
+    },
+    {
+      "input": 5.676363557585232e+261,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.136458285465575e+280,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.753391356694477e+133,
+      "value": 6.827120348497025e+200,
+      "overflow": false
+    },
+    {
+      "input": 4.379634925872523e+284,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.6482944850960084e-72,
+      "value": 2.1161780644659996e-108,
+      "overflow": false
+    },
+    {
+      "input": 6.199457672499234e-76,
+      "value": 1.5435849968921948e-113,
+      "overflow": false
+    },
+    {
+      "input": 5.816894861433182e+227,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.675161641257232e+247,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.5910153408596665e-136,
+      "value": 2.0068344645742667e-204,
+      "overflow": false
+    },
+    {
+      "input": 2.53957386452929e-09,
+      "value": 1.2797975471472387e-13,
+      "overflow": false
+    },
+    {
+      "input": 3.1318558286525574e-121,
+      "value": 1.75268004637667e-181,
+      "overflow": false
+    },
+    {
+      "input": 8.286483507958855e+148,
+      "value": 2.3853680915947237e+223,
+      "overflow": false
+    },
+    {
+      "input": 2.060279408701115e-169,
+      "value": 9.35167021380767e-254,
+      "overflow": false
+    },
+    {
+      "input": 3.3198715492402886e+27,
+      "value": 1.9128544287888806e+41,
+      "overflow": false
+    },
+    {
+      "input": 1.2877366542503337e+57,
+      "value": 4.621049136722023e+85,
+      "overflow": false
+    },
+    {
+      "input": 6.347109401562928e-150,
+      "value": 1.5990571149362242e-224,
+      "overflow": false
+    },
+    {
+      "input": 5.103491713281184e+106,
+      "value": 1.1529251708955142e+160,
+      "overflow": false
+    },
+    {
+      "input": 4.2642933401709163e-94,
+      "value": 8.805836309527543e-141,
+      "overflow": false
+    },
+    {
+      "input": 2.3267869039534204e-299,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.7286540359128202e+196,
+      "value": 4.507364842952905e+294,
+      "overflow": false
+    },
+    {
+      "input": 3.4301355615855524e+49,
+      "value": 2.0089398147927387e+74,
+      "overflow": false
+    },
+    {
+      "input": 3.0710661329347164e-220,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.8927282662368744e+201,
+      "value": 8.234408384375743e+301,
+      "overflow": false
+    },
+    {
+      "input": 6.450528968584588e-149,
+      "value": 5.1807542854399994e-223,
+      "overflow": false
+    },
+    {
+      "input": 1.1539246075946714e-303,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.351129524101571e+101,
+      "value": 2.8701395769263437e+152,
+      "overflow": false
+    },
+    {
+      "input": 2.097967322763563e-233,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.069158152421819e-241,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 7.017978423677394e-274,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.9050126970261097e-114,
+      "value": 2.6293403848488076e-171,
+      "overflow": false
+    },
+    {
+      "input": 2.8193003813010196e+233,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.3484882318150811e-160,
+      "value": 1.5659242191237185e-240,
+      "overflow": false
+    },
+    {
+      "input": 4.9171995375236946e+176,
+      "value": 1.0903771658926438e+265,
+      "overflow": false
+    },
+    {
+      "input": 1.1812484111335239e+169,
+      "value": 4.059867463514186e+253,
+      "overflow": false
+    },
+    {
+      "input": 2.7466429527713335e+23,
+      "value": 1.4394722966676636e+35,
+      "overflow": false
+    },
+    {
+      "input": 4.642822984897977e+256,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 28050845407.814438,
+      "value": 4698064036610141.0,
+      "overflow": false
+    },
+    {
+      "input": 1.9583326644765994e-80,
+      "value": 2.7404993401514006e-120,
+      "overflow": false
+    },
+    {
+      "input": 1.0771165009422042e+90,
+      "value": 1.1178769947173975e+135,
+      "overflow": false
+    },
+    {
+      "input": 7.110977905950625e-152,
+      "value": 1.8962430144816222e-227,
+      "overflow": false
+    },
+    {
+      "input": 7.238210298107571e-236,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 8.645300257166927e-89,
+      "value": 8.038409410726615e-133,
+      "overflow": false
+    },
+    {
+      "input": 940.2646149842615,
+      "value": 28832.024536585744,
+      "overflow": false
+    },
+    {
+      "input": 2.2245663382918493e-89,
+      "value": 1.0492235791647907e-133,
+      "overflow": false
+    },
+    {
+      "input": 1.309481719094107e-265,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.4036563510649394e-252,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 5.077823835854812e-146,
+      "value": 1.1442382062945926e-218,
+      "overflow": false
+    },
+    {
+      "input": 5.278107067087556e-33,
+      "value": 3.834575503602809e-49,
+      "overflow": false
+    },
+    {
+      "input": 2.0002165374325348e+71,
+      "value": 8.945724526572082e+106,
+      "overflow": false
+    },
+    {
+      "input": 9.746828624282411e-79,
+      "value": 9.622656766408868e-118,
+      "overflow": false
+    },
+    {
+      "input": 1.4359418628300149e-114,
+      "value": 1.7207005019129597e-171,
+      "overflow": false
+    },
+    {
+      "input": 9.063066444516636e-197,
+      "value": 8.628051842797301e-295,
+      "overflow": false
+    },
+    {
+      "input": 9.321024642284986e+96,
+      "value": 2.845741741655586e+145,
+      "overflow": false
+    },
+    {
+      "input": 4.915443282753464e+36,
+      "value": 1.0897930501527153e+55,
+      "overflow": false
+    },
+    {
+      "input": 6.211154074553109e-286,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.7497036987974998e+30,
+      "value": 2.3144444675983543e+45,
+      "overflow": false
+    },
+    {
+      "input": 1.4786572539404512e+187,
+      "value": 5.685926969145805e+280,
+      "overflow": false
+    },
+    {
+      "input": 3.1529694143473344e-229,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.574001058674793e-37,
+      "value": 9.367856010545394e-55,
+      "overflow": false
+    },
+    {
+      "input": 2.8815312557672186e-57,
+      "value": 1.5468029869924404e-85,
+      "overflow": false
+    },
+    {
+      "input": 7.130158945232534e-47,
+      "value": 6.020725358202843e-70,
+      "overflow": false
+    },
+    {
+      "input": 1.2992396151601264e+145,
+      "value": 4.683104849716805e+217,
+      "overflow": false
+    },
+    {
+      "input": 1.1208820773244734e-84,
+      "value": 1.1866971173626121e-126,
+      "overflow": false
+    },
+    {
+      "input": 4.5465881597132365e-156,
+      "value": 9.694567189132418e-234,
+      "overflow": false
+    },
+    {
+      "input": 3.4384205300715213e-153,
+      "value": 2.0162226388865727e-229,
+      "overflow": false
+    },
+    {
+      "input": 1.1614409229224494e+255,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 5.202467869426332e-270,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.4220080546325526e-17,
+      "value": 2.9405549127969915e-25,
+      "overflow": false
+    },
+    {
+      "input": 4.060547217265216e-277,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 7.846286061276362e-49,
+      "value": 6.950182466777093e-73,
+      "overflow": false
+    },
+    {
+      "input": 3.0127064660155243e-152,
+      "value": 5.2291997210318805e-228,
+      "overflow": false
+    },
+    {
+      "input": 4.86754380180775e+124,
+      "value": 1.0739023740791028e+187,
+      "overflow": false
+    },
+    {
+      "input": 4.318646499305556e+82,
+      "value": 8.974731919433337e+123,
+      "overflow": false
+    },
+    {
+      "input": 1.7268286822142283e+292,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.462484371251244e+25,
+      "value": 1.2219691006170192e+38,
+      "overflow": false
+    },
+    {
+      "input": 7.625479834800286e-35,
+      "value": 6.658873512670439e-52,
+      "overflow": false
+    },
+    {
+      "input": 4.482539620754399e-77,
+      "value": 3.00113965541692e-115,
+      "overflow": false
+    },
+    {
+      "input": 1.3780815271737612e-205,
+      "value": 5.115785972277748e-308,
+      "overflow": false
+    },
+    {
+      "input": 5.946840251406932e+153,
+      "value": 4.585950982995285e+230,
+      "overflow": false
+    },
+    {
+      "input": 1.1710881534369196e+249,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.3485736380545702e+234,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.8812632121291967e-236,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.752142498606807e+32,
+      "value": 4.565689522619114e+48,
+      "overflow": false
+    },
+    {
+      "input": 2.6539828922399198e-135,
+      "value": 1.36724762789043e-202,
+      "overflow": false
+    },
+    {
+      "input": 2.3536636735477994e+91,
+      "value": 1.1418698520116506e+137,
+      "overflow": false
+    },
+    {
+      "input": 8.366802526816776e-260,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.3709444946659412e+132,
+      "value": 1.6052024275356944e+198,
+      "overflow": false
+    },
+    {
+      "input": 1.195933981880643e-206,
+      "value": 1.30785865119858e-309,
+      "overflow": false
+    },
+    {
+      "input": 9.037846449497071e-200,
+      "value": 2.7170487941666767e-299,
+      "overflow": false
+    },
+    {
+      "input": 1.1568023029488833e-213,
+      "value": 3.9347e-320,
+      "overflow": false
+    },
+    {
+      "input": 4.0814817150542544e+176,
+      "value": 8.245685813827712e+264,
+      "overflow": false
+    },
+    {
+      "input": 5.550429149409679e-29,
+      "value": 4.135136451080802e-43,
+      "overflow": false
+    },
+    {
+      "input": 2.9124411362820932e-244,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.6194809952411905e+137,
+      "value": 6.517241042582057e+205,
+      "overflow": false
+    },
+    {
+      "input": 8.586027665043403e-302,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.164422932243218e-111,
+      "value": 3.973435108705547e-167,
+      "overflow": false
+    },
+    {
+      "input": 2.9324502696666324e+206,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.0270922710484474e-50,
+      "value": 1.0409124228695841e-75,
+      "overflow": false
+    },
+    {
+      "input": 3.653652859943277e+39,
+      "value": 2.2084670438699915e+59,
+      "overflow": false
+    },
+    {
+      "input": 2.2925025676471096e+267,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.4053916672528738e-79,
+      "value": 1.1797193510073211e-118,
+      "overflow": false
+    },
+    {
+      "input": 3.677165870147407e-281,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.0450019117005069e+222,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.271442364421984e-134,
+      "value": 1.9607889427588342e-200,
+      "overflow": false
+    },
+    {
+      "input": 9.011303032949057e-234,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.064828353580149e-281,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.6086989608774357e-246,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.2380997600025249e+259,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.089729134038412e-292,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 8.456405993514637e+114,
+      "value": 2.459114428814475e+172,
+      "overflow": false
+    },
+    {
+      "input": 2.779188967570851e-93,
+      "value": 1.4651332204349899e-139,
+      "overflow": false
+    },
+    {
+      "input": 8.815543033649607e+238,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 9.840891779098444e+32,
+      "value": 3.0871070091849766e+49,
+      "overflow": false
+    },
+    {
+      "input": 2.875527634148069e-62,
+      "value": 4.876141707779139e-93,
+      "overflow": false
+    },
+    {
+      "input": 2.1856563926373988e-215,
+      "value": 1.04e-322,
+      "overflow": false
+    },
+    {
+      "input": 1.6085836919247429e-49,
+      "value": 6.451571164691845e-74,
+      "overflow": false
+    },
+    {
+      "input": 9.8961625091667e+68,
+      "value": 3.113151297135989e+103,
+      "overflow": false
+    },
+    {
+      "input": 1.3258859900825873e-260,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 29124.296804470472,
+      "value": 4970306.51786629,
+      "overflow": false
+    },
+    {
+      "input": 3.485145690380985e+58,
+      "value": 6.506259883703528e+87,
+      "overflow": false
+    },
+    {
+      "input": 5.239976656486462e+172,
+      "value": 1.199482809956e+259,
+      "overflow": false
+    },
+    {
+      "input": 9.257347183240777e+74,
+      "value": 2.8166301735767417e+112,
+      "overflow": false
+    },
+    {
+      "input": 3.0189126017149335e+150,
+      "value": 5.245366163540753e+225,
+      "overflow": false
+    },
+    {
+      "input": 2.4641342828352573e-131,
+      "value": 1.2231974202807892e-196,
+      "overflow": false
+    },
+    {
+      "input": 3.176152766284687e-135,
+      "value": 1.789996057199718e-202,
+      "overflow": false
+    },
+    {
+      "input": 4.383178205657853e-58,
+      "value": 9.176639944173193e-87,
+      "overflow": false
+    },
+    {
+      "input": 2.8982814088995405e-143,
+      "value": 1.5603097653155663e-214,
+      "overflow": false
+    },
+    {
+      "input": 7.296626317959203e+195,
+      "value": 6.232799520870519e+293,
+      "overflow": false
+    },
+    {
+      "input": 1.4471254841999843e-104,
+      "value": 1.7408417249131099e-156,
+      "overflow": false
+    },
+    {
+      "input": 1.368978355436043e+210,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 8.031066279668861e-181,
+      "value": 7.197137753360661e-271,
+      "overflow": false
+    },
+    {
+      "input": 9.464377877543373e-304,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.976730537145601e-297,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 5.757350780818201e+159,
+      "value": 4.368517060235988e+239,
+      "overflow": false
+    },
+    {
+      "input": 2.6946605447770137e-58,
+      "value": 4.423398794058865e-87,
+      "overflow": false
+    },
+    {
+      "input": 2.9656627427526505e+36,
+      "value": 5.107197371767688e+54,
+      "overflow": false
+    },
+    {
+      "input": 5.5345666209429765e+119,
+      "value": 4.1174224606994465e+179,
+      "overflow": false
+    },
+    {
+      "input": 2.544778767502381e-59,
+      "value": 1.2837340150288747e-88,
+      "overflow": false
+    },
+    {
+      "input": 1.1013356213507596e-107,
+      "value": 3.654933918286823e-161,
+      "overflow": false
+    },
+    {
+      "input": 2.0761257691632086e+155,
+      "value": 9.459768065486157e+232,
+      "overflow": false
+    },
+    {
+      "input": 4.2365792206466676e-107,
+      "value": 2.7575474718903164e-160,
+      "overflow": false
+    },
+    {
+      "input": 9.967836164685374e-157,
+      "value": 9.951793062060693e-235,
+      "overflow": false
+    },
+    {
+      "input": 2.707006890560475e-32,
+      "value": 4.453834159726386e-48,
+      "overflow": false
+    },
+    {
+      "input": 3.2775972763017773e-102,
+      "value": 5.933806569592803e-153,
+      "overflow": false
+    },
+    {
+      "input": 4.895531456808114e+264,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.302344173921257e-24,
+      "value": 1.4862390136693084e-36,
+      "overflow": false
+    },
+    {
+      "input": 7.974972437127888e+194,
+      "value": 2.252131713167542e+292,
+      "overflow": false
+    },
+    {
+      "input": 25.54339332377234,
+      "value": 129.09751607242333,
+      "overflow": false
+    },
+    {
+      "input": 5.915039469117337e+81,
+      "value": 4.5492150822675984e+122,
+      "overflow": false
+    },
+    {
+      "input": 1.0557688059516943e-163,
+      "value": 3.4304669462052363e-245,
+      "overflow": false
+    },
+    {
+      "input": 3.0971571340067917e-209,
+      "value": 1.7236332357e-313,
+      "overflow": false
+    },
+    {
+      "input": 1.7333168667115234e-141,
+      "value": 7.216339297706581e-212,
+      "overflow": false
+    },
+    {
+      "input": 3184.9719455288637,
+      "value": 179745.66158858433,
+      "overflow": false
+    },
+    {
+      "input": 2.9214316070399614e+129,
+      "value": 1.579041649841429e+194,
+      "overflow": false
+    },
+    {
+      "input": 4.880907191873528e-161,
+      "value": 3.4099720928459655e-241,
+      "overflow": false
+    },
+    {
+      "input": 1.941934406829733e+174,
+      "value": 2.7061498084738214e+261,
+      "overflow": false
+    },
+    {
+      "input": 5.416017117926811e+19,
+      "value": 3.985841663489385e+29,
+      "overflow": false
+    },
+    {
+      "input": 3.3661697874911907e+282,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.6239924856278975e+109,
+      "value": 2.181629174662624e+164,
+      "overflow": false
+    },
+    {
+      "input": 3.3424285164322405e-137,
+      "value": 1.9323829274481704e-205,
+      "overflow": false
+    },
+    {
+      "input": 2.9316259124329135e-09,
+      "value": 1.5873139301474424e-13,
+      "overflow": false
+    },
+    {
+      "input": 7.659074272625571e-56,
+      "value": 2.1196512988343417e-83,
+      "overflow": false
+    },
+    {
+      "input": 0.004715843820618347,
+      "value": 0.00032384643497403094,
+      "overflow": false
+    },
+    {
+      "input": 2.327627681356678e+245,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.904017767741841e+163,
+      "value": 5.736577306899094e+245,
+      "overflow": false
+    },
+    {
+      "input": 4.6297291112045064e-172,
+      "value": 9.961697996384865e-258,
+      "overflow": false
+    },
+    {
+      "input": 2.317771464563998e+201,
+      "value": 1.1158502564177945e+302,
+      "overflow": false
+    },
+    {
+      "input": 154642494578.42227,
+      "value": 6.081255777185971e+16,
+      "overflow": false
+    },
+    {
+      "input": 1.2484114525194794e+157,
+      "value": 4.410995514323274e+235,
+      "overflow": false
+    },
+    {
+      "input": 1.5275699049139077e-16,
+      "value": 1.8879984805344713e-24,
+      "overflow": false
+    },
+    {
+      "input": 3.7070808931188555e+22,
+      "value": 7.137532429267577e+33,
+      "overflow": false
+    },
+    {
+      "input": 4.963456279036293e+237,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 5.987483573987337e+211,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.571821918015478e+271,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.9944848617187094e-199,
+      "value": 2.524591812466891e-298,
+      "overflow": false
+    },
+    {
+      "input": 0.2509636167520913,
+      "value": 0.1257234085352609,
+      "overflow": false
+    },
+    {
+      "input": 2.2627624344305146e+51,
+      "value": 1.076362206222903e+77,
+      "overflow": false
+    },
+    {
+      "input": 3.2601782831026485e-238,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.1813562719402874e+254,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.2205362084112867e-115,
+      "value": 1.827646838080785e-172,
+      "overflow": false
+    },
+    {
+      "input": 1.1539576738510028e+191,
+      "value": 3.919988738469274e+286,
+      "overflow": false
+    },
+    {
+      "input": 4.5436109645806325e-119,
+      "value": 3.06268060547949e-178,
+      "overflow": false
+    },
+    {
+      "input": 2.042432283840795e+114,
+      "value": 2.918915346088957e+171,
+      "overflow": false
+    },
+    {
+      "input": 8.836527111217464e-246,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.9270293936549065e-135,
+      "value": 8.459262635081307e-203,
+      "overflow": false
+    },
+    {
+      "input": 7.902785996130147e-23,
+      "value": 7.025388288423109e-34,
+      "overflow": false
+    },
+    {
+      "input": 9.560650437662198e+17,
+      "value": 9.348268105122306e+26,
+      "overflow": false
+    },
+    {
+      "input": 3.4037861101468823e+154,
+      "value": 6.279765008930893e+231,
+      "overflow": false
+    },
+    {
+      "input": 3.695560447701236e-268,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.6189153560367818e-237,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.831734327536148e-229,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.5365778959200062e-275,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.945074765649804e-253,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 5.9041244266277e+29,
+      "value": 4.536628869940019e+44,
+      "overflow": false
+    },
+    {
+      "input": 2.499707485754952e-301,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.824653490915559e+83,
+      "value": 3.3511910795833277e+125,
+      "overflow": false
+    },
+    {
+      "input": 9.090510894701066e+71,
+      "value": 8.66727222886945e+107,
+      "overflow": false
+    },
+    {
+      "input": 3.5412966200452547e-101,
+      "value": 2.1073829274256556e-151,
+      "overflow": false
+    },
+    {
+      "input": 7.442149999469693e-79,
+      "value": 6.420186273123423e-118,
+      "overflow": false
+    },
+    {
+      "input": 8.680316855435998e+72,
+      "value": 2.5574277165960775e+109,
+      "overflow": false
+    },
+    {
+      "input": 3.694145453712442e-273,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.8224796574520948e-185,
+      "value": 1.4994991736251114e-277,
+      "overflow": false
+    },
+    {
+      "input": 8.842675165110181e+160,
+      "value": 2.6295141204367952e+241,
+      "overflow": false
+    },
+    {
+      "input": 2.597663833480228e+185,
+      "value": 1.3239586511702793e+278,
+      "overflow": false
+    },
+    {
+      "input": 1.4992200287586324e-40,
+      "value": 1.835684594706941e-60,
+      "overflow": false
+    },
+    {
+      "input": 1.59516267666817e-206,
+      "value": 2.01468646745972e-309,
+      "overflow": false
+    },
+    {
+      "input": 2.3354941154789834e+107,
+      "value": 1.1286730780741752e+161,
+      "overflow": false
+    },
+    {
+      "input": 5.9180074824838974e-195,
+      "value": 4.552639528931531e-292,
+      "overflow": false
+    },
+    {
+      "input": 2.593214677341026e-84,
+      "value": 4.175973235161312e-126,
+      "overflow": false
+    },
+    {
+      "input": 1.8034236854099864e+232,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.201308486944714e-168,
+      "value": 1.544276291867725e-251,
+      "overflow": false
+    },
+    {
+      "input": 6.025282586609819e+216,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.473698800786792e-103,
+      "value": 5.208692676582593e-154,
+      "overflow": false
+    },
+    {
+      "input": 1.0265654491713793e-244,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.785679924232146e-75,
+      "value": 2.3292485723360304e-112,
+      "overflow": false
+    },
+    {
+      "input": 1.11872156626862e-294,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.460139564729255e+189,
+      "value": 1.2202241561901385e+284,
+      "overflow": false
+    },
+    {
+      "input": 1.75504534151669e+42,
+      "value": 2.3250511488651145e+63,
+      "overflow": false
+    },
+    {
+      "input": 5.890930859259596e-45,
+      "value": 4.521430798977274e-67,
+      "overflow": false
+    },
+    {
+      "input": 2.5337222756871932e+231,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.168686330216649e-103,
+      "value": 2.69152753597482e-154,
+      "overflow": false
+    },
+    {
+      "input": 8.991800466697045e+161,
+      "value": 8.526484200005654e+242,
+      "overflow": false
+    },
+    {
+      "input": 3.3179921006134716e+138,
+      "value": 6.043840876184919e+207,
+      "overflow": false
+    },
+    {
+      "input": 3.1575688105300037e+220,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.0261114098975304e+72,
+      "value": 1.0394216900670804e+108,
+      "overflow": false
+    },
+    {
+      "input": 8.840771791709039e+36,
+      "value": 2.628665167296819e+55,
+      "overflow": false
+    },
+    {
+      "input": 3.6199286192858256e-80,
+      "value": 6.887316012137174e-120,
+      "overflow": false
+    },
+    {
+      "input": 2.261398235839062e+297,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.540980046375292e-196,
+      "value": 1.6728778715148607e-293,
+      "overflow": false
+    },
+    {
+      "input": 2.104314712964263e+44,
+      "value": 3.052572852260089e+66,
+      "overflow": false
+    },
+    {
+      "input": 1.9654574721641385e-183,
+      "value": 8.713557004849897e-275,
+      "overflow": false
+    },
+    {
+      "input": 5.580008091098011e-195,
+      "value": 4.168235451412123e-292,
+      "overflow": false
+    },
+    {
+      "input": 1.4039929774653128e-64,
+      "value": 1.6635942219812831e-96,
+      "overflow": false
+    },
+    {
+      "input": 4.7193306236405155e-297,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.6092265090843813e-104,
+      "value": 6.8567956689779e-156,
+      "overflow": false
+    },
+    {
+      "input": 2.305805057956618e-20,
+      "value": 3.501336742789787e-30,
+      "overflow": false
+    },
+    {
+      "input": 269385.220691842,
+      "value": 139817215.23246688,
+      "overflow": false
+    },
+    {
+      "input": 6.16539688555904e+301,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 0.3317163411028793,
+      "value": 0.19105143303013425,
+      "overflow": false
+    },
+    {
+      "input": 2.1015602564133268e+209,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.929847409756927e+214,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.9369599672520787e-276,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.63608199255908e+20,
+      "value": 2.991236351898049e+31,
+      "overflow": false
+    },
+    {
+      "input": 1.0439661584394502e-119,
+      "value": 3.373103218375432e-179,
+      "overflow": false
+    },
+    {
+      "input": 1.0436472036902852e+267,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.428733682943176e+31,
+      "value": 5.400412393501554e+46,
+      "overflow": false
+    },
+    {
+      "input": 1.8158444684588124e-84,
+      "value": 2.4469098606006725e-126,
+      "overflow": false
+    },
+    {
+      "input": 9.913282361883255e+97,
+      "value": 9.870205949804682e+146,
+      "overflow": false
+    },
+    {
+      "input": 3.0034199207770135e-209,
+      "value": 1.6459782248e-313,
+      "overflow": false
+    },
+    {
+      "input": 3.243051901199136e-129,
+      "value": 1.8468467038596058e-193,
+      "overflow": false
+    },
+    {
+      "input": 5.955169982736117e-150,
+      "value": 1.4532530515616053e-224,
+      "overflow": false
+    },
+    {
+      "input": 1.94574978255451e+55,
+      "value": 8.582829512550578e+82,
+      "overflow": false
+    },
+    {
+      "input": 1.9769217239909884e+245,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.519940007009495e+79,
+      "value": 1.2649847860250619e+119,
+      "overflow": false
+    },
+    {
+      "input": 3.5997028906216224e+71,
+      "value": 2.15973260707666e+107,
+      "overflow": false
+    },
+    {
+      "input": 1.9585304549481002e+102,
+      "value": 2.7409145339175992e+153,
+      "overflow": false
+    },
+    {
+      "input": 2.3607775469075117e+276,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.0078357761590575e-99,
+      "value": 3.199518725922819e-149,
+      "overflow": false
+    },
+    {
+      "input": 3.798571022882056e-235,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.8439947714182024e+266,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.794865037514358e+111,
+      "value": 1.4775468532941199e+167,
+      "overflow": false
+    },
+    {
+      "input": 1.660823497263572e-12,
+      "value": 2.140352089006085e-18,
+      "overflow": false
+    },
+    {
+      "input": 4.278737463215728e+95,
+      "value": 2.798810274088784e+143,
+      "overflow": false
+    },
+    {
+      "input": 7.565936285330004e+124,
+      "value": 2.0811051287053922e+187,
+      "overflow": false
+    },
+    {
+      "input": 6.615691027004846e+20,
+      "value": 1.7016209395666195e+31,
+      "overflow": false
+    },
+    {
+      "input": 1.7368978813399108e+172,
+      "value": 2.289082409956829e+258,
+      "overflow": false
+    },
+    {
+      "input": 9.406315021269888e+59,
+      "value": 9.12282363466368e+89,
+      "overflow": false
+    },
+    {
+      "input": 1.27365442135539e+274,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.0114289500444617e-258,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.8206584022720786e+278,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.8933088891329466e+113,
+      "value": 1.5562960027144283e+170,
+      "overflow": false
+    },
+    {
+      "input": 2.0718272542109732e+78,
+      "value": 2.982155687604961e+117,
+      "overflow": false
+    },
+    {
+      "input": 3.2228921491070336e-156,
+      "value": 5.785869831055753e-234,
+      "overflow": false
+    },
+    {
+      "input": 5.364025568012914e+159,
+      "value": 3.9285859481646524e+239,
+      "overflow": false
+    },
+    {
+      "input": 5.865069302745965e+102,
+      "value": 1.4203969212296024e+154,
+      "overflow": false
+    },
+    {
+      "input": 8.497578831302545e+173,
+      "value": 7.8332647162796e+260,
+      "overflow": false
+    },
+    {
+      "input": 1.2661021074105603e-79,
+      "value": 4.5050861205902396e-119,
+      "overflow": false
+    },
+    {
+      "input": 5.300880832503177e-285,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.1124412177768579e+256,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.3272277795563503e-165,
+      "value": 4.835241773106376e-248,
+      "overflow": false
+    },
+    {
+      "input": 5.1015253478659016e-104,
+      "value": 1.152258905349934e-155,
+      "overflow": false
+    },
+    {
+      "input": 7.657976994279129e+306,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.476977189407588e+260,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.2470249881044468e+29,
+      "value": 4.403649390582587e+43,
+      "overflow": false
+    },
+    {
+      "input": 1.2732146116841401e+152,
+      "value": 1.4366547763049127e+228,
+      "overflow": false
+    },
+    {
+      "input": 7.168653921880317e-25,
+      "value": 6.069549001250051e-37,
+      "overflow": false
+    },
+    {
+      "input": 1.6567104005406455e+25,
+      "value": 6.743259890056772e+37,
+      "overflow": false
+    },
+    {
+      "input": 2.4722677637180665e-260,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.757749675992125e-299,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 376777.6500005164,
+      "value": 231274472.77180633,
+      "overflow": false
+    },
+    {
+      "input": 8.357355457444541e-140,
+      "value": 2.416035499153468e-209,
+      "overflow": false
+    },
+    {
+      "input": 3.000670825576221e-96,
+      "value": 5.197895376103911e-144,
+      "overflow": false
+    },
+    {
+      "input": 4.873349968562656e-10,
+      "value": 1.0758244262120701e-14,
+      "overflow": false
+    },
+    {
+      "input": 4.4884953764389314e-160,
+      "value": 9.509357465510446e-240,
+      "overflow": false
+    },
+    {
+      "input": 3.677594461894631e+212,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4314435684598.594,
+      "value": 8.961609155218194e+18,
+      "overflow": false
+    },
+    {
+      "input": 1.9076861089664932e+245,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.590414797195465e+33,
+      "value": 6.342575003223421e+49,
+      "overflow": false
+    },
+    {
+      "input": 1.5251702907100296e-143,
+      "value": 5.95631291544741e-215,
+      "overflow": false
+    },
+    {
+      "input": 8.971160154427166e-221,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.3548439932006224e-180,
+      "value": 1.577008140999654e-270,
+      "overflow": false
+    },
+    {
+      "input": 1.2498073923007993e+165,
+      "value": 4.418395965188411e+247,
+      "overflow": false
+    },
+    {
+      "input": 3.7804404602757695e-85,
+      "value": 2.3244146492809314e-127,
+      "overflow": false
+    },
+    {
+      "input": 2.1553016863410494e-100,
+      "value": 3.16418671702021e-150,
+      "overflow": false
+    },
+    {
+      "input": 3.26561571921532e+257,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.103188189741533e-44,
+      "value": 1.8931280106533077e-65,
+      "overflow": false
+    },
+    {
+      "input": 8.803832233898006e-54,
+      "value": 2.6122072895279662e-80,
+      "overflow": false
+    },
+    {
+      "input": 3.129780786895195e-232,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.41530008605952e+219,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.2876093635568697e-29,
+      "value": 1.0941397552256567e-43,
+      "overflow": false
+    },
+    {
+      "input": 1.6016255539914137e-57,
+      "value": 6.4097558008033364e-86,
+      "overflow": false
+    },
+    {
+      "input": 1.268756154213933e+61,
+      "value": 4.51925911640498e+91,
+      "overflow": false
+    },
+    {
+      "input": 5.52513681100463e+293,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.866582418973881e-68,
+      "value": 1.7993305588251544e-101,
+      "overflow": false
+    },
+    {
+      "input": 8.917787532082041e-284,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.2668209569423442e+110,
+      "value": 1.4258467790361474e+165,
+      "overflow": false
+    },
+    {
+      "input": 1.2867481366209538e-17,
+      "value": 4.6157292076413237e-26,
+      "overflow": false
+    },
+    {
+      "input": 2.3522515385723697e+35,
+      "value": 1.140842369311582e+53,
+      "overflow": false
+    },
+    {
+      "input": 1.7100376126269979e-211,
+      "value": 7.0714504e-317,
+      "overflow": false
+    },
+    {
+      "input": 3.311035874709152e-173,
+      "value": 1.9052230603545068e-259,
+      "overflow": false
+    },
+    {
+      "input": 1.0529408545812788e-255,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 8.98873340103759e+51,
+      "value": 8.522122049705714e+77,
+      "overflow": false
+    },
+    {
+      "input": 3.9164197887906934e+97,
+      "value": 2.450946629777519e+146,
+      "overflow": false
+    },
+    {
+      "input": 1.8899480149681382e-149,
+      "value": 8.216271616813659e-224,
+      "overflow": false
+    },
+    {
+      "input": 4.489433688561955e+186,
+      "value": 9.512339493210777e+279,
+      "overflow": false
+    },
+    {
+      "input": 2.896205677616819e-75,
+      "value": 1.5586338391207332e-112,
+      "overflow": false
+    },
+    {
+      "input": 2.035284474543086e-236,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.0846496296173335e+125,
+      "value": 9.518085666853763e+187,
+      "overflow": false
+    },
+    {
+      "input": 1.91974495203338e+36,
+      "value": 2.6598999507868497e+54,
+      "overflow": false
+    },
+    {
+      "input": 8.504561264723027e+158,
+      "value": 2.480149561527648e+238,
+      "overflow": false
+    },
+    {
+      "input": 1.2083264245255063e-166,
+      "value": 1.3282395555241958e-249,
+      "overflow": false
+    },
+    {
+      "input": 9.154244617119989e-114,
+      "value": 2.769706626174366e-170,
+      "overflow": false
+    },
+    {
+      "input": 2.5784606330851625e-280,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.2095419980366191e+266,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.6386222175758726e+20,
+      "value": 2.097578672212336e+30,
+      "overflow": false
+    },
+    {
+      "input": 2.394392732257686e+292,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.1867269773410503e+205,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.7082807869330147e-205,
+      "value": 7.060555718099696e-308,
+      "overflow": false
+    },
+    {
+      "input": 5.548934835726276e-115,
+      "value": 4.133466640990827e-172,
+      "overflow": false
+    },
+    {
+      "input": 5.923242016189554e+93,
+      "value": 4.558681143621623e+140,
+      "overflow": false
+    },
+    {
+      "input": 7.397663836230647e+270,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.415096846417146e-148,
+      "value": 1.6833686880087928e-222,
+      "overflow": false
+    },
+    {
+      "input": 7.682320853653307e-06,
+      "value": 2.1293088659699805e-08,
+      "overflow": false
+    },
+    {
+      "input": 1.67941015216802e+98,
+      "value": 2.1763821800756827e+147,
+      "overflow": false
+    },
+    {
+      "input": 6.1508564699988165e+94,
+      "value": 1.525469009990199e+142,
+      "overflow": false
+    },
+    {
+      "input": 2.961121748956773e+251,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.5655334531549512e+169,
+      "value": 1.299470793820914e+254,
+      "overflow": false
+    },
+    {
+      "input": 9.887324781064422e+165,
+      "value": 9.831464158388901e+248,
+      "overflow": false
+    },
+    {
+      "input": 2.3376592992803367e-178,
+      "value": 3.5741421664967984e-267,
+      "overflow": false
+    },
+    {
+      "input": 7.289197113479514e+144,
+      "value": 1.9679748399125173e+217,
+      "overflow": false
+    },
+    {
+      "input": 2.472186781205829,
+      "value": 3.887066045945499,
+      "overflow": false
+    },
+    {
+      "input": 9.804212345251562e+133,
+      "value": 9.707760723554568e+200,
+      "overflow": false
+    },
+    {
+      "input": 1.2406097277202743e+139,
+      "value": 4.369711586857101e+208,
+      "overflow": false
+    },
+    {
+      "input": 2.084506032923793e-226,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.4549879455913928e+94,
+      "value": 3.846573594694906e+141,
+      "overflow": false
+    },
+    {
+      "input": 5.760307926194365e+167,
+      "value": 4.3718831914269173e+251,
+      "overflow": false
+    },
+    {
+      "input": 7.425674312646066e-57,
+      "value": 6.398878234398303e-85,
+      "overflow": false
+    },
+    {
+      "input": 3.178387006092218e-224,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.98760081293261e-69,
+      "value": 1.6329912339474091e-103,
+      "overflow": false
+    },
+    {
+      "input": 3.201822998238124e-43,
+      "value": 1.8117404454234142e-64,
+      "overflow": false
+    },
+    {
+      "input": 4.326929982249712e+19,
+      "value": 2.846228751076355e+29,
+      "overflow": false
+    },
+    {
+      "input": 1.6448944436856208e-116,
+      "value": 2.1096336805019987e-174,
+      "overflow": false
+    },
+    {
+      "input": 2.8602164586833056e+54,
+      "value": 4.837247981896159e+81,
+      "overflow": false
+    },
+    {
+      "input": 7.287965065152139e-258,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.3611175900347547e+302,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.567338632185217e+182,
+      "value": 9.76101136590831e+273,
+      "overflow": false
+    },
+    {
+      "input": 5.791681809648551e-164,
+      "value": 1.3938211205173916e-245,
+      "overflow": false
+    },
+    {
+      "input": 4.049846867050396e-104,
+      "value": 8.150005521181727e-156,
+      "overflow": false
+    },
+    {
+      "input": 1.3144060453385497e+237,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.556758850279405e+48,
+      "value": 2.0773197252625965e+73,
+      "overflow": false
+    },
+    {
+      "input": 6.870668836963455e-287,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.0267722293567249e-275,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 6.621272111600503e+42,
+      "value": 1.7037746585852686e+64,
+      "overflow": false
+    },
+    {
+      "input": 1670411780.7026105,
+      "value": 68270850992108.8,
+      "overflow": false
+    },
+    {
+      "input": 1.615059168554569e-143,
+      "value": 6.490567283891198e-215,
+      "overflow": false
+    },
+    {
+      "input": 9.226250385815253e-247,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 6.046406407894393e+217,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.2138330766102423e+97,
+      "value": 4.2290074632252935e+145,
+      "overflow": false
+    },
+    {
+      "input": 5.854002488814476e-164,
+      "value": 1.416378592516909e-245,
+      "overflow": false
+    },
+    {
+      "input": 1.3906682637899048e-292,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 5.387681477918052e-14,
+      "value": 1.250555205114763e-20,
+      "overflow": false
+    },
+    {
+      "input": 1.3131200716585084e+145,
+      "value": 4.758353027300765e+217,
+      "overflow": false
+    },
+    {
+      "input": 6.828922496956224e-27,
+      "value": 5.643236817578057e-40,
+      "overflow": false
+    },
+    {
+      "input": 3.311959647198204e-223,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 7.29181004167089e-17,
+      "value": 6.226629423405749e-25,
+      "overflow": false
+    },
+    {
+      "input": 7.04936270652124e+181,
+      "value": 5.918678977206662e+272,
+      "overflow": false
+    },
+    {
+      "input": 3.489043429553898e+24,
+      "value": 6.51717770268587e+36,
+      "overflow": false
+    },
+    {
+      "input": 2.8148301998498084e-15,
+      "value": 1.493407413089163e-22,
+      "overflow": false
+    },
+    {
+      "input": 4.932549234770737e-222,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.018735225234644e-190,
+      "value": 2.868263469597881e-285,
+      "overflow": false
+    },
+    {
+      "input": 2961546003.4271975,
+      "value": 161167594816397.66,
+      "overflow": false
+    },
+    {
+      "input": 4.251890448677864e-72,
+      "value": 8.767445994152997e-108,
+      "overflow": false
+    },
+    {
+      "input": 2.122592606419114e+38,
+      "value": 3.0924306617487554e+57,
+      "overflow": false
+    },
+    {
+      "input": 8.79011574514511e-307,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.9596681838288567e+178,
+      "value": 5.091720264898074e+267,
+      "overflow": false
+    },
+    {
+      "input": 3.8299891693675135e-264,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.1346169184735761e+290,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.099987664099671e-304,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.1327125282096714e-105,
+      "value": 3.812234049405336e-158,
+      "overflow": false
+    },
+    {
+      "input": 3.3247764745090095e-182,
+      "value": 6.062387317002865e-273,
+      "overflow": false
+    },
+    {
+      "input": 5.858961390393729e+298,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.7361652263947058e-230,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.0689346800617083e+245,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.6186080618018915e+195,
+      "value": 3.138821826639964e+293,
+      "overflow": false
+    },
+    {
+      "input": 1.5621383587982554e+238,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.2048069758412362e+64,
+      "value": 3.2738280203150703e+96,
+      "overflow": false
+    },
+    {
+      "input": 2.0176568792147984e+264,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.6465832467784673e-10,
+      "value": 4.305547040914543e-15,
+      "overflow": false
+    },
+    {
+      "input": 3.5146525349832146e-15,
+      "value": 2.0836443583944525e-22,
+      "overflow": false
+    },
+    {
+      "input": 4.788160433803826e+186,
+      "value": 1.0477388321982938e+280,
+      "overflow": false
+    },
+    {
+      "input": 1500.1609367170558,
+      "value": 58104.10002226277,
+      "overflow": false
+    },
+    {
+      "input": 6.451718086240818e+131,
+      "value": 5.182186914530349e+197,
+      "overflow": false
+    },
+    {
+      "input": 1.2894646524122011e-114,
+      "value": 1.4642463908832238e-171,
+      "overflow": false
+    },
+    {
+      "input": 4.882489402043425e-57,
+      "value": 3.4116303080692935e-85,
+      "overflow": false
+    },
+    {
+      "input": 2.3476528119566083e-205,
+      "value": 1.1374984303139203e-307,
+      "overflow": false
+    },
+    {
+      "input": 1.4767133615281251e+66,
+      "value": 1.7945034874911295e+99,
+      "overflow": false
+    },
+    {
+      "input": 3.9669143379154874e-91,
+      "value": 2.498499308280575e-136,
+      "overflow": false
+    },
+    {
+      "input": 8.945761322657212e-26,
+      "value": 2.67562940514143e-38,
+      "overflow": false
+    },
+    {
+      "input": 8.21124481924464e-95,
+      "value": 7.44069497379447e-142,
+      "overflow": false
+    },
+    {
+      "input": 3.728788225798256e-203,
+      "value": 2.2769399541864416e-304,
+      "overflow": false
+    },
+    {
+      "input": 4.127728287045444e+168,
+      "value": 8.386227744761932e+252,
+      "overflow": false
+    },
+    {
+      "input": 1.7900005643921679e-146,
+      "value": 2.3948579133444526e-219,
+      "overflow": false
+    },
+    {
+      "input": 3.4338217720995807e+77,
+      "value": 2.0121790588982543e+116,
+      "overflow": false
+    },
+    {
+      "input": 6.852860800675307e+110,
+      "value": 1.793939801017258e+166,
+      "overflow": false
+    },
+    {
+      "input": 1.5607802624897436e+214,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.3260118400547025e+195,
+      "value": 1.121806317992086e+293,
+      "overflow": false
+    },
+    {
+      "input": 5.4676999527528775e-76,
+      "value": 1.2785184838291135e-113,
+      "overflow": false
+    },
+    {
+      "input": 9.640122570240994e-195,
+      "value": 9.465070077103934e-292,
+      "overflow": false
+    },
+    {
+      "input": 8.439233357519346e-290,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.697766212140766e+159,
+      "value": 9.550092218891115e+239,
+      "overflow": false
+    },
+    {
+      "input": 7.997465547094038e-162,
+      "value": 2.2616665076633473e-242,
+      "overflow": false
+    },
+    {
+      "input": 2.2334861911046565e+247,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.032752785124561e+179,
+      "value": 9.164881355740251e+268,
+      "overflow": false
+    },
+    {
+      "input": 1.4320882428978792e+252,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.906834881874322e-193,
+      "value": 1.567222090668514e-289,
+      "overflow": false
+    },
+    {
+      "input": 2.533487735403373e-192,
+      "value": 4.032535592661257e-288,
+      "overflow": false
+    },
+    {
+      "input": 8.04125039927969e+176,
+      "value": 2.2802653028622998e+265,
+      "overflow": false
+    },
+    {
+      "input": 9.313467084332113e-122,
+      "value": 2.8422814196063183e-182,
+      "overflow": false
+    },
+    {
+      "input": 2.8606131186994185e-205,
+      "value": 1.5299903405812247e-307,
+      "overflow": false
+    },
+    {
+      "input": 4.2938253074657805e+270,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.567613278196362e+273,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.897248820063558e-169,
+      "value": 2.43297250695259e-253,
+      "overflow": false
+    },
+    {
+      "input": 18483178.9690674,
+      "value": 79463008408.2746,
+      "overflow": false
+    },
+    {
+      "input": 1.3678694905888438e+263,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.2096196965345956e-265,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.0311857094361778e-193,
+      "value": 3.3113518437969403e-290,
+      "overflow": false
+    },
+    {
+      "input": 4.7009295840246087e+33,
+      "value": 3.2231136455033222e+50,
+      "overflow": false
+    },
+    {
+      "input": 4.7162821795986735e-11,
+      "value": 3.238915905063213e-16,
+      "overflow": false
+    },
+    {
+      "input": 2.5663042105636057e-112,
+      "value": 4.1111394163153364e-168,
+      "overflow": false
+    },
+    {
+      "input": 4.287419235741145e-280,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.9732285493749596e-174,
+      "value": 2.7718267746252345e-261,
+      "overflow": false
+    },
+    {
+      "input": 9.525684282867529e-280,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 7.95805016539114e-134,
+      "value": 2.2449672444363775e-200,
+      "overflow": false
+    },
+    {
+      "input": 2.996095509858201e-165,
+      "value": 1.6399608505094478e-247,
+      "overflow": false
+    },
+    {
+      "input": 4.646929175967452e-179,
+      "value": 3.167736728976325e-268,
+      "overflow": false
+    },
+    {
+      "input": 8.102169494089989e+41,
+      "value": 7.292929013125423e+62,
+      "overflow": false
+    },
+    {
+      "input": 1.7729092058502482e-300,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.5692379960041681e-81,
+      "value": 6.216317996588887e-122,
+      "overflow": false
+    },
+    {
+      "input": 3.6253568342984176e-103,
+      "value": 2.1828612893831552e-154,
+      "overflow": false
+    },
+    {
+      "input": 1.0920142678524097e-231,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 6.679313751022473e+112,
+      "value": 1.7262264486681435e+169,
+      "overflow": false
+    },
+    {
+      "input": 5.173140390172977e+267,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.2625190760230582e+92,
+      "value": 3.403207066608777e+138,
+      "overflow": false
+    },
+    {
+      "input": 1.2529523706060835e-117,
+      "value": 4.4350839335869004e-176,
+      "overflow": false
+    },
+    {
+      "input": 1.054360682911384e+172,
+      "value": 1.082639340062003e+258,
+      "overflow": false
+    },
+    {
+      "input": 4.878280768631185e-08,
+      "value": 1.0774575995215079e-11,
+      "overflow": false
+    },
+    {
+      "input": 3.4692422110771376e+103,
+      "value": 2.043393148552709e+155,
+      "overflow": false
+    },
+    {
+      "input": 5.499954718422745e-38,
+      "value": 1.2898484047774604e-56,
+      "overflow": false
+    },
+    {
+      "input": 1.6081089126549818e-223,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.143172243078195e+44,
+      "value": 1.2222709965991063e+66,
+      "overflow": false
+    },
+    {
+      "input": 2.8489009407077515e+23,
+      "value": 1.5206036301147449e+35,
+      "overflow": false
+    },
+    {
+      "input": 3.630849627387714e-48,
+      "value": 6.918507153072631e-72,
+      "overflow": false
+    },
+    {
+      "input": 1.1003340337844023e+156,
+      "value": 1.1542152792628979e+234,
+      "overflow": false
+    },
+    {
+      "input": 6.9731706837373524e-220,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.026198846516054e-246,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.654017197057176e+249,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.08102500588913e-172,
+      "value": 8.244301840360597e-258,
+      "overflow": false
+    },
+    {
+      "input": 4.153054535214093e+217,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.3499807120923706e-107,
+      "value": 4.9601104270688604e-161,
+      "overflow": false
+    },
+    {
+      "input": 1.590537051506377e-50,
+      "value": 2.00592959389873e-75,
+      "overflow": false
+    },
+    {
+      "input": 1.9843230964794557e+138,
+      "value": 2.79523664413918e+207,
+      "overflow": false
+    },
+    {
+      "input": 2.3663206432432178e-132,
+      "value": 3.640075475329442e-198,
+      "overflow": false
+    },
+    {
+      "input": 9.958395945386328e+194,
+      "value": 3.142563664469439e+292,
+      "overflow": false
+    },
+    {
+      "input": 68117557211667.93,
+      "value": 5.62197095762027e+20,
+      "overflow": false
+    },
+    {
+      "input": 6.53670231174718e-256,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.0222807563461944e-16,
+      "value": 1.0336066109654079e-24,
+      "overflow": false
+    },
+    {
+      "input": 4.383077770026365e+282,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.3919997157687994e+29,
+      "value": 1.9755303712470417e+44,
+      "overflow": false
+    },
+    {
+      "input": 9.001209882671622e-283,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.1359220484443374e-251,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 5.6135901586046144e-139,
+      "value": 4.20592043985647e-208,
+      "overflow": false
+    },
+    {
+      "input": 3.4141312639400896e-109,
+      "value": 1.9948962860279475e-163,
+      "overflow": false
+    },
+    {
+      "input": 7.769956737616627e+134,
+      "value": 2.1658476341077004e+202,
+      "overflow": false
+    },
+    {
+      "input": 2.462357639856984e-39,
+      "value": 1.2218747691419636e-58,
+      "overflow": false
+    },
+    {
+      "input": 0.0014706906034745626,
+      "value": 5.640037303732264e-05,
+      "overflow": false
+    },
+    {
+      "input": 2.505365334473292e+234,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.267918667482764e+235,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 9.550713596478836e+167,
+      "value": 9.333697739578338e+251,
+      "overflow": false
+    },
+    {
+      "input": 2752024.121764367,
+      "value": 4565394952.426417,
+      "overflow": false
+    },
+    {
+      "input": 7.579647195672088e-153,
+      "value": 6.59892947553363e-229,
+      "overflow": false
+    },
+    {
+      "input": 6.020918061146634e+228,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.301645405332962e+253,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 8.947668410931696e+26,
+      "value": 2.676485050606769e+40,
+      "overflow": false
+    },
+    {
+      "input": 4.734783149919639e+105,
+      "value": 3.257992949043724e+158,
+      "overflow": false
+    },
+    {
+      "input": 6.217648020104583e+154,
+      "value": 1.5503837208691135e+232,
+      "overflow": false
+    },
+    {
+      "input": 3.802289030880932e+84,
+      "value": 7.41425792388603e+126,
+      "overflow": false
+    },
+    {
+      "input": 2.09615027624625e+75,
+      "value": 9.596958615120377e+112,
+      "overflow": false
+    },
+    {
+      "input": 5.195564709908429e-44,
+      "value": 1.184265663018959e-65,
+      "overflow": false
+    },
+    {
+      "input": 1.9975425345052437e+300,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.2872667432199504e+249,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.358531129943863e+194,
+      "value": 9.099347027194306e+291,
+      "overflow": false
+    },
+    {
+      "input": 1.4943970110041186e+286,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.147269957542818e+50,
+      "value": 1.2288487496468132e+75,
+      "overflow": false
+    },
+    {
+      "input": 1.0625435029970987e+228,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 5.4830731137342186e+216,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.4349542876407078e+114,
+      "value": 3.799585473926597e+171,
+      "overflow": false
+    },
+    {
+      "input": 7.81355388843326e+129,
+      "value": 6.906736979004339e+194,
+      "overflow": false
+    },
+    {
+      "input": 2.987002324514575e-65,
+      "value": 1.6325005672949725e-97,
+      "overflow": false
+    },
+    {
+      "input": 2.833164171809786e-230,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.4004188674691594e-268,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.286072529242664e-65,
+      "value": 4.612094450474273e-98,
+      "overflow": false
+    },
+    {
+      "input": 2.738864247041017e+58,
+      "value": 4.53268731163471e+87,
+      "overflow": false
+    },
+    {
+      "input": 5.4409215857206345e+199,
+      "value": 4.01336538305741e+299,
+      "overflow": false
+    },
+    {
+      "input": 4.9605237532320365e-40,
+      "value": 1.1048194222791665e-59,
+      "overflow": false
+    },
+    {
+      "input": 4.3607647384481554e-154,
+      "value": 9.10634261193642e-231,
+      "overflow": false
+    },
+    {
+      "input": 4.009958366160847e+287,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.9026866326359695e+258,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.828027049941417e+212,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.8572974574772562e-111,
+      "value": 1.5273310543513433e-166,
+      "overflow": false
+    },
+    {
+      "input": 1.1292364347234858e-294,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.1537145337422976e-216,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.4438598792064678e-124,
+      "value": 1.7349524363273485e-186,
+      "overflow": false
+    },
+    {
+      "input": 1.6342289155178996e+95,
+      "value": 6.606468000353645e+142,
+      "overflow": false
+    },
+    {
+      "input": 7.077438905299734e-239,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.645069552150529e+221,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.2655382609115265e-256,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.806447859383332e+51,
+      "value": 9.711081195291176e+77,
+      "overflow": false
+    },
+    {
+      "input": 1.5067714555916613e+236,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.180418088013815e+18,
+      "value": 3.219657420857049e+27,
+      "overflow": false
+    },
+    {
+      "input": 3.5396561103640945e+64,
+      "value": 6.659499740505848e+96,
+      "overflow": false
+    },
+    {
+      "input": 3.0683937007509066e+224,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.9649538630180488e-64,
+      "value": 5.10536632791091e-96,
+      "overflow": false
+    },
+    {
+      "input": 1.3796819903761508e-175,
+      "value": 5.124700543508435e-263,
+      "overflow": false
+    },
+    {
+      "input": 4.3597822534320433e-141,
+      "value": 2.8787052435892854e-211,
+      "overflow": false
+    },
+    {
+      "input": 8.645022934225073e-84,
+      "value": 2.541845939818337e-125,
+      "overflow": false
+    },
+    {
+      "input": 565038780873.5088,
+      "value": 4.247343487667339e+17,
+      "overflow": false
+    },
+    {
+      "input": 2.9240435062357847e-232,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 5.3937906461898215e+265,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 9.524255284595579e-07,
+      "value": 9.294938943644394e-10,
+      "overflow": false
+    },
+    {
+      "input": 7.331150112928006e+110,
+      "value": 1.9849892921537407e+166,
+      "overflow": false
+    },
+    {
+      "input": 1.7382483895785153e-194,
+      "value": 2.2917527098654193e-291,
+      "overflow": false
+    },
+    {
+      "input": 1.0870356211066209e-275,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.8903931405142793e+253,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.881586137297956e+265,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 5.6847146371802644e+187,
+      "value": 4.2861069445157975e+281,
+      "overflow": false
+    },
+    {
+      "input": 1.0359596603787232e-254,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.9901526672775974e-128,
+      "value": 2.8075635116958912e-192,
+      "overflow": false
+    },
+    {
+      "input": 1.9023370420656855e-60,
+      "value": 2.6238028337509977e-90,
+      "overflow": false
+    },
+    {
+      "input": 8.389000014289228e-230,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.144055698367439e+146,
+      "value": 5.574877729980671e+219,
+      "overflow": false
+    },
+    {
+      "input": 5.645554847870341e-131,
+      "value": 4.2418953160944143e-196,
+      "overflow": false
+    },
+    {
+      "input": 2.6152850337469254e+94,
+      "value": 4.2293978752378454e+141,
+      "overflow": false
+    },
+    {
+      "input": 5.5687003961426686e+150,
+      "value": 1.3141071530942857e+226,
+      "overflow": false
+    },
+    {
+      "input": 1.740513175067064e+65,
+      "value": 7.261326629008106e+97,
+      "overflow": false
+    },
+    {
+      "input": 3.842954744408293e-203,
+      "value": 2.3823079783849207e-304,
+      "overflow": false
+    },
+    {
+      "input": 3.6026853969994075e+84,
+      "value": 6.838163944902053e+126,
+      "overflow": false
+    },
+    {
+      "input": 9.533062224786052e-20,
+      "value": 2.943395636262084e-29,
+      "overflow": false
+    },
+    {
+      "input": 5.054609793283446e+289,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.8425319305362e+243,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.314416604443894e-307,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.863266024494705e+189,
+      "value": 8.042893118309688e+283,
+      "overflow": false
+    },
+    {
+      "input": 1.0593186783001508e-108,
+      "value": 1.0902847686047539e-162,
+      "overflow": false
+    },
+    {
+      "input": 7.003497683408959e+97,
+      "value": 5.861010291865053e+146,
+      "overflow": false
+    },
+    {
+      "input": 2.293881929550669e-158,
+      "value": 3.4742141939420623e-237,
+      "overflow": false
+    },
+    {
+      "input": 5.83806659489028e+89,
+      "value": 4.460705657848002e+134,
+      "overflow": false
+    },
+    {
+      "input": 9.908640241692294e+285,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.7673892035537453e-15,
+      "value": 7.430162235089586e-23,
+      "overflow": false
+    },
+    {
+      "input": 1.8243980824497644e+206,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.681490289417682e-163,
+      "value": 6.89511549977121e-245,
+      "overflow": false
+    },
+    {
+      "input": 2.419370690307866e-160,
+      "value": 3.763168134310575e-240,
+      "overflow": false
+    },
+    {
+      "input": 0.0290236510191735,
+      "value": 0.004944564712879792,
+      "overflow": false
+    },
+    {
+      "input": 1.2444336911217536e-106,
+      "value": 1.388217902167138e-159,
+      "overflow": false
+    },
+    {
+      "input": 7.546034304981915e-50,
+      "value": 2.0728990992265394e-74,
+      "overflow": false
+    },
+    {
+      "input": 9.488691960216061e-94,
+      "value": 2.9228701495752194e-140,
+      "overflow": false
+    },
+    {
+      "input": 1.7356643526165467e+256,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.3158275569705383e+208,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.440394658881546e+19,
+      "value": 2.9589141000831408e+29,
+      "overflow": false
+    },
+    {
+      "input": 1.2869922545028297e-148,
+      "value": 1.4600371279619652e-222,
+      "overflow": false
+    },
+    {
+      "input": 1.2769205906626e+19,
+      "value": 4.562951316668935e+28,
+      "overflow": false
+    },
+    {
+      "input": 1.8496163277982923e-249,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.2727569603255947e+271,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.6712054464165871e+38,
+      "value": 2.1604527049490396e+57,
+      "overflow": false
+    },
+    {
+      "input": 7.708050961406016e-160,
+      "value": 2.1400152390169164e-239,
+      "overflow": false
+    },
+    {
+      "input": 5.884451200622939e-207,
+      "value": 4.51397291047767e-310,
+      "overflow": false
+    },
+    {
+      "input": 1.7901673579613697e+46,
+      "value": 2.395192653074782e+69,
+      "overflow": false
+    },
+    {
+      "input": 4.0704124733973224e+234,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.18849795276016e-295,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.851246184243692e+118,
+      "value": 3.0919805863308752e+178,
+      "overflow": false
+    },
+    {
+      "input": 1.2552799572757726e+274,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.8836533244928322e-206,
+      "value": 2.58524355813159e-309,
+      "overflow": false
+    },
+    {
+      "input": 2.515315745794119e-154,
+      "value": 3.9892271327670904e-231,
+      "overflow": false
+    },
+    {
+      "input": 1.1770322250494531e-265,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 6.478967199454005e+206,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.7634070573286645e-203,
+      "value": 7.405064775099792e-305,
+      "overflow": false
+    },
+    {
+      "input": 1.8416592987910667e-261,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.401120769477873e+165,
+      "value": 1.98350399796339e+248,
+      "overflow": false
+    },
+    {
+      "input": 2.0704376957530725e-147,
+      "value": 9.420918552549746e-221,
+      "overflow": false
+    },
+    {
+      "input": 5.146872955044558e+88,
+      "value": 1.1676566913967785e+133,
+      "overflow": false
+    },
+    {
+      "input": 1.5983906009211372e+257,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 8.241209351570871e+147,
+      "value": 7.481461062942156e+221,
+      "overflow": false
+    },
+    {
+      "input": 1.137977443310295e-280,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 6.695830126019084e+190,
+      "value": 1.732633234398585e+286,
+      "overflow": false
+    },
+    {
+      "input": 6.248540709377382e-175,
+      "value": 4.93932843922861e-262,
+      "overflow": false
+    },
+    {
+      "input": 5.646077904203708e-68,
+      "value": 1.3415915040337589e-101,
+      "overflow": false
+    },
+    {
+      "input": 4.863546765059846e-304,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.7356886985019404e-170,
+      "value": 1.0305634111443608e-254,
+      "overflow": false
+    },
+    {
+      "input": 9.163219747253029e+266,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 9.414877869073201e+246,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.1196611718387846e-105,
+      "value": 1.7424532765033853e-157,
+      "overflow": false
+    },
+    {
+      "input": 1.2316460524270436e-65,
+      "value": 4.322439057550135e-98,
+      "overflow": false
+    },
+    {
+      "input": 4.145592521300725e+47,
+      "value": 2.6691926374982523e+71,
+      "overflow": false
+    },
+    {
+      "input": 6.45104182347621e-126,
+      "value": 1.6384937393443207e-188,
+      "overflow": false
+    },
+    {
+      "input": 7.93432029770452e+55,
+      "value": 7.067480071338618e+83,
+      "overflow": false
+    },
+    {
+      "input": 0.43326768922350345,
+      "value": 0.28519010581851756,
+      "overflow": false
+    },
+    {
+      "input": 4.594665661509088e+58,
+      "value": 9.848744525172429e+87,
+      "overflow": false
+    },
+    {
+      "input": 5.968793498044117e+138,
+      "value": 1.4582427665591307e+208,
+      "overflow": false
+    },
+    {
+      "input": 2.2333102562198216e+175,
+      "value": 1.0554157978444618e+263,
+      "overflow": false
+    },
+    {
+      "input": 2.917413465620654e+124,
+      "value": 4.983069847824927e+186,
+      "overflow": false
+    },
+    {
+      "input": 1.7770525949602347e-236,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.1571994721239903e-67,
+      "value": 3.9365188943963214e-101,
+      "overflow": false
+    },
+    {
+      "input": 4.103474341902464e-79,
+      "value": 2.6286186406174552e-118,
+      "overflow": false
+    },
+    {
+      "input": 2.2687326571336626e+27,
+      "value": 1.080624933209121e+41,
+      "overflow": false
+    },
+    {
+      "input": 5.127772992335869e+238,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.10468350350111e-304,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 6.851549379690404e-302,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.791771206720353e-97,
+      "value": 7.5844454131696164e-146,
+      "overflow": false
+    },
+    {
+      "input": 2.0733372324958008e-184,
+      "value": 2.9854164401722368e-276,
+      "overflow": false
+    },
+    {
+      "input": 2.6277961390890795e-186,
+      "value": 4.259783287262933e-279,
+      "overflow": false
+    },
+    {
+      "input": 8.855905536567051e-32,
+      "value": 2.635417728387933e-47,
+      "overflow": false
+    },
+    {
+      "input": 1.9885015029020482e+197,
+      "value": 8.867248619024306e+295,
+      "overflow": false
+    },
+    {
+      "input": 2.169819464388403e+271,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.845781139321894e+216,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.9909955309937584e-70,
+      "value": 7.973001801276537e-105,
+      "overflow": false
+    },
+    {
+      "input": 7.459581467064474e-231,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.1860963248440216e+153,
+      "value": 1.7984085244574949e+230,
+      "overflow": false
+    },
+    {
+      "input": 5.867017804722088e-179,
+      "value": 4.4939279920176626e-268,
+      "overflow": false
+    },
+    {
+      "input": 2.9013768169122808e-114,
+      "value": 4.942039415589744e-171,
+      "overflow": false
+    },
+    {
+      "input": 2.0774414479585427e+37,
+      "value": 9.468761731510249e+55,
+      "overflow": false
+    },
+    {
+      "input": 1.3981407857657296e-103,
+      "value": 5.227888992625585e-155,
+      "overflow": false
+    },
+    {
+      "input": 1.0294741571076861e+30,
+      "value": 1.0445354250093392e+45,
+      "overflow": false
+    },
+    {
+      "input": 1.2664084586996215e+214,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.5858464313731598e-27,
+      "value": 6.315266669331384e-41,
+      "overflow": false
+    },
+    {
+      "input": 6.743085417523625e-83,
+      "value": 5.537171713601118e-124,
+      "overflow": false
+    },
+    {
+      "input": 2.5357695599996582e+66,
+      "value": 4.037984766741324e+99,
+      "overflow": false
+    },
+    {
+      "input": 1.4181206758636942e-05,
+      "value": 5.34035076705396e-08,
+      "overflow": false
+    },
+    {
+      "input": 1.095770151017518e-150,
+      "value": 1.147041679656279e-225,
+      "overflow": false
+    },
+    {
+      "input": 3.0152672442584965e+252,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.7202888904300477e-188,
+      "value": 2.2563271905932662e-282,
+      "overflow": false
+    },
+    {
+      "input": 1.100068648106102e+104,
+      "value": 1.1537977327837534e+156,
+      "overflow": false
+    },
+    {
+      "input": 2.4242779087652786e-143,
+      "value": 1.1936406651342578e-214,
+      "overflow": false
+    },
+    {
+      "input": 2.0413389256487298e+185,
+      "value": 9.223009916940113e+277,
+      "overflow": false
+    },
+    {
+      "input": 5.72495956516999e+75,
+      "value": 4.331702636638445e+113,
+      "overflow": false
+    },
+    {
+      "input": 7.905038225292973e-64,
+      "value": 2.2225726279325865e-95,
+      "overflow": false
+    },
+    {
+      "input": 6.553974397668e+200,
+      "value": 1.677865370757817e+301,
+      "overflow": false
+    },
+    {
+      "input": 9.802040520677307e-55,
+      "value": 9.704535214215805e-82,
+      "overflow": false
+    },
+    {
+      "input": 5.993975881121688e-172,
+      "value": 1.467480998727669e-257,
+      "overflow": false
+    },
+    {
+      "input": 6.97612655542016e+224,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 5.174840298397979e+187,
+      "value": 3.722591893356133e+281,
+      "overflow": false
+    },
+    {
+      "input": 5.000183810281493e+152,
+      "value": 1.1180956411591608e+229,
+      "overflow": false
+    },
+    {
+      "input": 1.8268617169323862e-253,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.3816424759987982e+308,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 8.134868331574163e+238,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.356060436489279e-175,
+      "value": 6.309107582577377e-262,
+      "overflow": false
+    },
+    {
+      "input": 1.2305655998267343e+150,
+      "value": 1.3650770192766456e+225,
+      "overflow": false
+    },
+    {
+      "input": 5.459184549015983e+206,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 9.81786194723253e-233,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.2315605389762598e-154,
+      "value": 1.3667328957196064e-231,
+      "overflow": false
+    },
+    {
+      "input": 6.154395653811795e-229,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.208893646580764e+60,
+      "value": 3.2829344330461025e+90,
+      "overflow": false
+    },
+    {
+      "input": 4.188260632420899e+217,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.642507513558441e-125,
+      "value": 6.681189832794129e-187,
+      "overflow": false
+    },
+    {
+      "input": 1.5213276947562243e-103,
+      "value": 5.93381711757391e-155,
+      "overflow": false
+    },
+    {
+      "input": 4.1577760902597785e-38,
+      "value": 8.477965524526864e-57,
+      "overflow": false
+    },
+    {
+      "input": 6.478068416964225e+53,
+      "value": 5.213967210203476e+80,
+      "overflow": false
+    },
+    {
+      "input": 1.8873456455739155e-213,
+      "value": 8.1995e-320,
+      "overflow": false
+    },
+    {
+      "input": 8.404350408446631e-110,
+      "value": 2.4364428404517744e-164,
+      "overflow": false
+    },
+    {
+      "input": 3.7672358173705e-173,
+      "value": 2.312246921100246e-259,
+      "overflow": false
+    },
+    {
+      "input": 1.8622683565154587e-196,
+      "value": 2.541343648906359e-294,
+      "overflow": false
+    },
+    {
+      "input": 1.690443218553753e+117,
+      "value": 6.950257279831883e+175,
+      "overflow": false
+    },
+    {
+      "input": 3.456394605204133e+280,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.0510181731801816e-20,
+      "value": 1.0774951853165448e-30,
+      "overflow": false
+    },
+    {
+      "input": 2.411524230579153e-109,
+      "value": 1.1842337797803143e-163,
+      "overflow": false
+    },
+    {
+      "input": 1.5530710587021762e+16,
+      "value": 1.935472433432608e+24,
+      "overflow": false
+    },
+    {
+      "input": 2.3567376437168737e-307,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 6.512614324301654e-77,
+      "value": 5.255729925285391e-115,
+      "overflow": false
+    },
+    {
+      "input": 3.350649223248382e-216,
+      "value": 5e-324,
+      "overflow": false
+    },
+    {
+      "input": 4.6106741456793927e+285,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.2449651094585824e-25,
+      "value": 4.392742749026372e-38,
+      "overflow": false
+    },
+    {
+      "input": 1.3836171099029742e-55,
+      "value": 5.146641123340581e-83,
+      "overflow": false
+    },
+    {
+      "input": 3.5182175709457796e+191,
+      "value": 2.086815433074044e+287,
+      "overflow": false
+    },
+    {
+      "input": 6.784843625520576e+241,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.115522949113519e-193,
+      "value": 3.72578477660002e-290,
+      "overflow": false
+    },
+    {
+      "input": 1.4706895891855389e+183,
+      "value": 5.640031469098931e+274,
+      "overflow": false
+    },
+    {
+      "input": 5.4937145206447106e+163,
+      "value": 4.071919011594195e+245,
+      "overflow": false
+    },
+    {
+      "input": 1.9127726489564467e+251,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 5.529423623601044e+247,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.6677603334330212e-306,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.4684814937463474e+297,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.679480902885382e+191,
+      "value": 3.201079932853511e+287,
+      "overflow": false
+    },
+    {
+      "input": 5.356893834161201e-149,
+      "value": 3.920753682749079e-223,
+      "overflow": false
+    },
+    {
+      "input": 4.618502838863375e-82,
+      "value": 9.925486942474013e-123,
+      "overflow": false
+    },
+    {
+      "input": 1.1818785396562375e+265,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.5380953801157664e+237,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 9.010084746224803e-265,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.3512015880117566e+150,
+      "value": 1.5706528997951253e+225,
+      "overflow": false
+    },
+    {
+      "input": 9.578831903497535e-52,
+      "value": 2.9646185929005043e-77,
+      "overflow": false
+    },
+    {
+      "input": 1.8379869224068833e+111,
+      "value": 7.879771529074671e+166,
+      "overflow": false
+    },
+    {
+      "input": 3.3928280721716933e+273,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.2060129089136384e+204,
+      "value": 1.3244267220835795e+306,
+      "overflow": false
+    },
+    {
+      "input": 6.4631539922772046e-46,
+      "value": 1.643110441356615e-68,
+      "overflow": false
+    },
+    {
+      "input": 1.7592620017561651e+78,
+      "value": 2.3334354084106078e+117,
+      "overflow": false
+    },
+    {
+      "input": 9.382195817218169e-119,
+      "value": 9.087757702932749e-178,
+      "overflow": false
+    },
+    {
+      "input": 3.481051561005299e-257,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 8.705355767333252e-297,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.6406539670334133e-253,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.8389611130102485e-197,
+      "value": 3.3661091785162386e-295,
+      "overflow": false
+    },
+    {
+      "input": 5.527024332988858e+255,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.735094336096373e+89,
+      "value": 5.52733166070648e+134,
+      "overflow": false
+    },
+    {
+      "input": 2.0435170507465218e-60,
+      "value": 2.92124107545031e-90,
+      "overflow": false
+    },
+    {
+      "input": 6.997388633066066e+291,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.0703255733972333e-107,
+      "value": 1.7012833234476608e-160,
+      "overflow": false
+    },
+    {
+      "input": 1.8595889053679837e+92,
+      "value": 2.5358608546166408e+138,
+      "overflow": false
+    },
+    {
+      "input": 6.069556828963189e-224,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.2678659795293545e+135,
+      "value": 4.514503800347832e+202,
+      "overflow": false
+    },
+    {
+      "input": 6.651432545595178e-289,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 8.965075131767606e+62,
+      "value": 2.684299066001055e+94,
+      "overflow": false
+    },
+    {
+      "input": 0.00018087662387281976,
+      "value": 2.4326165928030028e-06,
+      "overflow": false
+    },
+    {
+      "input": 2.3056860099080818e-150,
+      "value": 3.501065586784093e-225,
+      "overflow": false
+    },
+    {
+      "input": 1.3510543393825744e-69,
+      "value": 4.966028698924296e-104,
+      "overflow": false
+    },
+    {
+      "input": 1.2580105707300322e-25,
+      "value": 4.4619678382885247e-38,
+      "overflow": false
+    },
+    {
+      "input": 8.505226924360881e-97,
+      "value": 7.843842379069396e-145,
+      "overflow": false
+    },
+    {
+      "input": 3.9912549012932657e+152,
+      "value": 7.973779048499946e+228,
+      "overflow": false
+    },
+    {
+      "input": 3.1756143298889555e+227,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.878454498706085e-09,
+      "value": 1.5443262484265825e-13,
+      "overflow": false
+    },
+    {
+      "input": 1.3200241228279303e-158,
+      "value": 1.5166061114048494e-237,
+      "overflow": false
+    },
+    {
+      "input": 3.1853380484689356e+136,
+      "value": 5.685036977552785e+204,
+      "overflow": false
+    },
+    {
+      "input": 8.984146509732388e+22,
+      "value": 2.692869071966945e+34,
+      "overflow": false
+    },
+    {
+      "input": 1.4470702157076303e+227,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.7844961123595357e-308,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.2713340210501434e+98,
+      "value": 8.827653992790004e+147,
+      "overflow": false
+    },
+    {
+      "input": 2.731224888426409e+99,
+      "value": 1.42736877514458e+149,
+      "overflow": false
+    },
+    {
+      "input": 2.6059183348025797e-26,
+      "value": 4.206696714199075e-39,
+      "overflow": false
+    },
+    {
+      "input": 1.3330292039315793e-244,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.368655879750187e+176,
+      "value": 6.182796789892201e+264,
+      "overflow": false
+    },
+    {
+      "input": 4.7823376250465016e+169,
+      "value": 3.307199167723503e+254,
+      "overflow": false
+    },
+    {
+      "input": 3.389829973057279e-172,
+      "value": 6.241182371483462e-258,
+      "overflow": false
+    },
+    {
+      "input": 5.2010182024359626e+23,
+      "value": 3.75087473472183e+35,
+      "overflow": false
+    },
+    {
+      "input": 6.4536764116927e-70,
+      "value": 1.6394975765053263e-104,
+      "overflow": false
+    },
+    {
+      "input": 2.368445066767156e+50,
+      "value": 3.644978528536923e+75,
+      "overflow": false
+    },
+    {
+      "input": 3.5080607220369976e-99,
+      "value": 2.0777852222649113e-148,
+      "overflow": false
+    },
+    {
+      "input": 1.8654760505502207e-267,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.2558866745451753e-198,
+      "value": 5.8749465588870266e-297,
+      "overflow": false
+    },
+    {
+      "input": 2.590182177720834e+157,
+      "value": 1.3182429767303825e+236,
+      "overflow": false
+    },
+    {
+      "input": 1.188308109941741e-175,
+      "value": 4.096317318908298e-263,
+      "overflow": false
+    },
+    {
+      "input": 2.0911686305148107e-215,
+      "value": 9.4e-323,
+      "overflow": false
+    },
+    {
+      "input": 1.1377680599559754e-254,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.3911421200637753e+249,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.5499797005164872e-166,
+      "value": 1.9296965288326282e-249,
+      "overflow": false
+    },
+    {
+      "input": 5.90590129625179e+190,
+      "value": 1.4352556879554727e+286,
+      "overflow": false
+    },
+    {
+      "input": 6.406153821036647e+212,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.0161620952347603e-273,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.8548745513724445e+183,
+      "value": 2.3934004819801808e+275,
+      "overflow": false
+    },
+    {
+      "input": 2.0581147629088627e-212,
+      "value": 2.9526e-318,
+      "overflow": false
+    },
+    {
+      "input": 4.527116866740871e-80,
+      "value": 9.632356745596491e-120,
+      "overflow": false
+    },
+    {
+      "input": 2.730971670332634e+167,
+      "value": 1.4271702778196003e+251,
+      "overflow": false
+    },
+    {
+      "input": 8.456304662364743e-230,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.2151142294999752e+30,
+      "value": 3.2968120614608156e+45,
+      "overflow": false
+    },
+    {
+      "input": 8.559290448692593e-230,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.642231836765472e+29,
+      "value": 9.468176694369599e+44,
+      "overflow": false
+    },
+    {
+      "input": 1.9918117600070373e-160,
+      "value": 2.811075035414453e-240,
+      "overflow": false
+    },
+    {
+      "input": 2.6880698871276292e-250,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 8.101735183407143e-247,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 402619245.4669441,
+      "value": 8078705857345.391,
+      "overflow": false
+    },
+    {
+      "input": 1.169202738703139,
+      "value": 1.264255163157814,
+      "overflow": false
+    },
+    {
+      "input": 9.674173965255274e-126,
+      "value": 3.008990656654666e-188,
+      "overflow": false
+    },
+    {
+      "input": 1.631703173044316e+289,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 8.368050544499527e+245,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.333461404832836e-247,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.431054378376196e+132,
+      "value": 6.355378227075166e+198,
+      "overflow": false
+    },
+    {
+      "input": 1.939127151595725e+176,
+      "value": 2.7002839251868423e+264,
+      "overflow": false
+    },
+    {
+      "input": 7.713268342265313e+189,
+      "value": 6.774194484249385e+284,
+      "overflow": false
+    },
+    {
+      "input": 3.2703244707077856e-73,
+      "value": 1.8701923064577336e-109,
+      "overflow": false
+    },
+    {
+      "input": 0.09405290008229536,
+      "value": 0.028844185977135797,
+      "overflow": false
+    },
+    {
+      "input": 6.166255295207156e+179,
+      "value": 4.842083251379624e+269,
+      "overflow": false
+    },
+    {
+      "input": 3.806224183194641e+24,
+      "value": 7.425770902628425e+36,
+      "overflow": false
+    },
+    {
+      "input": 5.0579006172478713e-17,
+      "value": 3.597124235087002e-25,
+      "overflow": false
+    },
+    {
+      "input": 3.4106654401098116e+211,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.617658348081913e+211,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.171646094472377e-163,
+      "value": 6.073349512475799e-244,
+      "overflow": false
+    },
+    {
+      "input": 1.3049345335238065e+250,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.3191903247370888e+57,
+      "value": 4.791386293139046e+85,
+      "overflow": false
+    },
+    {
+      "input": 1.6733593482194386e+107,
+      "value": 6.845163428007446e+160,
+      "overflow": false
+    },
+    {
+      "input": 5.726236771904267e+212,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.4379848320290124e+209,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.9599112527187367e+243,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.4283675153029563e-244,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.8385160136080392e-209,
+      "value": 7.8831742336e-314,
+      "overflow": false
+    },
+    {
+      "input": 2.195715816823992e+217,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 8.042298530589591e-144,
+      "value": 2.280711146833027e-215,
+      "overflow": false
+    },
+    {
+      "input": 3.5123595105648944e+197,
+      "value": 2.081605578754836e+296,
+      "overflow": false
+    },
+    {
+      "input": 1.0453233391508817e+71,
+      "value": 3.3796830267070266e+106,
+      "overflow": false
+    },
+    {
+      "input": 9.949712586496334e+281,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.20588328875659e+290,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 9.912322500126512e+178,
+      "value": 3.1207798646337975e+268,
+      "overflow": false
+    },
+    {
+      "input": 4.576248831967378e+187,
+      "value": 3.0957397707655005e+281,
+      "overflow": false
+    },
+    {
+      "input": 4.507340814454428e+206,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 9.403757766328763e+73,
+      "value": 9.119103612517355e+110,
+      "overflow": false
+    },
+    {
+      "input": 8.666117631410569e-218,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.2136900613427127e+272,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.195748380663337e-169,
+      "value": 6.103991960440935e-253,
+      "overflow": false
+    },
+    {
+      "input": 5.928055762072876e+198,
+      "value": 1.4433392444019782e+298,
+      "overflow": false
+    },
+    {
+      "input": 9.615278164729277e+79,
+      "value": 9.428503768431972e+119,
+      "overflow": false
+    },
+    {
+      "input": 1.931965533072984e+247,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.3173466605369366e-57,
+      "value": 1.1155434988473415e-85,
+      "overflow": false
+    },
+    {
+      "input": 6.020896685442786e-247,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.435903000477889e-256,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.1858295418323895e+57,
+      "value": 1.0219377375550077e+86,
+      "overflow": false
+    },
+    {
+      "input": 2439154092.3862395,
+      "value": 120464437285797.28,
+      "overflow": false
+    },
+    {
+      "input": 1.1769340332350851e-203,
+      "value": 4.03764546654092e-305,
+      "overflow": false
+    },
+    {
+      "input": 2.3287407994686927e-130,
+      "value": 3.55370790301569e-195,
+      "overflow": false
+    },
+    {
+      "input": 1.1080160549157462e-14,
+      "value": 1.1663236441841746e-21,
+      "overflow": false
+    },
+    {
+      "input": 120.17548044391593,
+      "value": 1317.41862982115,
+      "overflow": false
+    },
+    {
+      "input": 2.846431129415218e+215,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.0446147942810722e+284,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.51282585909295e+134,
+      "value": 1.8607302117023825e+201,
+      "overflow": false
+    },
+    {
+      "input": 4.9045672912948954e-64,
+      "value": 1.08617811030902e-95,
+      "overflow": false
+    },
+    {
+      "input": 5.915671685968353e-111,
+      "value": 4.5499444520289015e-166,
+      "overflow": false
+    },
+    {
+      "input": 1.7169019514662102e-175,
+      "value": 7.114071756108788e-263,
+      "overflow": false
+    },
+    {
+      "input": 1.3416355496905522e+97,
+      "value": 4.9141887805006194e+145,
+      "overflow": false
+    },
+    {
+      "input": 2.2452152663531572e-142,
+      "value": 3.364240074743762e-213,
+      "overflow": false
+    },
+    {
+      "input": 9.546787821071395e-233,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.7963633568641548e-108,
+      "value": 4.676171211237393e-162,
+      "overflow": false
+    },
+    {
+      "input": 1.2672463279265311e+250,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.0821720995500167e+165,
+      "value": 9.501122862667475e+247,
+      "overflow": false
+    },
+    {
+      "input": 2.2112532424541485e-07,
+      "value": 1.0398189409492243e-10,
+      "overflow": false
+    },
+    {
+      "input": 3.2466750244087944e+75,
+      "value": 1.8499425015377013e+113,
+      "overflow": false
+    },
+    {
+      "input": 1.5041437654171846e-46,
+      "value": 1.8447351452934853e-69,
+      "overflow": false
+    },
+    {
+      "input": 5.888865682393802e-279,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.426654352061504e-61,
+      "value": 9.152429127819626e-91,
+      "overflow": false
+    },
+    {
+      "input": 4.0898524005661593e-75,
+      "value": 2.615540519530109e-112,
+      "overflow": false
+    },
+    {
+      "input": 6.0749693988782165e+131,
+      "value": 4.7349581184155267e+197,
+      "overflow": false
+    },
+    {
+      "input": 2.7603211633553525e+176,
+      "value": 4.586056730570216e+264,
+      "overflow": false
+    },
+    {
+      "input": 1.0536264661958662e-75,
+      "value": 3.420030717837468e-113,
+      "overflow": false
+    },
+    {
+      "input": 3.9642391096036557e-131,
+      "value": 2.495972308016574e-196,
+      "overflow": false
+    },
+    {
+      "input": 3.3179334218740687e-152,
+      "value": 6.043680548770763e-228,
+      "overflow": false
+    },
+    {
+      "input": 1.929940930871642e-97,
+      "value": 8.478441449000741e-146,
+      "overflow": false
+    },
+    {
+      "input": 2.8907215425575574e-36,
+      "value": 4.914840048360448e-54,
+      "overflow": false
+    },
+    {
+      "input": 3.880201101698313e-81,
+      "value": 2.4170261659107665e-121,
+      "overflow": false
+    },
+    {
+      "input": 7.241049869322919e-157,
+      "value": 6.161724943813706e-235,
+      "overflow": false
+    },
+    {
+      "input": 4.3574181186733396e+150,
+      "value": 9.095861783345288e+225,
+      "overflow": false
+    },
+    {
+      "input": 1.9127811597845575e+39,
+      "value": 8.365616049778424e+58,
+      "overflow": false
+    },
+    {
+      "input": 6.633092311510937e+47,
+      "value": 5.402242335448141e+71,
+      "overflow": false
+    },
+    {
+      "input": 6.48400218704342e-94,
+      "value": 1.65106712083068e-140,
+      "overflow": false
+    },
+    {
+      "input": 1.389452631440427e-266,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.1452814968239309e-190,
+      "value": 1.2256553534065253e-285,
+      "overflow": false
+    },
+    {
+      "input": 4.894870670553997e-127,
+      "value": 3.424615613793086e-190,
+      "overflow": false
+    },
+    {
+      "input": 3.2829624293381313e-90,
+      "value": 5.948382249073283e-135,
+      "overflow": false
+    },
+    {
+      "input": 4.658016793767156e+275,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.280489087627849e+18,
+      "value": 1.9644493371161262e+28,
+      "overflow": false
+    },
+    {
+      "input": 2.6673114437236577e+265,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.7256343253509953e-183,
+      "value": 2.2740517277278482e-274,
+      "overflow": false
+    },
+    {
+      "input": 2.8184917122818815e+128,
+      "value": 4.731786525271763e+192,
+      "overflow": false
+    },
+    {
+      "input": 5.433250075130632e+278,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.337872740093374e-92,
+      "value": 1.9877202555303546e-137,
+      "overflow": false
+    },
+    {
+      "input": 4.258246073538351e+134,
+      "value": 8.787111393490803e+201,
+      "overflow": false
+    },
+    {
+      "input": 6.7855841107204855e+159,
+      "value": 5.589601634532521e+239,
+      "overflow": false
+    },
+    {
+      "input": 1.9152239913893081e+90,
+      "value": 2.650509468709396e+135,
+      "overflow": false
+    },
+    {
+      "input": 2.4837601950261654e+215,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 3.4659375130869066e-242,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.418598260333118e-157,
+      "value": 9.140699029774795e-235,
+      "overflow": false
+    },
+    {
+      "input": 9.576660206474261e-68,
+      "value": 2.9636104498659166e-101,
+      "overflow": false
+    },
+    {
+      "input": 2.2895448336930063e+61,
+      "value": 1.0955286217308896e+92,
+      "overflow": false
+    },
+    {
+      "input": 7.558628458304144e+21,
+      "value": 6.571499775735878e+32,
+      "overflow": false
+    },
+    {
+      "input": 6.097484284358074e-234,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.121383716065156e+253,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.591762173048417e-283,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.0668139365044193e+120,
+      "value": 1.1018767535808693e+180,
+      "overflow": false
+    },
+    {
+      "input": 8.827473018909156e-68,
+      "value": 2.6227361253686416e-101,
+      "overflow": false
+    },
+    {
+      "input": 5.776812167924153e+160,
+      "value": 1.3884567946971054e+241,
+      "overflow": false
+    },
+    {
+      "input": 6.38909986138982e-167,
+      "value": 5.106925404610094e-250,
+      "overflow": false
+    },
+    {
+      "input": 1.0869748082558516e-155,
+      "value": 3.583679962995674e-233,
+      "overflow": false
+    },
+    {
+      "input": 2.2765510431983074e-42,
+      "value": 3.434915741576861e-63,
+      "overflow": false
+    },
+    {
+      "input": 2.536905918597025e-285,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.7430908035718273e-143,
+      "value": 7.27746318933811e-215,
+      "overflow": false
+    },
+    {
+      "input": 8.950510786710268e-132,
+      "value": 2.6777604969129674e-197,
+      "overflow": false
+    },
+    {
+      "input": 9.565750606226616e+58,
+      "value": 2.958547735694532e+88,
+      "overflow": false
+    },
+    {
+      "input": 1.402825012194074e+60,
+      "value": 1.6615187670204267e+90,
+      "overflow": false
+    },
+    {
+      "input": 2.5097816740639795e+295,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 6.900291005989411e-271,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.5706224524669175e+98,
+      "value": 9.771540200230439e+147,
+      "overflow": false
+    },
+    {
+      "input": 1.9938928372632842e-36,
+      "value": 2.8154817712068484e-54,
+      "overflow": false
+    },
+    {
+      "input": 5.563729950548663e-42,
+      "value": 1.3123481501139672e-62,
+      "overflow": false
+    },
+    {
+      "input": 2.2656980550901875e+30,
+      "value": 3.410382159735049e+45,
+      "overflow": false
+    },
+    {
+      "input": 1.7936767686276024e-50,
+      "value": 2.40223934024357e-75,
+      "overflow": false
+    },
+    {
+      "input": 1.4949809730315493e-188,
+      "value": 1.827904483109879e-282,
+      "overflow": false
+    },
+    {
+      "input": 9.408054983797271e+131,
+      "value": 9.125355035950953e+197,
+      "overflow": false
+    },
+    {
+      "input": 2.522241559265257e-210,
+      "value": 4.00571472e-315,
+      "overflow": false
+    },
+    {
+      "input": 7176697861383.43,
+      "value": 1.922591395295098e+19,
+      "overflow": false
+    },
+    {
+      "input": 2.697824790855051e-269,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 5.544838246582558e-135,
+      "value": 4.128890089977292e-202,
+      "overflow": false
+    },
+    {
+      "input": 4.927196722081673e+45,
+      "value": 3.4585961463401385e+68,
+      "overflow": false
+    },
+    {
+      "input": 2.7222966944403563e+299,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.5711603892403424e+128,
+      "value": 1.9693857097856804e+192,
+      "overflow": false
+    },
+    {
+      "input": 3.116728653298803e+73,
+      "value": 1.739996963819336e+110,
+      "overflow": false
+    },
+    {
+      "input": 48169921984.61992,
+      "value": 1.0572164558177076e+16,
+      "overflow": false
+    },
+    {
+      "input": 2.6944935482485982e+126,
+      "value": 4.422987602675806e+189,
+      "overflow": false
+    },
+    {
+      "input": 2.9339522326522267e-141,
+      "value": 1.5892036662768922e-211,
+      "overflow": false
+    },
+    {
+      "input": 2.7797301419494745e+152,
+      "value": 4.634511397596751e+228,
+      "overflow": false
+    },
+    {
+      "input": 2.70662398470111e-69,
+      "value": 1.4081272045223363e-103,
+      "overflow": false
+    },
+    {
+      "input": 8.359459390315216e-246,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.1335640866854206e-266,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.404583322791862e-121,
+      "value": 1.179124724676266e-181,
+      "overflow": false
+    },
+    {
+      "input": 4.531420892130508e-97,
+      "value": 3.050363558596756e-145,
+      "overflow": false
+    },
+    {
+      "input": 3.2436850530385484e-216,
+      "value": 5e-324,
+      "overflow": false
+    },
+    {
+      "input": 3.913979659575318e+149,
+      "value": 2.4486563895286843e+224,
+      "overflow": false
+    },
+    {
+      "input": 4.842148501509709e-166,
+      "value": 1.065509084175203e-248,
+      "overflow": false
+    },
+    {
+      "input": 6.918251777021963e-214,
+      "value": 1.8196e-320,
+      "overflow": false
+    },
+    {
+      "input": 9.774679342012174e-76,
+      "value": 3.05600301893955e-113,
+      "overflow": false
+    },
+    {
+      "input": 1.8394272284407357e+149,
+      "value": 7.889035609356968e+223,
+      "overflow": false
+    },
+    {
+      "input": 6.348011333667143e+248,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.6253363878414472e-105,
+      "value": 1.3451708175379669e-157,
+      "overflow": false
+    },
+    {
+      "input": 6.322427747479073e+258,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.1551153644499183e-286,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 4.302473959346036e-229,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 9.881891704588782e+61,
+      "value": 9.823361700050112e+92,
+      "overflow": false
+    },
+    {
+      "input": 7.522718040955507e-100,
+      "value": 2.0632990418196662e-149,
+      "overflow": false
+    },
+    {
+      "input": 4.41329411699826e+301,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.076865552914223e+280,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.2577009134078197e-250,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 7.077051872836288e-262,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.668702359173094e+254,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.291858097993992e-228,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.008229006752964e-221,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.7827380558996515e+205,
+      "value": 1.4679406295465625e+308,
+      "overflow": false
+    },
+    {
+      "input": 1.6480278337808795e-301,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.2984076828670362e-11,
+      "value": 4.678607524089425e-17,
+      "overflow": false
+    },
+    {
+      "input": 6.392243786455262e+75,
+      "value": 5.1106953642621856e+113,
+      "overflow": false
+    },
+    {
+      "input": 1.51994175462682e-272,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.2802330838528672e-258,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 2.75844034366711e-207,
+      "value": 1.4487564882786e-310,
+      "overflow": false
+    },
+    {
+      "input": 3.904658976926189e-275,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 3.1378584746905716e+164,
+      "value": 5.5584029579283736e+246,
+      "overflow": false
+    },
+    {
+      "input": 2.526394969163225e+243,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 5.6827783632593035e-14,
+      "value": 1.354693594724692e-20,
+      "overflow": false
+    },
+    {
+      "input": 3.145709021511505e+57,
+      "value": 1.7643218872112587e+86,
+      "overflow": false
+    },
+    {
+      "input": 1.246026999968999e-262,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 5.732994328102083e+84,
+      "value": 1.372689362448144e+127,
+      "overflow": false
+    },
+    {
+      "input": 4.1942270454510053e-212,
+      "value": 8.589697e-318,
+      "overflow": false
+    },
+    {
+      "input": 9.478384728959399e+31,
+      "value": 9.227870670068057e+47,
+      "overflow": false
+    },
+    {
+      "input": 2.965413472074666e-191,
+      "value": 1.6148339983995632e-286,
+      "overflow": false
+    },
+    {
+      "input": 1.4250050049759939e+245,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.234777293372632e-152,
+      "value": 1.3720911141769188e-228,
+      "overflow": false
+    },
+    {
+      "input": 2.337884239489459e+161,
+      "value": 1.1304061323436362e+242,
+      "overflow": false
+    },
+    {
+      "input": 1.4832232307803393e+157,
+      "value": 5.712283830231647e+235,
+      "overflow": false
+    },
+    {
+      "input": 1.0222456137063395e-48,
+      "value": 1.0335533134454043e-72,
+      "overflow": false
+    },
+    {
+      "input": 6.458883421209573e+148,
+      "value": 1.641482166525839e+223,
+      "overflow": false
+    },
+    {
+      "input": 1.865773528913212e-100,
+      "value": 2.5485220218837937e-150,
+      "overflow": false
+    },
+    {
+      "input": 2.85629086363851e-32,
+      "value": 4.8272928474068743e-48,
+      "overflow": false
+    },
+    {
+      "input": 4.2676699285393713e+126,
+      "value": 8.816297445981555e+189,
+      "overflow": false
+    },
+    {
+      "input": 1.7852349446253751e+25,
+      "value": 7.542981956706809e+37,
+      "overflow": false
+    },
+    {
+      "input": 3.7675031369456363e+95,
+      "value": 2.3124930378259447e+143,
+      "overflow": false
+    },
+    {
+      "input": 2.4113418823444762e+290,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.181094874953335e+58,
+      "value": 8.549388125068133e+87,
+      "overflow": false
+    },
+    {
+      "input": 4.2100717901298677e+83,
+      "value": 2.731707859772262e+125,
+      "overflow": false
+    },
+    {
+      "input": 1.9353412184880856e+112,
+      "value": 2.6923797739726215e+168,
+      "overflow": false
+    },
+    {
+      "input": 5.8043611747812114e+79,
+      "value": 4.422131395460564e+119,
+      "overflow": false
+    },
+    {
+      "input": 4.053445538871607e-210,
+      "value": 8.16087101e-315,
+      "overflow": false
+    },
+    {
+      "input": 3.900400045133257e-151,
+      "value": 2.4359239711435375e-226,
+      "overflow": false
+    },
+    {
+      "input": 5.1732888849531414e+107,
+      "value": 3.720917973224624e+161,
+      "overflow": false
+    },
+    {
+      "input": 3.139585095985396e+202,
+      "value": 5.562991394804644e+303,
+      "overflow": false
+    },
+    {
+      "input": 5.706669988296207e+248,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.8472273629009623e+268,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 7.455392810044059e+261,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.0767393293162368e-172,
+      "value": 1.1172898791582828e-258,
+      "overflow": false
+    },
+    {
+      "input": 2.374986672379141e-238,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 10219361.204910064,
+      "value": 32668983717.52048,
+      "overflow": false
+    },
+    {
+      "input": 3.216249006782524e+111,
+      "value": 1.8239985874093656e+167,
+      "overflow": false
+    },
+    {
+      "input": 5.875220429709748e+201,
+      "value": 4.503355665933992e+302,
+      "overflow": false
+    },
+    {
+      "input": 4.627905982461819e+260,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 2.590855135815924e-102,
+      "value": 4.1702750139762564e-153,
+      "overflow": false
+    },
+    {
+      "input": 7.189005819353676e+305,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 4.7600302336234625e-227,
+      "value": 0.0,
+      "overflow": false
+    },
+    {
+      "input": 1.8391015375347901e+99,
+      "value": 7.886940440781957e+148,
+      "overflow": false
+    },
+    {
+      "input": 54028986524.192276,
+      "value": 1.2558571186779162e+16,
+      "overflow": false
+    },
+    {
+      "input": 1.8737450074950317e+233,
+      "value": null,
+      "overflow": true
+    },
+    {
+      "input": 1.2083135587781847e+114,
+      "value": 1.3282183417834362e+171,
+      "overflow": false
+    },
+    {
+      "input": 2.003286223442478e+134,
+      "value": 2.835401120191924e+201,
+      "overflow": false
+    },
+    {
+      "input": 1.3067431884292486e+45,
+      "value": 4.7237332770329005e+67,
+      "overflow": false
+    },
+    {
+      "input": 1.5596223865470181e+86,
+      "value": 1.9477319597364546e+129,
+      "overflow": false
+    },
+    {
+      "input": 3.1727571734522035e-111,
+      "value": 1.7871263244925743e-166,
+      "overflow": false
+    },
+    {
+      "input": 4.207513732983636e+194,
+      "value": 8.630546826337303e+291,
+      "overflow": false
+    },
+    {
+      "input": 6.450512931524672e-183,
+      "value": 5.180734965160457e-274,
+      "overflow": false
+    },
+    {
+      "input": 6.188567682277396e-155,
+      "value": 4.868388384329827e-232,
+      "overflow": false
+    },
+    {
+      "input": 3.3066008156439743e-24,
+      "value": 6.01274315810065e-36,
+      "overflow": false
+    }
+  ]
+}

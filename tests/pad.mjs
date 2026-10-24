@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';import {execFileSync} from 'node:child_process';import {createHash} from 'node:crypto';
-import createKernel from '../dist/asitic.js';import {parseTechnology,configureKernel,createGeometry} from '../web/technology.mjs';
+import createKernel from './reference-kernel.mjs';import {parseTechnology,configureKernel,createGeometry} from '../web/technology.mjs';
 const input=readFileSync('tests/fixtures/pad-cases.json','utf8'),cases=JSON.parse(input).cases,original=JSON.parse(readFileSync('tests/fixtures/original-pad.json','utf8')),text=readFileSync('web/technology/CMOS.tek','utf8'),hash=v=>createHash('sha256').update(v).digest('hex');
 assert.equal(hash(input),original.case_definition_sha256);assert.equal(hash(text),original.technology_sha256);
 const cpuProbe=JSON.parse(execFileSync('build/native-geometry',['--x87-raw',...original.hardware.log_operand].map(String),{encoding:'utf8'})),hostSignature=Object.fromEntries(['low','high','exponent'].map(key=>[key,cpuProbe[key]])),referenceHardware=JSON.stringify(hostSignature)===JSON.stringify(original.hardware.log_signature),hostDifferences=[];

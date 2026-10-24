@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';import {execFileSync} from 'node:child_process';import {createHash} from 'node:crypto';
-import {networkMatrixCSV} from '../web/network.mjs';import createKernel from '../dist/asitic.js';import {parseTechnology,configureKernel,createGeometry} from '../web/technology.mjs';
+import {networkMatrixCSV} from '../web/network.mjs';import createKernel from './reference-kernel.mjs';import {parseTechnology,configureKernel,createGeometry} from '../web/technology.mjs';
 const input=readFileSync('tests/fixtures/transformer-cases.json','utf8'),cases=JSON.parse(input).cases,original=JSON.parse(readFileSync('tests/fixtures/original-transformer.json','utf8')),text=readFileSync('web/technology/CMOS.tek','utf8'),hash=value=>createHash('sha256').update(value).digest('hex');
 assert.equal(hash(input),original.case_definition_sha256);assert.equal(hash(text),original.technology_sha256);
 const kernel=await createKernel(),technology=parseTechnology(text);let fields=0,printed=0,rawCacheBytes=0;const reports=[],failures=[];

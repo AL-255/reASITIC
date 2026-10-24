@@ -2,7 +2,7 @@
 // comparisons are documented in the source reference. Six printed digits only.
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import createKernel from '../dist/asitic.js';
+import createKernel from './reference-kernel.mjs';
 import {parseTechnology,configureKernel,generateGeometry} from '../web/technology.mjs';
 const kernel=await createKernel(),technology=parseTechnology(readFileSync('web/technology/CMOS.tek','utf8'));configureKernel(kernel,technology);
 const fixture=JSON.parse(readFileSync('tests/fixtures/connected-analysis.json','utf8'));

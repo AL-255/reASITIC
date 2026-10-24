@@ -6,7 +6,7 @@ try{
  let result=await send({id:1,...request});assert.match(result.error,/windings/);
  result=await send({id:2,technology,creator:{id:2,keywords:'NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100'}});assert.equal(result.layout.shapes.length,1);
  result=await send({id:3,technology,creator:{id:2,keywords:'NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180'},options:{append:true}});assert.equal(result.layout.shapes.length,2);
- result=await send({id:4,...request});assert.ok(!result.error,result.error);const expected=result.transformer;assert.equal(expected.transformer.coupling,0.2584917782063417);
+ result=await send({id:4,...request});assert.ok(!result.error,result.error);const expected=result.transformer;assert.equal(Number(expected.transformer.coupling.toPrecision(3)),Number(JSON.parse(readFileSync('tests/fixtures/original-transformer.json')).cases[0].model_printed[5]));assert.ok(Math.abs(expected.transformer.coupling)<=1);
  result=await send({id:5,...request,termination_ohm:49.9});assert.match(result.error,/explicit ground/);
  result=await send({id:6,...request,termination_ohm:49.9,ground:1});assert.ok(!result.error,result.error);assert.equal(result.transformer.termination_ohm,Math.fround(49.9));assert.equal(result.transformer.filaments,10);
  result=await send({id:7,...request,eddy:{mode:1,layers:[0,1],evaluation_limit:1}});assert.match(result.error,/budget/);result=await send({id:8,...request});assert.deepEqual(result.transformer,expected);

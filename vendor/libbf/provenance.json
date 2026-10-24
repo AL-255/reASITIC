@@ -1,0 +1,14 @@
+{
+  "source": "LibBF portable C implementation; unmodified upstream files",
+  "url": "https://bellard.org/libbf/libbf-2025-06-03.tar.gz",
+  "archive_sha256": "4b23394d67a4a3c3266a38b66831094523fffb5d01974a5c05a0327b36b0a340",
+  "license": "MIT",
+  "files": {
+    "COPYING": "1a3aae5a7de73ebc1acd1f5813f4c0357e7097a4cad298c0931f358e1ba415fb",
+    "cutils.c": "a1ec96510f657c9f585d42083c527b25cbccd480a28d31c6fa2d25f705ccaeeb",
+    "cutils.h": "92084de8f384cdd746f9fc86d8378acd178dc726cb79fbed3dbd3c642aa475a2",
+    "libbf.c": "8abc36c9feaeaeb04729e3494c6b693611a518442d11c6546c86bc08b30a1228",
+    "libbf.h": "6376f2965cef49ad9e1351ff99e3dce4c6e9961d9e59e75de45aad63a1724c8a",
+    "readme.txt": "e5e5919ae21c0878c2b58508005a9c4c9acf182e00f14eadb99e55ac1d7f2019"
+  }
+}

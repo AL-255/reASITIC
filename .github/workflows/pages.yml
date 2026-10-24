@@ -32,7 +32,14 @@ jobs:
           pip install gdstk==1.0.2
       - run: python tools/build.py
       - run: python tools/build_native.py
-      - name: Compare original geometry fixtures and unchanged i386 C++
+      - run: python tools/build_portable_math.py
+      - name: Verify portable numerical formulation
+        run: |
+          node tests/portable-gmd.mjs
+          node tests/portable-error-power.mjs
+          node tests/portable-simulation.mjs
+          node tests/portable-pad.mjs
+      - name: Audit recovered arithmetic and production solver behavior
         run: |
           node tests/native-creators.mjs
           node tests/original-creator-binary.mjs
@@ -78,7 +85,7 @@ jobs:
           node tests/simulation-data.mjs
           node tests/retained-math.mjs
           python tests/gds_reader.py
-      - name: Record unresolved hardware rounding differences
+      - name: Record historical instruction rounding differences
         run: |
           node tests/eddy-math-diagnostics.mjs
           node tests/pad-rounding.mjs

@@ -2,6 +2,7 @@
 #include "json.hpp"
 #include "eddy_runtime.hpp"
 #include "three_history.hpp"
+#include "numerical_policy.hpp"
 #include "asitic/combined_network.hpp"
 #include "asitic/extended_twoport.hpp"
 #include "asitic/extended_analysis.hpp"
@@ -433,6 +434,7 @@ extern "C" const char* simulate_three_port(int first_winding,int second_winding,
 
 extern "C" const char* probe_three_port(int first_winding,int second_winding,int third_winding,int ground,double frequency,double length_cell,double width_cell,double thickness_cell,double contact_length,double contact_width,
     double chip_x,double chip_y,int nx,int ny,int contact_limit,int filament_limit,int mode,int count,int first,int second,int budget,const ComplexValue* cap_history,const ComplexValue* ind_history,int history_cells,const unsigned* history_addresses) {
+    reasitic::ReferenceNumericsScope reference_arithmetic;
     if(second_winding<0 || third_winding<0 || !cap_history || !ind_history || !history_addresses || history_cells<1 || history_cells>512*512)return "{\"error\":\"Select valid windings and captured three-port backing arrays\"}";
     auto* session=static_cast<reasitic::EddySession*>(calloc(1,sizeof(reasitic::EddySession)));if(!session)return "{\"error\":\"Unable to allocate three-port eddy workspace\"}";
     reasitic::EddyScope scope(session);reasitic::clear_diagnostics();if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid three-port eddy configuration\"}";

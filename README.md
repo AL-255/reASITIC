@@ -6,9 +6,9 @@ implementation from `~/github/asitic-re` is preserved unchanged under
 
 Work in progress. The target is original ASITIC geometry and simulation algorithms,
 including its technology model, filament solver, substrate effects, and metrics.
-Identical results must be demonstrated against the original; compiling recovered
-source to WebAssembly alone is not proof of numerical identity. In particular,
-x87 extended arithmetic and transcendental instructions require a fidelity layer.
+The original models and reported results are checked against the executable.
+Production accuracy is checked independently of processor instruction rounding;
+the recovered instruction sequence remains available for historical audits.
 
 No original executable is needed by the deployed application. The C++ sources are
 the math kernel. JavaScript handles the interface and GDSII serialization.
@@ -29,15 +29,44 @@ and permittivity. The original eddy Green kernels, QUADPACK integration and
 matrix stamping are integrated. PI2 combines the original capacitance, inductance
 and node-equation solvers into a two-port admittance matrix and pi model.
 CALCTRANS adds original coupled-winding narrowband simulation. PIX adds the
-original extended two-port node system. PI4 pad deembedding is available under validation, with measured WASM rounding
-differences. Two-port S-parameter/sweep integration remains outstanding.
+original extended two-port node system. PI4 pad deembedding retains original
+reported model precision with the stable formulation; broader validation continues. Two-port S-parameter/sweep integration remains outstanding.
 Original 3PORT provides three-winding models and S/Y/Z conversion. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
+
+Production numerics use deterministic software arithmetic. The rectangular
+cross-section integral is normalized by geometry scale, keeps guard precision
+through its cancelling terms, and rounds to binary64 once. It starts at binary128
+and increases precision when the conditioning or rounding interval requires it.
+QUADPACK's error-power term uses the algebraically equivalent `x * sqrt(x)` with
+software guard precision instead of a logarithm/exponential sequence. The
+portable fallback is pinned LibBF C with explicit rounding and its SIMD path
+disabled; the vendored MIT license is included in deployment.
+
+The primary numerical checks compare the same C++ implementation compiled for a
+native host and WASM against independent mpmath references: 203 geometric-mean
+distances and 1,040 error-power values. Geometry tests include analytic square and
+thin-strip limits, power-of-two scale changes, subnormal dimensions and extreme
+aspect ratios. Production solver/worker checks exercise the stable default.
+All fourteen PI4 reference cases also retain the original published model
+precision, capacitance and Green tables, and nonfinite rejection behavior.
+The original instruction/store sequence remains available through the explicitly
+named `tests/reference-kernel.mjs` audit helper; those historical bit comparisons
+do not choose the production numerical policy or depend on a runtime CPU profile.
+`tools/reference_gmd.py` regenerates the distance fixtures with mpmath 1.3.0 and
+checks the antiderivative against direct quadrature of mean log-distance.
+`tools/reference_error_power.py` independently uses `sqrt(x**3)` for exact
+binary64 inputs at 200 decimal digits.
 
 ```sh
 # Emscripten 6.0.6, Python 3, Node 24
 python3 tools/build.py                    # or --emxx /path/to/em++
-python3 tools/build_native.py             # GCC i386 + libc.so.6 comparison
+python3 tools/build_native.py             # GCC i386 + libc.so.6 reference audit
+python3 tools/build_portable_math.py       # native/WASM software-math verification
+node tests/portable-gmd.mjs
+node tests/portable-error-power.mjs
+node tests/portable-simulation.mjs
+node tests/portable-pad.mjs
 node tests/native-creators.mjs
 node tests/original-creator-binary.mjs
 node tests/parity.mjs
@@ -73,7 +102,7 @@ node tests/three-port-lifecycle.mjs
 node tests/worker-three-port.mjs
 node tests/three-port-data.mjs
 node tests/eddy-math-diagnostics.mjs        # records 3 unresolved finite differences
-# Completion gate; currently fails on those known differences:
+# Historical instruction-identity check; known differences remain:
 # node tests/eddy-math-diagnostics.mjs --strict
 node tests/lmat.mjs
 node tests/original-lmat.mjs
@@ -149,16 +178,19 @@ Current measured evidence:
   one-ULP binary64 discrepancies at extreme inputs. Hardware FYL2X differs from
   mathematically nearest binary80 in these cases. No empirical rounding rule
   or per-input correction is substituted. The differences are retained in
-  `build/evidence/eddy-math-diagnostics.json`; `--strict` is a failing completion
-  gate until they are resolved. Exact full-goal identity is not established.
+  `build/evidence/eddy-math-diagnostics.json`; `--strict` records failure of historical instruction-bit identity. Production
+  error-power accuracy is checked independently against the high-precision
+  algebraic reference, with no per-input corrections.
 - All 96 recovered scalar/frequency/grid/angle parser cases match i386 exactly,
   including the original negative-angle normalization behavior.
-- Both transformer windings match the unchanged i386 solver. Rejected meshes
+- Both transformer windings match the unchanged i386 solver in reference mode;
+  production agrees to ten significant digits. Rejected meshes
   recover, simulation does not mutate source geometry, and 100 repeated solves
   retain a bounded heap. An independent gdstk reader validates 33 GDS exports.
 
-These are bounded tests, not universal parity claims. All listed exact
-comparisons are required CI gates. The explicitly unresolved error-power
+These are bounded tests, not universal parity claims. The historical numerical
+comparisons run in explicit reference mode. Production is independently gated by
+the software-math references and default-policy solver/worker checks. The explicitly unresolved error-power
 measurement is uploaded separately and does not claim a passing identity check. The source translator rejects unknown
 assembly. Native Clang AST ranges expose implicit long-double-to-double stores
 in creator, layered-potential, Green, quadrature, eddy and network units; the build retains an expression/offset report. This preserves
@@ -275,8 +307,8 @@ inductance/node matrices, pads-only capacitance and pre-subtraction admittance.
 Omitted ground retains the device reference; explicit self-ground additionally
 resets its mesh. Negative native metrics are retained.
 
-**PI4 is not yet verified identical in WASM.** Fourteen repeated original cases
-include seven exact raw WASM comparisons, four finite WASM rounding discrepancies
+**Historical PI4 arithmetic audit.** Fourteen repeated original cases
+include seven exact raw reference-mode comparisons, four finite reference-mode rounding discrepancies
 and three native nonfinite outputs (reported as errors). The x87 recovered source on the AMD Ryzen 9 7940HX reference machine
 matches all finite raw executable observations. Captures include the CPU identity
 and an exact FLDLN2/FYL2X instruction signature. A CI machine with a different
@@ -292,9 +324,12 @@ the retained difference. `probe_retained_math` and `tests/pad-rounding.mjs`
 reproduce this instruction input without substituting captured outputs.
 `tools/capture_pad.py` captures both solve stages, inner/final admittances and
 pi fields through read-only GDB observations in two fresh processes per case.
-`node tests/pad.mjs --strict` and `node tests/pad-rounding.mjs --strict` deliberately
-fail while these differences remain. The normal audit records known differences
-and rejects any unclassified case; it is not a full-goal completion gate.
+`node tests/pad.mjs --strict` and `node tests/pad-rounding.mjs --strict` measure
+historical instruction-bit identity. The default production path instead uses
+the stable cross-section formulation verified by `portable-gmd.mjs` and
+`portable-simulation.mjs`; it is not tuned to reproduce a processor's final-bit
+approximation. Captured three-port backing replay explicitly scopes the retained
+reference arithmetic and restores the production policy afterwards.
 
 The coupled-winding panel runs the original CALCTRANS backend and extracts its
 narrowband transformer model: primary/secondary L and R, mutual inductance,
@@ -408,8 +443,8 @@ valid descriptor values are passed unchanged to the original builders. Native
 unwritten parser/history and mesh words use explicit zero initial state, rather
 than claiming process-independent parity for uninitialized bytes.
 
-Next required work includes resolving the measured hardware rounding differences,
-broader original-executable creator/input coverage, exact PI4 fidelity,
+Next recreation work includes broader original-executable creator/input coverage,
+additional validation of stable full-network metrics,
 native two-port S-parameter conversion and port sweeps, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.

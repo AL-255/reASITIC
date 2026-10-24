@@ -23,11 +23,11 @@ def expose(name,text,clang=None):
     version=subprocess.check_output([clang,'--version'],text=True).splitlines()[0]
     cache=ROOT/'build/native-ast';cache.mkdir(parents=True,exist_ok=True)
     source=cache/(name+'.cpp');source.write_bytes(encoded)
-    key=hashlib.sha256((digest+version+'cv-target-v3').encode()).hexdigest()
+    key=hashlib.sha256((digest+version+'cv-target-v4').encode()).hexdigest()
     artifact=cache/(name+'-'+key[:16]+'.json')
     if artifact.exists():locations=json.loads(artifact.read_text())
     else:
-        result=subprocess.run([clang,'-target','i386-linux-gnu','-std=c++17','-fsyntax-only','-I'+str(ROOT/'vendor/asitic/include'),'-I'+str(ROOT/'vendor/asitic/src'),'-Xclang','-ast-dump=json',str(source)],capture_output=True,text=True)
+        result=subprocess.run([clang,'-target','i386-linux-gnu','-std=c++17','-fsyntax-only','-I'+str(ROOT/'vendor/asitic/include'),'-I'+str(ROOT/'vendor/asitic/src'),'-I'+str(ROOT/'kernel'),'-Xclang','-ast-dump=json',str(source)],capture_output=True,text=True)
         if result.returncode:raise RuntimeError(f'Native AST analysis failed for {name}:\n{result.stderr}')
         locations=[]
         def visit(node):

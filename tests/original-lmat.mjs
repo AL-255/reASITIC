@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {mkdirSync,readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import createKernel from '../dist/asitic.js';
+import createKernel from './reference-kernel.mjs';
 import {parseTechnology,configureKernel,generateGeometry} from '../web/technology.mjs';
 const fixture=JSON.parse(readFileSync('tests/fixtures/original-lmat.json','utf8'));
 const text=readFileSync('web/technology/CMOS.tek','utf8');assert.equal(createHash('sha256').update(text).digest('hex'),fixture.technology_sha256);
