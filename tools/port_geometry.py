@@ -7,7 +7,7 @@ from pathlib import Path
 import re,json
 from implicit_stores import expose
 ROOT=Path(__file__).resolve().parents[1]
-SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis']
+SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','port_records']
 
 def translate(name,s):
     # Loads/stores of finite double values. Signaling NaN status is not exposed.
@@ -65,6 +65,9 @@ def translate(name,s):
     s=s.replace('asm("fld1; fdivl %1":"=t"(shunt):"m"(termination));','shunt=1.L/static_cast<long double>(termination);')
     s=s.replace('asm("faddl %2":"=t"(updated):"0"(shunt),"m"(cell.real));','updated=shunt+cell.real;')
     s=s.replace('asm("fldl %1; faddl %2":"=t"(updated):"m"(cell.imag),"m"(zero));','updated=static_cast<long double>(cell.imag)+zero;')
+    for input_ in ['in','value']:
+        s=s.replace(f'asm volatile("fldl %1" : "=t"(out) : "m"({input_}));',f'out={input_};')
+    s=s.replace('asm volatile("fldl %1":"=t"(out):"m"(value));','out=value;')
     if re.search(r'\basm\s*(?:volatile)?\s*\(',s):raise ValueError(f'Untranslated assembly in {name}')
     s=s.replace('#include "x87.hpp"','#include "x87_port.hpp"')
     # Preserve all literal bits using a binary128 host literal before conversion.
@@ -96,6 +99,22 @@ def source(name):
         needle='    remove_geometry_shape(state.shapes,joined,memory);\n    if(!solve_node_equations('
         s=s.replace(needle,'    if(o.inductance.snapshot)o.inductance.snapshot("YM.out",inductance,o.inductance.snapshot_user);\n'+needle,1)
         return s
+    if name=='port_records':
+        s=(ROOT/'vendor/asitic/src/port_output.cpp').read_text()
+        return s[:s.index('void write_port_shape_summary(')]+'}\n'
+    if name=='three_port_analysis':
+        s=(ROOT/'vendor/asitic/src/three_port_analysis.cpp').read_text();signature='bool solve_three_port_network('
+        begin=s.index('    const auto& runtime=o.commands.construction.geometry;',s.index(signature));end=s.index('    const GeometryShape* ground=',begin)
+        prefix=s[begin:end].replace('const int first_count=','first_count=').replace('const int second_count=','second_count=').replace('unsigned n=','n=')
+        helper='GeometryShape* prepare_three_port_geometry(const GeometryShape& first,const GeometryShape& second,const GeometryShape& third,GeometryShape& reference,ThreePortAnalysisState& state,const ThreePortAnalysisOptions& o,int& first_count,int& second_count,unsigned& n) {\n'+prefix+'    return joined;\n}\n'
+        s=s[:begin]+'    const auto& runtime=o.commands.construction.geometry;const auto memory=runtime.memory;\n    int first_count,second_count;unsigned n;auto* joined=prepare_three_port_geometry(first,second,third,reference,state,o,first_count,second_count,n);\n'+s[end:]
+        s=s.replace(signature,helper+signature,1)
+        needle='    auto inductance=matrix(static_cast<int>(n),memory,runtime.errors);';assert s.count(needle)==1
+        s=s.replace(needle,'    if(o.inductance.snapshot)o.inductance.snapshot("ZC.out",capacitance,o.inductance.snapshot_user);\n'+needle)
+        needle='    remove_geometry_shape(state.shapes,joined,memory);\n    if(!solve_three_port_equations(';assert s.count(needle)==1
+        s=s.replace(needle,'    if(o.inductance.snapshot)o.inductance.snapshot("YM.out",inductance,o.inductance.snapshot_user);\n'+needle)
+        s=s.replace('namespace asitic {','namespace asitic {\nbool run_three_port_equations(ComplexMatrix&,const ComplexMatrix&,int,int,int,ThreePortImpedance&,SolverMemory,const NodeEquationOptions&);',1)
+        return s.replace('solve_three_port_equations(capacitance.data,inductance.data,','run_three_port_equations(capacitance,inductance,',1)
     if name=='potential_solver':
         s=(ROOT/'vendor/asitic/src/potential_solver.cpp').read_text()
         s=s.replace('namespace asitic {','namespace asitic {\nvoid record_capacitance_totals(double,double);',1)
@@ -129,7 +148,7 @@ def generate(clang=None):
     proof={}
     for name in SOURCES:
         native=source(name)
-        if name.startswith('shape_') or name=='native_creators' or name in ('legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis'):
+        if name.startswith('shape_') or name=='native_creators' or name in ('legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','port_records'):
             native,proof[name]=expose(name,native,clang)
         (target/(name+'.cpp')).write_text(translate(name,native))
     evidence=ROOT/'build/evidence';evidence.mkdir(exist_ok=True)

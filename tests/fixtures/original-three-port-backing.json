@@ -1,0 +1,273 @@
+{
+  "reference": "Read-only GDB capture at native node post-allocation boundary and model return; no numerical writes",
+  "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+  "libm_sha256": "6ff63f39b4c1fc4a04b91cc86da32aceec1d758e3b440b753b937f95ce1690b6",
+  "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+  "case_definition_sha256": "9f23c067a3f9d9b72925780820cec2b42eaba52338b1d8365235aff6d8a4ea97",
+  "histories": [
+    {
+      "format": "reasitic-three-port-backing-v1",
+      "names": [
+        "A",
+        "B",
+        "C"
+      ],
+      "ground": "G",
+      "frequency_hz": 1000000000.0,
+      "node_count": 4,
+      "addresses": [
+        139582976,
+        139583648,
+        139583808,
+        139584848,
+        139471728
+      ],
+      "capacitance_hex": "9b8dec038bd6763e21ad5482ebf3613ff52c909b632847be809efec57e8aca3e9616287be80d32be711d182c38b9b53ef32c909b632847be819efec57e8aca3e366ea86f10d1553e53049fa67fdb333fbfe3828d583520bed3b18ce5a6b1ce3e9616287be80d32be6e1d182c38b9b53ebfe3828d583520bed3b18ce5a6b1ce3e76e4ec29d927433e092615930393293f2e303838303331353431392011000000ad5b51086668ad1200000000110000009d5a51086668ad1200d2510811000000bd5b51086668ad120100000011000000dd5b51086668ad1201000000a10000001d6551086668ad126d2d1ca1f17e05c000000000000000000000000000000000",
+      "inductance_hex": "cdccccccccccc43f3d585b9a72f4d13f000000000080333c3cc814deef8fb23f0000000000d846bc5b5eee74aa7da33f000000000080333c3cc814deef8fb23f9b9999999999c13f3e585b9a72f4d13f0000000000dc59bc5f625b8a288db23f0000000000d846bc5b5eee74aa7da33f0000000000dc59bc5f625b8a288db23f333333333333b33f994819d69dded13f20202020202020202020202011040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "case": {
+        "creators": [
+          {
+            "id": 2,
+            "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=C:LEN=100:WID=40:METAL=M5:XORG=100:YORG=260"
+          }
+        ],
+        "names": [
+          "A",
+          "B",
+          "C"
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "name": "wires-default",
+        "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100"
+      },
+      "expected_impedance_hex": "2e3db5ec39e8c53fe5febe264b94d13f1aa0610d6992013f33c2a9084593b23f0164bad9316e89bf3232af385ec3b33f1aa0610d6992013f33c2a9084593b23fc45c9369ad08fe3e83b813c67d90b23ffe4d6e5ee87089bfa4403ede88c0b33f0164bad9316e89bf3232af385ec3b33ffe4d6e5ee87089bfa4403ede88c0b33f498e52569023bf3f44256456cfebd43f",
+      "expected_model_hex": "a9a7fa227d08c83dc0e48fab4661a93d083e2963179acc3d2e3db5ec39e8c53fc45c9369ad08fe3e498e52569023bf3f6f753a0e1365a93db52eed0ed104ab3d41eed967f100ab3d1aa0610d6992013f0164bad9316e89bffe4d6e5ee87089bf3173b6b6aa73e03fb9492895137dd03faeadf9324009e03f",
+      "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+      "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268"
+    },
+    {
+      "format": "reasitic-three-port-backing-v1",
+      "names": [
+        "A",
+        "B",
+        "C"
+      ],
+      "ground": "G",
+      "frequency_hz": 1000000000.0,
+      "node_count": 4,
+      "addresses": [
+        161582592,
+        161583264,
+        161583424,
+        161584464,
+        161471344
+      ],
+      "capacitance_hex": "9b8dec038bd6763e21ad5482ebf3613ff52c909b632847be809efec57e8aca3e9616287be80d32be711d182c38b9b53ef32c909b632847be819efec57e8aca3e366ea86f10d1553e53049fa67fdb333fbfe3828d583520bed3b18ce5a6b1ce3e9616287be80d32be6e1d182c38b9b53ebfe3828d583520bed3b18ce5a6b1ce3e76e4ec29d927433e092615930393293f2e303838303331353431392011000000a814a1092e735c1900000000110000009815a1092e735c190082a10911000000b814a1092e735c190100000011000000d814a1092e735c1901000000a1000000180aa1092e735c196d2d1ca1f17e05c000000000000000000000000000000000",
+      "inductance_hex": "cdccccccccccc43f3d585b9a72f4d13f000000000080333c3cc814deef8fb23f0000000000d846bc5b5eee74aa7da33f000000000080333c3cc814deef8fb23f9b9999999999c13f3e585b9a72f4d13f0000000000dc59bc5f625b8a288db23f0000000000d846bc5b5eee74aa7da33f0000000000dc59bc5f625b8a288db23f333333333333b33f994819d69dded13f20202020202020202020202011040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "case": {
+        "creators": [
+          {
+            "id": 2,
+            "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=C:LEN=100:WID=40:METAL=M5:XORG=100:YORG=260"
+          }
+        ],
+        "names": [
+          "A",
+          "B",
+          "C"
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "name": "wires-default",
+        "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100"
+      },
+      "expected_impedance_hex": "2e3db5ec39e8c53fe5febe264b94d13f1aa0610d6992013f33c2a9084593b23f0164bad9316e89bf3232af385ec3b33f1aa0610d6992013f33c2a9084593b23fc45c9369ad08fe3e83b813c67d90b23ffe4d6e5ee87089bfa4403ede88c0b33f0164bad9316e89bf3232af385ec3b33ffe4d6e5ee87089bfa4403ede88c0b33f498e52569023bf3f44256456cfebd43f",
+      "expected_model_hex": "a9a7fa227d08c83dc0e48fab4661a93d083e2963179acc3d2e3db5ec39e8c53fc45c9369ad08fe3e498e52569023bf3f6f753a0e1365a93db52eed0ed104ab3d41eed967f100ab3d1aa0610d6992013f0164bad9316e89bffe4d6e5ee87089bf3173b6b6aa73e03fb9492895137dd03faeadf9324009e03f",
+      "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+      "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268"
+    },
+    {
+      "format": "reasitic-three-port-backing-v1",
+      "names": [
+        "A",
+        "B",
+        "C"
+      ],
+      "ground": "G",
+      "frequency_hz": 1000000000.0,
+      "node_count": 4,
+      "addresses": [
+        146046464,
+        146047136,
+        146047296,
+        146048336,
+        145935216
+      ],
+      "capacitance_hex": "9b8dec038bd6763e21ad5482ebf3613ff52c909b632847be809efec57e8aca3e9616287be80d32be711d182c38b9b53ef32c909b632847be819efec57e8aca3e366ea86f10d1553e53049fa67fdb333fbfe3828d583520bed3b18ce5a6b1ce3e9616287be80d32be6e1d182c38b9b53ebfe3828d583520bed3b18ce5a6b1ce3e76e4ec29d927433e092615930393293f2e303838303331353431392011000000f7f5b4082714e7270000000011000000c7f4b4082714e7270072b40811000000e7f5b4082714e727010000001100000087f5b4082714e72701000000a1000000470bb4082714e7276d2d1ca1f17e05c000000000000000000000000000000000",
+      "inductance_hex": "cdccccccccccc43f3d585b9a72f4d13f000000000080333c3cc814deef8fb23f0000000000d846bc5b5eee74aa7da33f000000000080333c3cc814deef8fb23f9b9999999999c13f3e585b9a72f4d13f0000000000dc59bc5f625b8a288db23f0000000000d846bc5b5eee74aa7da33f0000000000dc59bc5f625b8a288db23f333333333333b33f994819d69dded13f20202020202020202020202011040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "case": {
+        "creators": [
+          {
+            "id": 2,
+            "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=C:LEN=100:WID=40:METAL=M5:XORG=100:YORG=260"
+          }
+        ],
+        "names": [
+          "A",
+          "B",
+          "C"
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "name": "wires-default",
+        "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100"
+      },
+      "expected_impedance_hex": "2e3db5ec39e8c53fe5febe264b94d13f1aa0610d6992013f33c2a9084593b23f0164bad9316e89bf3232af385ec3b33f1aa0610d6992013f33c2a9084593b23fc45c9369ad08fe3e83b813c67d90b23ffe4d6e5ee87089bfa4403ede88c0b33f0164bad9316e89bf3232af385ec3b33ffe4d6e5ee87089bfa4403ede88c0b33f498e52569023bf3f44256456cfebd43f",
+      "expected_model_hex": "a9a7fa227d08c83dc0e48fab4661a93d083e2963179acc3d2e3db5ec39e8c53fc45c9369ad08fe3e498e52569023bf3f6f753a0e1365a93db52eed0ed104ab3d41eed967f100ab3d1aa0610d6992013f0164bad9316e89bffe4d6e5ee87089bf3173b6b6aa73e03fb9492895137dd03faeadf9324009e03f",
+      "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+      "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268"
+    },
+    {
+      "format": "reasitic-three-port-backing-v1",
+      "names": [
+        "A",
+        "B",
+        "C"
+      ],
+      "ground": "G",
+      "frequency_hz": 1000000000.0,
+      "node_count": 4,
+      "addresses": [
+        148045312,
+        148045984,
+        148046144,
+        148047184,
+        147934064
+      ],
+      "capacitance_hex": "9b8dec038bd6763e21ad5482ebf3613ff52c909b632847be809efec57e8aca3e9616287be80d32be711d182c38b9b53ef32c909b632847be819efec57e8aca3e366ea86f10d1553e53049fa67fdb333fbfe3828d583520bed3b18ce5a6b1ce3e9616287be80d32be6e1d182c38b9b53ebfe3828d583520bed3b18ce5a6b1ce3e76e4ec29d927433e092615930393293f2e3038383033313534313920110000009f73d2086095a7810000000011000000af72d2086095a78100f2d208110000008f73d2086095a7810100000011000000ef73d2086095a78101000000a10000002f8dd3086095a7816d2d1ca1f17e05c000000000000000000000000000000000",
+      "inductance_hex": "cdccccccccccc43f3d585b9a72f4d13f000000000080333c3cc814deef8fb23f0000000000d846bc5b5eee74aa7da33f000000000080333c3cc814deef8fb23f9b9999999999c13f3e585b9a72f4d13f0000000000dc59bc5f625b8a288db23f0000000000d846bc5b5eee74aa7da33f0000000000dc59bc5f625b8a288db23f333333333333b33f994819d69dded13f20202020202020202020202011040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "case": {
+        "creators": [
+          {
+            "id": 2,
+            "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=C:LEN=100:WID=40:METAL=M5:XORG=100:YORG=260"
+          }
+        ],
+        "names": [
+          "A",
+          "B",
+          "C"
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "name": "wires-default",
+        "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100"
+      },
+      "expected_impedance_hex": "2e3db5ec39e8c53fe5febe264b94d13f1aa0610d6992013f33c2a9084593b23f0164bad9316e89bf3232af385ec3b33f1aa0610d6992013f33c2a9084593b23fc45c9369ad08fe3e83b813c67d90b23ffe4d6e5ee87089bfa4403ede88c0b33f0164bad9316e89bf3232af385ec3b33ffe4d6e5ee87089bfa4403ede88c0b33f498e52569023bf3f44256456cfebd43f",
+      "expected_model_hex": "a9a7fa227d08c83dc0e48fab4661a93d083e2963179acc3d2e3db5ec39e8c53fc45c9369ad08fe3e498e52569023bf3f6f753a0e1365a93db52eed0ed104ab3d41eed967f100ab3d1aa0610d6992013f0164bad9316e89bffe4d6e5ee87089bf3173b6b6aa73e03fb9492895137dd03faeadf9324009e03f",
+      "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+      "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268"
+    }
+  ]
+}

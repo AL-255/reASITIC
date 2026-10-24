@@ -29,7 +29,8 @@ and permittivity. The original eddy Green kernels, QUADPACK integration and
 matrix stamping are integrated. PI2 combines the original capacitance, inductance
 and node-equation solvers into a two-port admittance matrix and pi model.
 CALCTRANS adds original coupled-winding narrowband simulation. Extended,
-deembedded and three-port paths remain outstanding. GDSII uses native ribbon boundaries, real via cuts and
+deembedded paths and two-port S-parameter/sweep integration remain outstanding.
+Original 3PORT provides three-winding models and S/Y/Z conversion. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
 ```sh
@@ -58,6 +59,11 @@ node tests/transformer.mjs
 node tests/transformer-lifecycle.mjs
 node tests/worker-transformer.mjs
 node tests/transformer-data.mjs
+node tests/three-port.mjs
+node tests/three-port-backing.mjs
+node tests/three-port-lifecycle.mjs
+node tests/worker-three-port.mjs
+node tests/three-port-data.mjs
 node tests/eddy-math-diagnostics.mjs        # records 3 unresolved finite differences
 # Completion gate; currently fails on those known differences:
 # node tests/eddy-math-diagnostics.mjs --strict
@@ -116,6 +122,15 @@ Current measured evidence:
   ground acquisition, phase, rotation, mesh refinement, two square spirals with
   vias, polygons and a planar transformer. Two-port Y records retain the native
   mixed final-column precision; native matrix/model arithmetic compares exactly.
+- Twelve three-port cases match 19,725 native numeric fields, 15,012 original
+  printed system/model fields, 31,503 bytes of original rectangular/polar S/Y/Z
+  records and 1,638,720 raw Green-table bytes through payload hashes. Native
+  CELL parsing and signed zeros are retained. Cases include mesh refinement,
+  phase, rotation, both eddy kernels, explicit first-winding reference, square
+  coils with vias and polygons. Four additional captured separate-reference
+  states match all 132 raw original Z/model fields exactly, including live
+  backing aliases. Archived ordinary original executions demonstrate six
+  different outputs from eight identical scripts for each SAVEMAT setting.
 - All 2,118 i386 libm sin/cos probes match both binary64 and raw binary80 return
   words. Pinned glibc 2.36 scalar numerical sources supply these callbacks; the
   recovered Green runtime calls libm, rather than the x87 FSIN instruction.
@@ -174,7 +189,7 @@ and native fault cases are rejected before matrix indexing. There is no
 persistent browser table cache yet; fine grids can take tens of seconds. The
 original nonsquare indexing is preserved with sufficient zero backing storage;
 original-executable parity is currently measured on square FFT grids only.
-Extended/deembedded and three-port models remain outstanding.
+Extended/deembedded models and two-port S-parameter/sweep integration remain outstanding.
 
 The worker protocol is tested with actual WASM startup, original wire matrices,
 streamed frequency samples, cancellation and error recovery. Scientific export
@@ -227,7 +242,7 @@ including explicit self-ground. Stage matrices are copied at original snapshot
 boundaries for comparison; all private state is released after every solve.
 Worker and lifecycle checks cover budget recovery, alternating CAP/LMAT/network
 requests, immutable source geometry and bounded repeated allocations. The full
-extended, deembedded and three-port paths remain to be exposed.
+extended and deembedded paths remain to be exposed.
 
 The coupled-winding panel runs the original CALCTRANS backend and extracts its
 narrowband transformer model: primary/secondary L and R, mutual inductance,
@@ -254,6 +269,56 @@ geometry; lifecycle checks alternate coupled/CAP/PI2 solves and verify recovery
 and bounded repeated allocations. Undefined derived metrics retain null/empty
 output rather than invented finite values.
 
+The three-port panel runs original 3PORT composition, reference-inclusive node
+assembly, general factor/solve, narrowband model extraction and S/Y/Z conversion.
+It exposes all three L/R values, three mutual inductances, cross resistances and
+couplings. Raw matrix/model CSVs retain SI units and every cell. Native numerical
+record downloads use the original C++ writer, including its entry ordering,
+repeated cells, zero third-row middle cell, Hz frequency field and polar-writing
+behavior. The writer's raw argument words retain the i386 numerical payloads.
+
+`simulate_three_port(first, second, third, ground, frequency_hz, length_cell,
+width_cell, thickness_cell, contact_length, contact_width, chip_x, chip_y, fft_x,
+fft_y, contact_limit, filament_limit, eddy_mode, layer_count, first_layer,
+second_layer, evaluation_limit)` provides the default/first-winding reference.
+All geometry, contact, filament and node budgets use native counts and preserve
+the original subdivision/mesh arithmetic. The source geometry remains private
+and unchanged across successful or rejected calls.
+
+A separately named reference triggers an original defect: its records increase
+the node count beyond the reduced matrix dimensions. The node routine reads
+unwritten/out-of-bounds data, including bytes aliased to its live LU workspace.
+Ordinary original-executable runs with identical physical input can produce
+different finite outputs. A uniquely determined result cannot be inferred from
+geometry/technology alone on this path. The workbench requires a native backing
+capture for this reference choice and rejects unspecified state explicitly.
+
+`probe_three_port(...same arguments..., capacitance_backing, inductance_backing,
+backing_cells, native_addresses)` takes the measured incoming state. The two
+arrays contain node_count² complex cells. The five original 32-bit addresses are
+capacitance, inductance, LU, RHS and pivots. A bounded memory overlay preserves
+actual overlaps while the unchanged original node arithmetic runs. Computed
+matrix prefixes must match the captured prefixes byte for byte. The adapter
+validates address ranges, shared bytes, zero-initialized overlaps and allocation
+sizes; it releases the overlay after each call. This supplies the bytes and live
+aliases read by the original algorithm. No expected result fields enter the
+calculation. Unwritten native process state is an explicit input, as with the
+other recovered construction/cache histories; input-only universal identity on
+this undefined original path is not claimed.
+
+Import `backing.json` from the capture tool into the three-port panel after
+creating its winding/reference records. The import restores available mesh,
+frequency and eddy settings. The worker checks winding order, reference,
+frequency and technology hash, and C++ verifies the actual matrix prefixes.
+Capture examples are written under
+`build/original-three-port/capture-*/backing/*/backing.json`. The capture uses GDB
+at the pinned post-allocation node boundary and model return, without changing
+numerical inputs, registers or results. `--cases`, `--technology`,
+`--backing-ground` and `--output-dir` select user-owned inputs/destinations.
+The deployed application runs C++/WASM locally and does not invoke the original
+executable or GDB. Lifecycle checks cover capture validation/recovery, repeated
+heaps, source immutability and alternating three-port/PI2 solves.
+
 The portable glibc callbacks preserve the numerical C sources unchanged and adapt
 runtime headers only. They do not expose errno or floating exception flags.
 LGPL notices and licenses are available under `dist/licenses/glibc-math`; source
@@ -269,6 +334,8 @@ python3 tools/capture_capacitance.py --reference ~/github/asitic-re
 python3 tools/capture_eddy.py --reference ~/github/asitic-re
 python3 tools/capture_network.py --reference ~/github/asitic-re
 python3 tools/capture_transformer.py --reference ~/github/asitic-re
+python3 tools/capture_three_port.py --reference ~/github/asitic-re # also requires GDB
+python3 tools/audit_three_port_backing.py --reference ~/github/asitic-re
 ```
 
 These test-only commands require the original executable's legacy runtime DSOs;
@@ -278,7 +345,9 @@ matrices are retained under `build/original-lmat`, `build/original-creators` and
 `build/original-eddy` with the original executable and libm hashes pinned.
 PI2 stage matrices, Green caches and reports are under `build/original-network`.
 CALCTRANS reports, 2PORTTRANS files and raw caches are under
-`build/original-transformer`.
+`build/original-transformer`. Three-port records, systems and read-only backing
+captures are under `build/original-three-port`; the variability audit is under
+`build/original-three-port-variability`.
 
 Creator input is bounded to native fixed buffers, 64 turns, 256 sides/via rows
 or columns, and a 32 MiB creation allocation budget. Invalid commands recover
@@ -289,7 +358,7 @@ than claiming process-independent parity for uninitialized bytes.
 
 Next required work includes resolving the measured hardware rounding differences,
 broader original-executable creator/input coverage, extended/deembedded network
-solvers, three-port metrics, native S-parameter conversion and port sweeps, and original-executable end-to-end
+solvers, native two-port S-parameter conversion and port sweeps, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.
 

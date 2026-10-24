@@ -1,6 +1,7 @@
 import createKernel from './asitic.js';
+import {validateThreePortBacking,allocateThreePortBacking} from './three-port.mjs';
 import {parseTechnology,configureKernel,generateGeometry,createGeometry} from './technology.mjs';
-const kernel=await createKernel();let epoch=0,processTechnology=null,hasLayout=false;
+const kernel=await createKernel();let epoch=0,processTechnology=null,hasLayout=false,currentLayout=null;
 function frequency(data,value=data.frequency_ghz) {
   const result=value===undefined?data.frequency:kernel._normalize_value(Number(value),5,.1,0);
   if(!Number.isFinite(result) || result<=0)throw Error('Enter a positive native ASITIC frequency.');return result;
@@ -26,6 +27,21 @@ self.onmessage=async({data})=>{
       const analysis=JSON.parse(kernel.UTF8ToString(kernel._analyze(frequency(data))));
       if(analysis.error)throw Error(analysis.error);
       postMessage({id:data.id,analysis,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
+    }
+    if(action==='three-port'){
+      if(!processTechnology || !hasLayout)throw Error('Generate three windings before running 3PORT.');
+      const indices=data.windings??[0,1,2];if(!Array.isArray(indices)||indices.length!==3||new Set(indices).size!==3||indices.some(i=>!Number.isInteger(i)||i<0||!currentLayout.shapes[i]))throw Error('Select three distinct winding records.');
+      const domain=processTechnology.domain,mesh=data.mesh??{},contact=data.contact_mesh??{},e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[];
+      if(!Array.isArray(layers)||layers.length>2||layers.some(i=>!Number.isInteger(i)||i<0))throw Error('Select up to two substrate layers.');
+      const cells=[mesh.length??50,mesh.width??1.5,mesh.thickness??.5,contact.length??50,contact.width??20],parsed=data.nativeInput?cells.map(v=>kernel._normalize_value(Number(v),7,data.grid??.1,data.snap===false?0:1)):cells,hz=frequency(data),ground=data.ground??-1;
+      const args=[...indices,ground,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000];let result;
+      if(data.backing){
+        const h=validateThreePortBacking(data.backing),names=indices.map(i=>currentLayout.shapes[i].name),reference=currentLayout.shapes[ground<0?indices[0]:ground]?.name;
+        if(JSON.stringify(h.names)!==JSON.stringify(names)||h.ground!==reference||h.frequency_hz!==hz)throw Error('Captured backing winding order, reference or frequency differs from this request.');
+        const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(processTechnology.source))),v=>v.toString(16).padStart(2,'0')).join('');if(task!==epoch)return;if(digest!==h.technology_sha256)throw Error('Captured backing uses a different technology file.');
+        const memory=allocateThreePortBacking(kernel,h);try{result=JSON.parse(kernel.UTF8ToString(kernel._probe_three_port(...args,memory.cap,memory.ind,memory.cells,memory.addresses)));}finally{memory.release();}
+      }else result=JSON.parse(kernel.UTF8ToString(kernel._simulate_three_port(...args)));
+      if(result.error)throw Error(result.error);postMessage({id:data.id,three_port:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
     }
     if(action==='transformer'){
       if(!processTechnology || !hasLayout)throw Error('Generate two windings before running CALCTRANS.');
@@ -77,8 +93,8 @@ self.onmessage=async({data})=>{
     const append=Boolean(data.options?.append);
     if(append && (!hasLayout || !data.creator || data.technology!==processTechnology?.source))throw Error('Add to layout requires an existing layout, an original creator command, and the same technology.');
     const technology=append?processTechnology:parseTechnology(data.technology);
-    if(!append){hasLayout=false;configureKernel(kernel,technology);processTechnology=technology;}
-    const layout=data.creator?createGeometry(kernel,data.creator.id,data.creator.keywords,data.creator.answers,{...data.options,domain:technology.domain}):generateGeometry(kernel,data.kind,data.parameters,data.options);hasLayout=true;postMessage({id:data.id,layout,technology});
+    if(!append){hasLayout=false;currentLayout=null;configureKernel(kernel,technology);processTechnology=technology;}
+    const layout=data.creator?createGeometry(kernel,data.creator.id,data.creator.keywords,data.creator.answers,{...data.options,domain:technology.domain}):generateGeometry(kernel,data.kind,data.parameters,data.options);hasLayout=true;currentLayout=layout;postMessage({id:data.id,layout,technology});
   }catch(error){postMessage({id:data.id,error:error.message,action,append:Boolean(data.options?.append)});}
 };
 postMessage({ready:true});

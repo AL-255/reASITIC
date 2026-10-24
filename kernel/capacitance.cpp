@@ -1,8 +1,12 @@
 #include "engine.hpp"
 #include "json.hpp"
 #include "eddy_runtime.hpp"
+#include "three_history.hpp"
 #include "asitic/combined_network.hpp"
 #include "asitic/later_analysis.hpp"
+#include "asitic/three_port_analysis.hpp"
+#include "asitic/port_output.hpp"
+namespace asitic { GeometryShape* prepare_three_port_geometry(const GeometryShape&,const GeometryShape&,const GeometryShape&,GeometryShape&,ThreePortAnalysisState&,const ThreePortAnalysisOptions&,int&,int&,unsigned&); }
 namespace asitic { GeometryShape* prepare_transformer_geometry(const GeometryShape&,const GeometryShape&,LaterAnalysisState&,const LaterAnalysisOptions&,int&); }
 #include "asitic/potential_solver.hpp"
 #include "asitic/legacy_complex.hpp"
@@ -16,13 +20,14 @@ using Real=long double;
 extern "C" void* calloc(unsigned,unsigned);
 extern "C" void free(void*);
 extern "C" int sprintf(char*,const char*,...);
+extern "C" int vsnprintf(char*,unsigned,const char*,__builtin_va_list);
 extern "C" void abort();
 using namespace asitic;
 namespace {
 char* output=nullptr;double total_capacitance=0,total_resistance=0;
 struct Allocation { void* pointer;Allocation* next; };
 struct Workspace {
-    Allocation* allocations=nullptr;int nx,ny;
+    Allocation* allocations=nullptr;int nx,ny;unsigned matrix_request=0,matrix_backing=0;
     Workspace(int x,int y):nx(x),ny(y) {}
     ~Workspace() { while(allocations) { auto* p=allocations;allocations=p->next;free(p->pointer);free(p); } }
     static void* get(unsigned n,void* user) {
@@ -33,6 +38,7 @@ struct Workspace {
         const unsigned largest=w.nx>w.ny?w.nx:w.ny;
         if(n==static_cast<unsigned>((w.nx+1)*(w.ny+1))*16u)backing=(largest+1)*(largest+1)*16u;
         if(n==static_cast<unsigned>(w.nx)*32u)backing=largest*32u;
+        if(n==w.matrix_request && backing<w.matrix_backing)backing=w.matrix_backing;
         auto* p=calloc(1,backing+16);auto* node=static_cast<Allocation*>(calloc(1,sizeof(Allocation)));
         if(!p || !node)abort();node->pointer=p;node->next=w.allocations;w.allocations=node;return p;
     }
@@ -113,11 +119,11 @@ char* matrix_json(char* out,const ComplexMatrix& matrix) {
     out+=sprintf(out,"]");return out;
 }
 bool finite_matrix(const ComplexMatrix& m) { for(int j=0;j<m.columns;++j)for(int i=0;i<m.rows;++i){auto z=m.view().at(i,j);if(!__builtin_isfinite(z.real) || !__builtin_isfinite(z.imag))return false;}return true; }
-struct NetworkRequest { double length,width,thickness;int filament_limit;reasitic::EddySession* eddy;int secondary=-1;double termination=0; };
+struct NetworkRequest { double length,width,thickness;int filament_limit;reasitic::EddySession* eddy;int secondary=-1;double termination=0;int third=-1;const ComplexValue* cap_history=nullptr;const ComplexValue* ind_history=nullptr;int history_cells=0;const unsigned* history_addresses=nullptr; };
 int private_name_random(void*) { return 65; }
 void network_terminate(int,void*) { abort(); }
 struct NetworkSnapshots {
-    SolverMemory memory;ComplexMatrix capacitance{},inductance{},node_capacitance{};
+    SolverMemory memory;ComplexMatrix capacitance{},inductance{},node_capacitance{},system_before{},system_after{};
     static void record(const char* name,const ComplexMatrix& matrix,void* user) {
         auto& s=*static_cast<NetworkSnapshots*>(user);
         if(!((name[0]=='Z' && name[1]=='C') || (name[0]=='Y' && name[1]=='M')))return;
@@ -126,14 +132,35 @@ struct NetworkSnapshots {
         copy.data=static_cast<ComplexValue*>(s.memory.arrays.get(matrix.rows*matrix.columns*16u));
         for(int j=0;j<matrix.columns;++j)for(int i=0;i<matrix.rows;++i)copy.view().at(i,j)=matrix.view().at(i,j);
     }
-    static void record_nodes(const char*,ComplexMatrixView matrix,int n,void* user) {
-        auto& s=*static_cast<NetworkSnapshots*>(user);auto& copy=s.node_capacitance;
+    static void record_nodes(const char* name,ComplexMatrixView matrix,int n,void* user) {
+        auto& s=*static_cast<NetworkSnapshots*>(user);auto& copy=name[0]=='A'?(name[4]=='p'?s.system_before:s.system_after):s.node_capacitance;
         copy={static_cast<ComplexValue*>(s.memory.arrays.get(n*n*16u)),n*n,0,n,n,n,0};
         for(int j=0;j<n;++j)for(int i=0;i<n;++i)copy.view().at(i,j)=matrix.at(i,j);
     }
 };
 char* number_json(char* out,double value) { return out+(__builtin_isfinite(value)?sprintf(out,"%.17g",value):sprintf(out,"null")); }
 char* complex_json(char* out,ComplexValue z) { out+=sprintf(out,"[");out=number_json(out,z.real);out+=sprintf(out,",");out=number_json(out,z.imag);out+=sprintf(out,"]");return out; }
+
+bool three_name_admissible(const GeometryShape& source,const GeometryShape* head) {
+    char name[80];unsigned i=0;while(source.filaments.prefix[i] && i<76){name[i]=source.filaments.prefix[i];++i;}if(source.filaments.prefix[i])return false;
+    name[i++]='_';name[i++]='_';name[i]=0;
+    for(auto* p=head;p;p=p->next){const char* q=reinterpret_cast<const char*>(p);unsigned j=0;while(name[j] && name[j]==q[j])++j;if(name[j]==q[j])return false;}return true;
+}
+char* cells_json(char* out,const ComplexValue* values,int n) {
+    out+=sprintf(out,"[");for(int i=0;i<n;++i){out+=sprintf(out,"%s[",i?",":"");for(int j=0;j<n;++j){if(j)out+=sprintf(out,",");out=complex_json(out,values[i*n+j]);}out+=sprintf(out,"]");}return out+sprintf(out,"]");
+}
+struct RecordBuffer { char* data;unsigned used,capacity; };
+int record_print(void* user,const char* format,...) {
+    auto& b=*static_cast<RecordBuffer*>(user);__builtin_va_list args;__builtin_va_start(args,format);const int n=vsnprintf(b.data+b.used,b.capacity-b.used,format,args);__builtin_va_end(args);
+    if(n>0){const unsigned remaining=b.capacity-b.used;b.used+=static_cast<unsigned>(n)<remaining?static_cast<unsigned>(n):remaining-1;}return n;
+}
+char* three_records_json(char* out,const ThreePortImpedance& impedance,double frequency,SolverMemory memory,WarningSink warnings,bool polar) {
+    out+=sprintf(out,"{");const char* keys[]={"s","y","z"};
+    for(int parameter=1;parameter<=3;++parameter){char record[4096]{};RecordBuffer buffer{record,0,sizeof(record)};ThreePortOutputState state{};state.impedance=impedance;
+        const PortOutputRuntime runtime{record_print,memory,{warnings},warnings};write_three_port_record(&buffer,frequency,parameter,polar?1:0,state,runtime);
+        out+=sprintf(out,"%s\"%s\":",parameter>1?",":"",keys[parameter-1]);out=reasitic::json_string(out,record);
+    }return out+sprintf(out,"}");
+}
 
 }
 namespace asitic {
@@ -152,12 +179,19 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         return "{\"error\":\"Use positive frequency, cells and chip dimensions, power-of-two FFT sizes from 1 to 256, and 1–512 contacts\"}";
     auto* source=engine.shapes;for(int i=0;source && i<winding;++i)source=source->next;
     auto* reference=engine.shapes;for(int i=0;reference && i<ground;++i)reference=reference->next;if(ground<0)reference=source;
-    GeometryShape* secondary=nullptr;const bool transformer=network && network->secondary>=0;
-    if(transformer) {
+    GeometryShape* secondary=nullptr;GeometryShape* third=nullptr;const bool three=network && network->third>=0,transformer=network && network->secondary>=0 && !three;
+    if(transformer || three) {
         secondary=engine.shapes;for(int i=0;secondary && i<network->secondary;++i)secondary=secondary->next;
         if(!secondary || secondary==source || !__builtin_isfinite(network->termination))return "{\"error\":\"Select two distinct windings and a finite transformer termination\"}";
     }
+    if(three){
+        third=engine.shapes;for(int i=0;third && i<network->third;++i)third=third->next;
+        if(!third || third==source || third==secondary)return "{\"error\":\"Select three distinct winding records\"}";
+        if(source && (!three_name_admissible(*source,engine.shapes) || !three_name_admissible(*secondary,engine.shapes) || !three_name_admissible(*third,engine.shapes)))return "{\"error\":\"Original three-port temporary names collide with the layout\"}";
+    }
     if(!source || !reference)return "{\"error\":\"Select a valid device and ground winding\"}";
+    if(three && !same_name(*source,*reference) && (!network->cap_history || !network->ind_history || network->history_cells<1))return "{\"error\":\"Native separate-reference three-port results depend on out-of-bounds matrix backing; captured backing is required for exact comparison\"}";
+    if(three && (network->history_cells<0 || network->history_cells>512*512))return "{\"error\":\"Invalid three-port backing size\"}";
     if(engine.substrate_count<2)return "{\"error\":\"The layered potential solve requires a substrate stack\"}";
     for(int i=0;i<engine.substrate_count;++i) { double eps;__builtin_memcpy(&eps,engine.substrate[i].prefix+4,8);
         if(!(eps>0) || !(engine.substrate[i].resistivity>0))return "{\"error\":\"Define positive layer permittivity and resistivity in the technology\"}"; }
@@ -171,8 +205,8 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
     // CAP's third argument uses native parser type 8, which resets the ground's
     // main mesh counts to -1/-1. Apply that exact acquisition step to a private
     // clone, so repeated solves leave the user's source geometry intact.
-    if(ground>=0) { const bool identical=source==reference,second_identical=secondary==reference;reference=clone_for_ground(*reference,memory);if(identical)source=reference;if(second_identical)secondary=reference; }
-    const auto* original_source=source;const auto* original_secondary=secondary;const auto* original_reference=reference;GeometryShape* preview_head=nullptr;int network_filaments=0,boundary=0;
+    if(ground>=0) { const bool identical=source==reference,second_identical=secondary==reference,third_identical=third==reference;reference=clone_for_ground(*reference,memory);if(identical)source=reference;if(second_identical)secondary=reference;if(third_identical)third=reference; }
+    const auto* original_source=source;const auto* original_secondary=secondary;const auto* original_third=third;const auto* original_reference=reference;GeometryShape* preview_head=nullptr;int network_filaments=0,boundary=0,second_boundary=0;unsigned node_count=0;
     char composition_message[1024];const GeometryRuntime private_geometry{memory,engine.warnings,network_terminate,nullptr};
     const GeometryTechnology composition_technology{engine.metals,engine.vias,engine.metal_heights,engine.metal_count};
     const GeometryCommandRuntime commands{{private_geometry,0,engine.warnings,sprintf,composition_message,nullptr,nullptr},nullptr,memory,private_name_random,nullptr};
@@ -183,7 +217,15 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         if(!source->filaments.first || !reasitic::bounded_solver_clone(*source,network->length,length_cell,network->filament_limit))
             return "{\"error\":\"Network longitudinal mesh exceeds the selected filament budget\"}";
         const GeometryRuntime geometry{memory,engine.warnings,network_terminate,nullptr};
-        if(transformer) {
+        if(three) {
+            const GeometryShape* other_shapes[]={secondary,third};for(auto* shape:other_shapes)if(!shape->filaments.first || !reasitic::bounded_solver_clone(*shape,network->length,length_cell,network->filament_limit))return "{\"error\":\"Three-port longitudinal mesh exceeds the selected filament budget\"}";
+            ThreePortAnalysisState preview{};ThreePortAnalysisOptions preparation{};preparation.discretization={network->length,length_cell};preparation.technology=composition_technology;preparation.commands=commands;
+            source=prepare_three_port_geometry(*source,*secondary,*third,*reference,preview,preparation,boundary,second_boundary,node_count);
+            if(same_name(*original_source,*original_reference))reference=source;
+            if(boundary<1 || second_boundary<1 || static_cast<unsigned>(boundary+second_boundary)>=node_count || node_count>static_cast<unsigned>(contact_limit))return "{\"error\":\"Three-port winding boundaries or reference-inclusive node budget are invalid\"}";
+            if(network->history_cells && static_cast<unsigned>(network->history_cells)!=node_count*node_count)return "{\"error\":\"Captured three-port backing size does not match reference-inclusive node count\"}";
+            work.matrix_request=count_geometry_metals(*source,engine.metal_count);work.matrix_request=work.matrix_request*work.matrix_request*16u;work.matrix_backing=node_count*node_count*16u;
+        }else if(transformer) {
             if(!secondary->filaments.first || !reasitic::bounded_solver_clone(*secondary,network->length,length_cell,network->filament_limit))return "{\"error\":\"Secondary longitudinal mesh exceeds the selected filament budget\"}";
             LaterAnalysisState preview{};LaterAnalysisOptions preparation{};preparation.discretization={network->length,length_cell};preparation.technology=composition_technology;preparation.commands=commands;
             source=prepare_transformer_geometry(*source,*secondary,preview,preparation,boundary);
@@ -226,7 +268,34 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
             {true,sprintf,engine.warnings,NetworkSnapshots::record_nodes,&intermediate},engine.warnings,false,false,NetworkSnapshots::record,&intermediate,{}};
         const GeometryRuntime geometry{memory,engine.warnings,network_terminate,nullptr};
         bool ok;
-        if(transformer) {
+        if(three) {
+            if(ground>=0)reset_geometry_mesh_counts(*const_cast<GeometryShape*>(original_reference));
+            ThreePortAnalysisState state3{};state3.capacitance=state;
+            auto ind3=inductance;ind3.snapshot=NetworkSnapshots::record;ind3.snapshot_user=&intermediate;
+            const ThreePortAnalysisOptions options3{{network->length,length_cell},composition_technology,options,ind3,network_options.eddy,network_options.nodes,commands,false,nullptr,nullptr};
+            reasitic::ThreePortHistory history{memory,network->cap_history,network->ind_history,network->history_addresses,network->history_cells};
+            reasitic::ThreePortHistoryScope history_scope(network->history_cells?&history:nullptr);
+            ok=solve_three_port_network(*original_source,*original_secondary,*original_third,*const_cast<GeometryShape*>(original_reference),frequency,state3,options3);
+            if(!history.prefix_matches)return "{\"error\":\"Captured backing matrix prefix differs from the original computed matrices\"}";
+            if(!history.contract_matches)return "{\"error\":\"Captured native three-port address layout or allocation contract is invalid\"}";
+            if(network->eddy->exceeded)return "{\"error\":\"Three-port eddy evaluation budget exceeded\"}";
+            const auto* z=reinterpret_cast<const ComplexValue*>(&state3.impedance);
+            if(!ok || !finite_matrix(intermediate.capacitance) || !finite_matrix(intermediate.inductance))return "{\"error\":\"Original three-port solver did not produce finite matrices\"}";
+            for(int i=0;i<9;++i)if(!__builtin_isfinite(z[i].real) || !__builtin_isfinite(z[i].imag))return "{\"error\":\"Original three-port node equations produced nonfinite impedance\"}";
+            ThreePortAdmittance admittance{};ThreePortScattering scattering{};convert_three_port_admittance(state3.impedance,admittance,memory,{engine.warnings});convert_three_port_scattering(state3.impedance,scattering,memory,{engine.warnings});
+            const unsigned capacity=64u*(intermediate.capacitance.elements+intermediate.inductance.elements+intermediate.system_before.elements+intermediate.system_after.elements)+65536u;
+            output=static_cast<char*>(calloc(1,capacity));if(!output)return "{\"error\":\"Unable to allocate three-port output\"}";char* out=output;
+            out+=sprintf(out,"{\"names\":[");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_source));out+=sprintf(out,",");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_secondary));out+=sprintf(out,",");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_third));out+=sprintf(out,"],\"ground\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_reference));
+            out+=sprintf(out,",\"frequency_hz\":%.17g,\"contacts\":%d,\"groups\":%d,\"filaments\":%d,\"node_count\":%u,\"winding_groups\":[%d,%d,%d],\"mesh\":{\"length\":%.17g,\"width\":%.17g,\"thickness\":%.17g,\"contact_length\":%.17g,\"contact_width\":%.17g,\"chip_x\":%.17g,\"chip_y\":%.17g,\"fft_x\":%d,\"fft_y\":%d},\"impedance_matrix\":",frequency,snapshots.contacts,expected_groups,network_filaments,node_count,boundary,second_boundary,expected_groups-boundary-second_boundary,network->length,network->width,network->thickness,length_cell,width_cell,chip_x,chip_y,nx,ny);
+
+            out=cells_json(out,z,3);out+=sprintf(out,",\"admittance_matrix\":");out=cells_json(out,reinterpret_cast<const ComplexValue*>(&admittance),3);out+=sprintf(out,",\"scattering_matrix\":");out=cells_json(out,reinterpret_cast<const ComplexValue*>(&scattering),3);
+            out+=sprintf(out,",\"model\":{");const char* model_names[]={"inductance_h","resistance_ohm","mutual_inductance_h","cross_resistance_ohm","coupling"};const double* values[]={state3.model.inductance,state3.model.resistance,state3.model.mutual,state3.model.cross_resistance,state3.model.coupling};
+            for(int i=0;i<5;++i){out+=sprintf(out,"%s\"%s\":[",i?",":"",model_names[i]);for(int j=0;j<3;++j){if(j)out+=sprintf(out,",");out=number_json(out,values[i][j]);}out+=sprintf(out,"]");}out+=sprintf(out,"},\"eddy\":");out=reasitic::eddy_metadata(out,*network->eddy);
+            out+=sprintf(out,",\"capacitance_matrix\":");out=matrix_json(out,intermediate.capacitance);out+=sprintf(out,",\"inductance_impedance_matrix\":");out=matrix_json(out,intermediate.inductance);out+=sprintf(out,",\"system_before\":");out=matrix_json(out,intermediate.system_before);out+=sprintf(out,",\"system_matrix\":");out=matrix_json(out,intermediate.system_after);
+            if(network->history_cells)out+=sprintf(out,",\"backing\":{\"captured\":true,\"cells\":%d,\"prefix_matches\":true}",network->history_cells);
+            out+=sprintf(out,",\"records\":");out=three_records_json(out,state3.impedance,frequency,memory,engine.warnings,false);out+=sprintf(out,",\"polar_records\":");out=three_records_json(out,state3.impedance,frequency,memory,engine.warnings,true);
+            sprintf(out,",\"green_table_hash\":\"%016llx\"}",table_hash(state3.capacitance.cache,nx,ny,pairs));return output;
+        }else if(transformer) {
             if(boundary<1 || boundary>=expected_groups)return "{\"error\":\"Transformer ports require metal conductor groups in both windings\"}";
             auto transformer_inductance=inductance;transformer_inductance.snapshot=NetworkSnapshots::record;transformer_inductance.snapshot_user=&intermediate;
             const LaterAnalysisOptions coupled_options{{network->length,length_cell},composition_technology,options,transformer_inductance,network_options.eddy,network_options.nodes,commands,engine.warnings,false,nullptr,nullptr};
@@ -291,4 +360,23 @@ extern "C" const char* simulate_transformer(int primary,int secondary,int ground
     if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid transformer eddy mode, layers or evaluation budget\"}";
     const NetworkRequest request{length_cell,width_cell,thickness_cell,filament_limit,session,secondary,termination};
     return simulate_capacitance_impl(primary,ground,frequency,contact_length,contact_width,chip_x,chip_y,nx,ny,contact_limit,0,&request);
+}
+
+extern "C" const char* simulate_three_port(int first_winding,int second_winding,int third_winding,int ground,double frequency,double length_cell,double width_cell,double thickness_cell,double contact_length,double contact_width,
+    double chip_x,double chip_y,int nx,int ny,int contact_limit,int filament_limit,int mode,int count,int first,int second,int budget) {
+    if(second_winding<0 || third_winding<0)return "{\"error\":\"Select valid second and third windings\"}";
+    auto* session=static_cast<reasitic::EddySession*>(calloc(1,sizeof(reasitic::EddySession)));if(!session)return "{\"error\":\"Unable to allocate three-port eddy workspace\"}";
+    reasitic::EddyScope scope(session);reasitic::clear_diagnostics();
+    if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid three-port eddy mode, layers or evaluation budget\"}";
+    const NetworkRequest request{length_cell,width_cell,thickness_cell,filament_limit,session,second_winding,0,third_winding};
+    return simulate_capacitance_impl(first_winding,ground,frequency,contact_length,contact_width,chip_x,chip_y,nx,ny,contact_limit,0,&request);
+}
+
+extern "C" const char* probe_three_port(int first_winding,int second_winding,int third_winding,int ground,double frequency,double length_cell,double width_cell,double thickness_cell,double contact_length,double contact_width,
+    double chip_x,double chip_y,int nx,int ny,int contact_limit,int filament_limit,int mode,int count,int first,int second,int budget,const ComplexValue* cap_history,const ComplexValue* ind_history,int history_cells,const unsigned* history_addresses) {
+    if(second_winding<0 || third_winding<0 || !cap_history || !ind_history || !history_addresses || history_cells<1 || history_cells>512*512)return "{\"error\":\"Select valid windings and captured three-port backing arrays\"}";
+    auto* session=static_cast<reasitic::EddySession*>(calloc(1,sizeof(reasitic::EddySession)));if(!session)return "{\"error\":\"Unable to allocate three-port eddy workspace\"}";
+    reasitic::EddyScope scope(session);reasitic::clear_diagnostics();if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid three-port eddy configuration\"}";
+    const NetworkRequest request{length_cell,width_cell,thickness_cell,filament_limit,session,second_winding,0,third_winding,cap_history,ind_history,history_cells,history_addresses};
+    return simulate_capacitance_impl(first_winding,ground,frequency,contact_length,contact_width,chip_x,chip_y,nx,ny,contact_limit,0,&request);
 }

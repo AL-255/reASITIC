@@ -56,6 +56,11 @@ jobs:
           node tests/transformer-lifecycle.mjs
           node tests/worker-transformer.mjs
           node tests/transformer-data.mjs
+          node tests/three-port.mjs
+          node tests/three-port-backing.mjs
+          node tests/three-port-lifecycle.mjs
+          node tests/worker-three-port.mjs
+          node tests/three-port-data.mjs
           node tests/lmat.mjs
           node tests/original-lmat.mjs
           node tests/lmat-lifecycle.mjs
