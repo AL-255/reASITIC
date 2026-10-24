@@ -79,6 +79,9 @@ jobs:
           node tests/optimization.mjs
           node tests/worker-optimization.mjs
           python tests/gds_optimization_reader.py
+          node tests/optimization.mjs --multimetal
+          node tests/worker-optimization.mjs --multimetal
+          python tests/gds_optimization_reader.py --multimetal
           node tests/capacitance.mjs
           node tests/capacitance-data.mjs
           node tests/capacitance-grids.mjs

@@ -107,18 +107,24 @@ def translate(name,s):
 def source(name):
     if name=='optimization_plan':
         s=(ROOT/'vendor/asitic/src/optimization_grid.cpp').read_text()
-        loops=s[s.index('    for(long double next_length='):s.index('    o.runtime.close(file,')]
-        begin=loops.index('                    const auto& construction=');end=loops.index('\n                }',begin)
-        loops=loops[:begin]+'                    if(!emit(args,static_cast<unsigned>(iterations-1),user))return false;'+loops[end:]
-        begin=loops.index('                    if(iterations%100==0)');end=loops.index('                    number(args,0x98,turns);',begin)
-        loops=loops[:begin]+loops[end:]
-        loops=loops.replace('o.runtime.flush(file,o.runtime.user);','').replace('o.prompts.chip_x','chip_x').replace('o.prompts.chip_y','chip_y')
-        for needle in ['        const double length=', '            const double spacing=', '                number(args,0x88,width);', '                    ++iterations;']:
-            assert loops.count(needle)==1
-            loops=loops.replace(needle,'        if(++steps>100000)return false;\n'+needle)
+        mm=(ROOT/'vendor/asitic/src/optimization_grid_multimetal.cpp').read_text()
+        def extract_loop(body):
+            loops=body[body.index('    for(long double next_length='):body.index('    o.runtime.close(file,')]
+            begin=loops.index('                    const auto& construction=');end=loops.index('\n                }',begin)
+            loops=loops[:begin]+'                    if(!emit(args,static_cast<unsigned>(iterations-1),user))return false;'+loops[end:]
+            begin=loops.index('                    if(iterations%100==0)');end=loops.index('                    number(args,0x98,turns);',begin)
+            loops=loops[:begin]+loops[end:]
+            loops=loops.replace('o.runtime.flush(file,o.runtime.user);','').replace('o.prompts.chip_x','chip_x').replace('o.prompts.chip_y','chip_y')
+            for needle in ['        const double length=', '            const double spacing=', '                number(args,0x88,width);', '                    ++iterations;']:
+                assert loops.count(needle)==1
+                loops=loops.replace(needle,'        if(++steps>100000)return false;\n'+needle)
+            return loops
+        loops=extract_loop(s);mm_loops=extract_loop(mm)
         predicate=s[s.index('if(load(pi.inductance)/'):s.index('\n                        print(file,',s.index('if(load(pi.inductance)/'))]
+        mm_predicate=mm[mm.index('if(load(pi.inductance)/'):mm.index('\n                        print(file,',mm.index('if(load(pi.inductance)/'))]
+        assert predicate==mm_predicate,'SWEEP and SWEEPMM acceptance rules differ'
         predicate=predicate.removeprefix('if(').removesuffix(')').replace('pi.inductance','inductance').replace('pi.quality_first','quality').replace('p.inductance_min','minimum').replace('p.inductance_max','maximum').replace('p.minimum_quality','minimum_quality')
-        return '''#include "optimization_plan.hpp"
+        prefix='''#include "optimization_plan.hpp"
 #include "asitic/optimization_radius.hpp"
 #include "x87.hpp"
 namespace reasitic { namespace {
@@ -127,15 +133,15 @@ void number(asitic::GeometryShape& s,unsigned o,long double v){*reinterpret_cast
 void word(asitic::GeometryShape& s,unsigned o,int v){__builtin_memcpy(s.filaments.prefix+o,&v,4);}
 }
 using namespace asitic;
-bool enumerate_spiral_grid(const OptimizationSweepState& p,double chip_x,double chip_y,GridCandidateSink emit,void* user){
-    GeometryShape args{};__builtin_memcpy(args.filaments.prefix,p.shape_name,80);
-    const int kind=p.sides==4?0:1;word(args,0x50,kind);word(args,0x64,p.sides);word(args,0x68,p.metal);word(args,0x6c,p.exit_metal);
-    number(args,0xa0,0.L);args.attributes=0;unsigned steps=0;int iterations=0;const double turn_step=x87::binary64(1.L/p.sides);
-'''+loops+'''    return true;
-}
-bool accept_spiral_grid(double inductance,double quality,double minimum,double maximum,double minimum_quality){return '''+predicate+''';}
-}
 '''
+        setup='''    GeometryShape args{};__builtin_memcpy(args.filaments.prefix,p.shape_name,80);
+    const int kind=KIND;word(args,0x50,kind);word(args,0x64,p.sides);word(args,0x68,p.metal);word(args,0x6c,p.exit_metal);
+    number(args,0xa0,0.L);args.attributes=0;unsigned steps=0;int iterations=0;const double turn_step=x87::binary64(1.L/p.sides);
+'''
+        output=prefix
+        for function,kind,body in [('enumerate_spiral_grid','p.sides==4?0:1',loops),('enumerate_multimetal_grid','p.sides==4?18:20',mm_loops)]:
+            output+='bool '+function+'(const OptimizationSweepState& p,double chip_x,double chip_y,GridCandidateSink emit,void* user){\n'+setup.replace('KIND',kind)+body+'    return true;\n}\n'
+        return output+'bool accept_spiral_grid(double inductance,double quality,double minimum,double maximum,double minimum_quality){return '+predicate+';}\n}\n'
     if name=='composite_geometry':
         s=(ROOT/'vendor/asitic/src/composite_geometry.cpp').read_text()
         # The original workspace contains shapes[0] through shapes[delta].

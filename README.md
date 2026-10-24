@@ -172,6 +172,31 @@ solver requests keep their existing cache policy. Nonsquare grids and larger
 tables still recompute. Fresh/cached matrices and hashes are checked exactly,
 including process changes, frequency aliases, arithmetic isolation and release.
 
+`SWEEPMM` extends design searches to the original multi-metal square constructor.
+Select top METAL and a lower EXIT to span the layers between them. The planner
+extracts this command's own original iteration and origin rules; construction
+uses the corrected `delta + 1` pointer workspace. Temporary copy names are
+checked before construction, so appending a conflicting candidate preserves the
+live geometry and selection. NAME is used explicitly rather than as unwritten
+batch-frame data.
+
+The original non-four-sided SWEEPMM path is kind 20 and constructs a single-metal
+polygon. That behavior is retained and identified in the interface. SWEEPMM
+always uses numerical PI2, including SIMTYPE=1, despite its original FAST header.
+Its AUTOCELL update is skipped for SIMTYPE=1; use SIMTYPE=2 or 3 for automatic
+cells. Candidate application, CSV, cancellation and private-kernel isolation use
+the same workbench controls as SWEEP.
+
+Nine repeated unmodified original SWEEPMM searches capture 43 candidates across
+all four supported CMOS metal spans and BiCMOS, fractional ranges, polygon paths
+and SIMTYPE=1 at a different frequency. All descriptors, 10,586 physical fields
+and 42 accepted printed rows match; the one original nonfinite model remains a
+rejection. Independent 80-digit circuit checks bound production metric error
+below `1.1e-12` on these cases, versus about `9.9e-7` for original extraction.
+An independent GDS reader verifies 43 libraries and 500 polygons. Worker checks
+also cover applying candidates, following simulation, temporary-name recovery,
+AUTOCELL/manual equivalence for a coarse mesh and SIMTYPE=1's bypass.
+
 The original numerical `SELFRES` search is available separately from the
 pi-model resonance estimate. It repeatedly analyzes the selected device and
 ground with the original PI2 SLOW driver and searches single-ended or
@@ -359,6 +384,9 @@ node tests/potential-memo.mjs
 node tests/optimization.mjs
 node tests/worker-optimization.mjs
 python3 tests/gds_optimization_reader.py
+node tests/optimization.mjs --multimetal
+node tests/worker-optimization.mjs --multimetal
+python3 tests/gds_optimization_reader.py --multimetal
 node tests/capacitance.mjs
 node tests/capacitance-data.mjs
 node tests/capacitance-grids.mjs

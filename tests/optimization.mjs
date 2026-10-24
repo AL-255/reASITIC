@@ -7,28 +7,29 @@ import {parseTechnology,configureKernel,createGeometry,editGeometry} from '../we
 import {optimizationPlan,createOptimizationCandidate,optimizationAccept,optimizationCSV} from '../web/optimization.mjs';
 import {parseCreatorCommand} from '../web/creators.mjs';
 import {writeGDS} from '../web/gds.mjs';
-const source=readFileSync('tests/fixtures/optimization-cases.json','utf8'),cases=JSON.parse(source).cases,fixture=JSON.parse(readFileSync('tests/fixtures/original-optimization.json','utf8')),hash=x=>createHash('sha256').update(x).digest('hex');assert.equal(hash(source),fixture.case_definition_sha256);
+const multimetal=process.argv.includes('--multimetal'),prefix=multimetal?'multimetal-':'';
+const source=readFileSync(`tests/fixtures/${prefix}optimization-cases.json`,'utf8'),cases=JSON.parse(source).cases,fixture=JSON.parse(readFileSync(`tests/fixtures/original-${prefix}optimization.json`,'utf8')),hash=x=>createHash('sha256').update(x).digest('hex');assert.equal(hash(source),fixture.case_definition_sha256);
 const k=await make(),reports=[];k._set_potential_memo(1);let count=0,nonfinite=0,accepted=0,fields=0,maximumCircuitError=0,maximumOriginalCircuitError=0;
 const names=['frequency_hz','inductance_h','resistance','capacitance_second_f','capacitance_first_f','resistance_second','resistance_first','quality_first','quality_second','quality_differential','shunt_single','shunt_differential'];
 const physical=layout=>({origin:layout.shapes[0].origin,segments:layout.shapes[0].segments.map(s=>({metal:s.metal,width:s.width,points:s.points,...(s.metal<layout.metal_count?{thickness:s.thickness}:{nx:s.nx,ny:s.ny})}))});
 const clean=({warnings,...rest})=>rest;
 const solve=hz=>JSON.parse(k.UTF8ToString(k._simulate_network(0,-1,hz,1000,1000,1000,1000,1000,512,512,128,128,128,256,0,0,0,0,250000)));
-mkdirSync('build/gds-optimization',{recursive:true});
+mkdirSync(`build/gds-${prefix}optimization`,{recursive:true});
 const lifecycleOnly=process.argv.includes('--lifecycle-only');
 if(!lifecycleOnly)for(const c of cases){
   const text=readFileSync(`web/technology/${c.technology}.tek`,'utf8');assert.equal(hash(text),fixture.technology_sha256[c.technology]);const technology=parseTechnology(text);configureKernel(k,technology);
   if(c.prelude){const creator=parseCreatorCommand(c.prelude);createGeometry(k,creator.id,creator.keywords);}
-  const expected=fixture.cases.find(v=>v.name===c.name),plan=optimizationPlan(k,c.keywords,technology.domain,{candidate_limit:1000});
+  const expected=fixture.cases.find(v=>v.name===c.name),plan=optimizationPlan(k,c.keywords,technology.domain,{candidate_limit:1000,search:c.search});
   assert.equal(plan.frequency_hz,expected.normalized.FREQUENCY_HZ);for(const [key,native]of [['inductance_min','LMIN'],['inductance_max','LMAX'],['minimum_quality','MINQ']])assert.equal(plan[key],expected.normalized[native]);
   assert.deepEqual(plan.candidates,expected.candidates.map(v=>v.descriptor),c.name+' original candidate order/descriptor');
-  if(c.technology==='CMOS'&&!c.prelude){const native=JSON.parse(execFileSync('build/native-geometry',['--grid',c.keywords,'1000'],{encoding:'utf8'}));assert.deepEqual(native,plan,c.name+' native/WASM plan');}
+  if(c.technology==='CMOS'&&!c.prelude){const native=JSON.parse(execFileSync('build/native-geometry',[multimetal?'--grid-mm':'--grid',c.keywords,'1000'],{encoding:'utf8'}));assert.deepEqual(native,plan,c.name+' native/WASM plan');}
   const samples=[];let matched=0;
   for(const [index,descriptor]of plan.candidates.entries()){
     const original=expected.candidates[index],layout=createOptimizationCandidate(k,plan.name,descriptor);layout.metal_count=technology.metals.length;assert.deepEqual(physical(layout),original.geometry,c.name+' original candidate geometry '+index);fields+=original.geometry.segments.reduce((n,s)=>n+Object.values(s).flat(2).filter(v=>typeof v==='number').length,2);
     if(c.technology==='CMOS'){
       const native=JSON.parse(execFileSync('build/native-geometry',['--grid-create',plan.name,...descriptor,'0'].map(String),{encoding:'utf8'}));native.metal_count=technology.metals.length;assert.deepEqual(physical(native),original.geometry,c.name+' native candidate '+index);
     }
-    writeFileSync(`build/gds-optimization/${c.name}-${index}.gds`,writeGDS(layout,technology));
+    writeFileSync(`build/gds-${prefix}optimization/${c.name}-${index}.gds`,writeGDS(layout,technology));
     const actual=solve(plan.frequency_hz),sample={index,descriptor,accepted:false,geometry_valid:true,frequency_hz:plan.frequency_hz};
     if(original.pi.some(v=>typeof v!=='number')){assert.ok(actual.error,c.name+' original nonfinite candidate must reject');nonfinite++;sample.error=actual.error;}
     else{
@@ -50,7 +51,7 @@ if(!lifecycleOnly)for(const c of cases){
   assert.equal(matched,expected.accepted_printed.length,c.name+' original accepted count');console.log(c.name+': original candidates, geometry, models and acceptance pass');reports.push({name:c.name,samples});
 }
 const technology=parseTechnology(readFileSync('web/technology/CMOS.tek','utf8'));configureKernel(k,technology);
-const before=createGeometry(k,2,'NAME=KEEP:LEN=40:WID=8:METAL=M1'),valid=cases[0].keywords;
+const before=createGeometry(k,2,'NAME=KEEP:LEN=40:WID=8:METAL=M1'),valid=JSON.parse(readFileSync('tests/fixtures/optimization-cases.json','utf8')).cases[0].keywords;
 for(const keywords of ['::',valid.replace('AINC=10','AINC=0'),valid.replace('SIMTYPE=2','SIMTYPE=1'),valid.replace('SIDES=4','SIDES=257'),valid.replace('NAME=OPT','NAME=KEEP')])assert.throws(()=>optimizationPlan(k,keywords,technology.domain));
 assert.throws(()=>optimizationPlan(k,valid,technology.domain,{candidate_limit:2}),/budget/);assert.deepEqual(clean(editGeometry(k,'UNSELECT')),clean(before),'Rejected plan changed source');
 const plan=optimizationPlan(k,valid,technology.domain),descriptor=plan.candidates[0];
@@ -60,6 +61,20 @@ assert.deepEqual(clean(editGeometry(k,'UNSELECT')),clean(before),'Rejected repla
 const composed=createOptimizationCandidate(k,'OPT',descriptor,true);assert.equal(composed.shapes.length,2);assert.deepEqual(composed.shapes[1],before.shapes[0]);assert.throws(()=>createOptimizationCandidate(k,'KEEP',descriptor,true),/already/);assert.deepEqual(clean(editGeometry(k,'UNSELECT')),clean(composed));
 for(let i=0;i<20;++i)createOptimizationCandidate(k,'OPT',plan.candidates[i%3]);const heap=k.HEAPF64.buffer.byteLength;for(let i=0;i<60;++i)createOptimizationCandidate(k,'OPT',plan.candidates[i%3]);assert.equal(k.HEAPF64.buffer.byteLength,heap,'Candidate replacement leaked heap');
 assert.throws(()=>optimizationPlan(k,valid+'\0',technology.domain),/NUL/);assert.throws(()=>createOptimizationCandidate(k,'BAD\0',descriptor),/NUL/);
+if(multimetal){
+  configureKernel(k,technology);const base=createGeometry(k,2,'NAME=KEEP:LEN=40:WID=8:METAL=M1'),keywords=cases[0].keywords;
+  const mm=optimizationPlan(k,keywords,technology.domain,{search:'SWEEPMM'}),mmDescriptor=mm.candidates[0];
+  assert.deepEqual(optimizationPlan(k,keywords.replace('SIMTYPE=2','SIMTYPE=1'),technology.domain,{search:'SWEEPMM'}).candidates,mm.candidates,'MM SIMTYPE=1 must retain numerical candidates');
+  for(const line of [keywords.replace('EXIT=M4','EXIT=M5'),keywords.replace('EXIT=M4','EXIT=-1')])assert.throws(()=>optimizationPlan(k,line,technology.domain,{search:'SWEEPMM'}),/lower/);
+  assert.throws(()=>optimizationPlan(k,keywords,technology.domain,{search:'UNKNOWN'}),/SWEEP/);
+  const collision=createGeometry(k,2,'NAME=OPT-1:LEN=40:WID=8:METAL=M1','',{append:true});const selected=editGeometry(k,'SELECT KEEP');
+  assert.throws(()=>createOptimizationCandidate(k,'OPT',mmDescriptor,true),/temporary name/);assert.deepEqual(clean(editGeometry(k,'MOVEX KEEP 0')),clean(selected),'Rejected MM copy-name collision damaged source/selection');
+  editGeometry(k,'RENAME OPT-1 OLD');const combined=createOptimizationCandidate(k,'OPT',mmDescriptor,true);assert.equal(combined.shapes.length,3);assert.equal(k._shape_kind(0),21,'Original MM join kind');
+  const beforeName=clean(combined);assert.throws(()=>createOptimizationCandidate(k,'X'.repeat(79),mmDescriptor),/74 characters/);assert.deepEqual(clean(editGeometry(k,'MOVEX KEEP 0')),beforeName,'Rejected MM replacement damaged source');
+  for(let i=0;i<30;++i)createOptimizationCandidate(k,'OPT',mm.candidates[i%3]);const size=k.HEAPF64.buffer.byteLength;for(let i=0;i<60;++i)createOptimizationCandidate(k,'OPT',mm.candidates[i%3]);assert.equal(k.HEAPF64.buffer.byteLength,size,'MM workspace replacement leaked memory');
+  editGeometry(k,'RENAME OPT PREVIOUS');
+  const polygon=optimizationPlan(k,cases.find(c=>c.name==='polygon-original-path').keywords,technology.domain,{search:'SWEEPMM'});const single=createOptimizationCandidate(k,'OPT',polygon.candidates[0]);assert.deepEqual([...new Set(single.shapes[0].segments.map(s=>s.metal))],[4],'Original kind-20 path added unrequested layers');assert.equal(k._shape_kind(0),20);
+}
 const csv=optimizationCSV(reports.flatMap(r=>r.samples));assert.equal(csv.trim().split('\n').length,count+1);assert.match(csv,/accepted/);
-mkdirSync('build/evidence',{recursive:true});writeFileSync(`build/evidence/optimization${lifecycleOnly?'-lifecycle':''}.json`,JSON.stringify({cases:lifecycleOnly?0:cases.length,candidates:count,accepted,originalNonfinite:nonfinite,physicalFields:fields,maximumCircuitError,maximumOriginalCircuitError,memo:JSON.parse(k.UTF8ToString(k._potential_memo_stats())),reports},null,2)+'\n');
-console.log(lifecycleOnly?'SWEEP admission, replacement/append rollback, late export rejection and bounded-heap lifecycle pass':`SWEEP: ${cases.length} original cases, ${count} exact descriptors/geometries, ${accepted} accepted reports, ${nonfinite} native nonfinite rejections, native plans, original model metrics, admission/rollback and bounded-heap replacement pass`);
+mkdirSync('build/evidence',{recursive:true});writeFileSync(`build/evidence/${prefix}optimization${lifecycleOnly?'-lifecycle':''}.json`,JSON.stringify({cases:lifecycleOnly?0:cases.length,candidates:count,accepted,originalNonfinite:nonfinite,physicalFields:fields,maximumCircuitError,maximumOriginalCircuitError,memo:JSON.parse(k.UTF8ToString(k._potential_memo_stats())),reports},null,2)+'\n');
+console.log(lifecycleOnly?'SWEEP admission, replacement/append rollback, late export rejection and bounded-heap lifecycle pass':`SWEEP${multimetal?'MM':''}: ${cases.length} original cases, ${count} exact descriptors/geometries, ${accepted} accepted reports, ${nonfinite} native nonfinite rejections, native plans, original model metrics, admission/rollback and bounded-heap replacement pass`);

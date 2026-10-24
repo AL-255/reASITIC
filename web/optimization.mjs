@@ -2,7 +2,10 @@ import {withString} from './technology.mjs';
 export function optimizationPlan(kernel,keywords,domain,options={}){
   if(typeof keywords!=='string'||keywords.includes('\0'))throw Error('Enter original SWEEP keywords without NUL characters.');
   const limit=options.candidate_limit??100;if(!Number.isInteger(limit)||limit<1||limit>1000)throw Error('Use a candidate budget from 1 to 1000.');
-  return withString(kernel,keywords,p=>{const result=JSON.parse(kernel.UTF8ToString(kernel._optimization_plan(p,domain.x,domain.y,options.grid??.1,options.snap===false?0:1,limit)));if(result.error)throw Error(result.error);return result;});
+  const search=options.search??'SWEEP';if(!['SWEEP','SWEEPMM'].includes(search))throw Error('Select SWEEP or SWEEPMM.');
+  const planner=search==='SWEEPMM'?kernel._optimization_multimetal_plan:kernel._optimization_plan;
+  if(typeof planner!=='function')throw Error('This kernel does not support the selected search.');
+  return withString(kernel,keywords,p=>{const result=JSON.parse(kernel.UTF8ToString(planner(p,domain.x,domain.y,options.grid??.1,options.snap===false?0:1,limit)));if(result.error)throw Error(result.error);return result;});
 }
 export function createOptimizationCandidate(kernel,name,descriptor,append=false){
   if(typeof name!=='string'||name.includes('\0'))throw Error('Use an optimizer candidate name without NUL characters.');

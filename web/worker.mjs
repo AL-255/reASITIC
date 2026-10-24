@@ -68,15 +68,15 @@ self.onmessage=async({data})=>{
       if(!optimizationKernel){optimizationKernel=await createKernel();optimizationKernel._set_potential_memo(1);}if(task!==epoch)return;
       configureKernel(optimizationKernel,technology);
       const planningKernel=processTechnology?.source===technology.source?kernel:optimizationKernel;
-      const plan=optimizationPlan(planningKernel,data.keywords,technology.domain,data.options),summary={name:plan.name,frequency_hz:plan.frequency_hz,inductance_min:plan.inductance_min,inductance_max:plan.inductance_max,minimum_quality:plan.minimum_quality,total:plan.candidates.length};
+      const plan=optimizationPlan(planningKernel,data.keywords,technology.domain,data.options),summary={search:plan.search??'SWEEP',name:plan.name,frequency_hz:plan.frequency_hz,inductance_min:plan.inductance_min,inductance_max:plan.inductance_max,minimum_quality:plan.minimum_quality,total:plan.candidates.length};
       optimizationState={plan,technology,completed:new Set()};
       if(!plan.candidates.length){postMessage({id:data.id,optimization:{...summary,done:true}});return;}
       for(const [index,descriptor]of plan.candidates.entries()){
         if(task!==epoch)return;const sample={index,descriptor,accepted:false,frequency_hz:plan.frequency_hz};
         try{
           const layout=createOptimizationCandidate(optimizationKernel,plan.name,descriptor);sample.geometry_valid=true;
-          const solved=solveNetwork({...data,model:'PI2',winding:0,ground:-1},plan.frequency_hz,{kernel:optimizationKernel,technology,layout});
-          sample.pi=solved.pi;sample.accepted=optimizationAccept(optimizationKernel,plan,solved.pi);sample.warnings=optimizationKernel.UTF8ToString(optimizationKernel._last_warnings());
+          const solved=solveNetwork({...data,...(plan.search==='SWEEPMM'&&plan.simulation_type===1?{automatic_cells:false}:{}),model:'PI2',winding:0,ground:-1},plan.frequency_hz,{kernel:optimizationKernel,technology,layout});
+          sample.pi=solved.pi;if(solved.automatic_cells)sample.automatic_cells=solved.automatic_cells;sample.accepted=optimizationAccept(optimizationKernel,plan,solved.pi);sample.warnings=optimizationKernel.UTF8ToString(optimizationKernel._last_warnings());
         }catch(error){sample.error=error.message;}
         optimizationState.completed.add(index);const done=index===plan.candidates.length-1;postMessage({id:data.id,optimization:{...summary,sample,done}});if(!done)await new Promise(resolve=>setTimeout(resolve,0));
       }return;

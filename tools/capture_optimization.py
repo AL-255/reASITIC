@@ -4,19 +4,19 @@ from pathlib import Path
 from capture_lmat import ROOT,ORIGINAL_SHA256
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--reference',type=Path,default=Path.home()/'github/asitic-re');args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--reference',type=Path,default=Path.home()/'github/asitic-re');parser.add_argument('--cases',type=Path,default=ROOT/'tests/fixtures/optimization-cases.json');parser.add_argument('--output',type=Path,default=ROOT/'tests/fixtures/original-optimization.json');args=parser.parse_args()
     binary=args.reference/'run/asitic.linux.2.2';assert hashlib.sha256(binary.read_bytes()).hexdigest()==ORIGINAL_SHA256
-    source=ROOT/'tests/fixtures/optimization-cases.json';cases=json.loads(source.read_text())['cases'];technologies={name:(ROOT/'web/technology'/(name+'.tek')).read_text() for name in ['CMOS','BiCMOS']}
-    base=ROOT/'build/original-optimization';base.mkdir(parents=True,exist_ok=True);work=Path(tempfile.mkdtemp(prefix='capture-',dir=base))
+    source=args.cases;cases=json.loads(source.read_text())['cases'];technologies={name:(ROOT/'web/technology'/(name+'.tek')).read_text() for name in ['CMOS','BiCMOS']}
+    base=ROOT/'build'/('original-'+source.stem);base.mkdir(parents=True,exist_ok=True);work=Path(tempfile.mkdtemp(prefix='capture-',dir=base))
     env=dict(os.environ,TERM='dumb',INPUTRC='/dev/null',LD_LIBRARY_PATH='/tmp/asitic-native-deps/readline-original:'+str(args.reference/'run/libs')+':/tmp/asitic-native-deps/root/usr/lib/i386-linux-gnu');env.pop('LD_PRELOAD',None)
     def limits():resource.setrlimit(resource.RLIMIT_CORE,(0,0))
     def capture(case):
-        snapshots=[];tech=technologies[case['technology']];metals=len(re.findall(r'(?im)^\s*<metal>',tech));p=case['parameters']
+        snapshots=[];tech=technologies[case['technology']];metals=len(re.findall(r'(?im)^\s*<metal>',tech));p=case['parameters'];search=case.get('search','SWEEP')
         for repeat in range(2):
             directory=work/case['name']/str(repeat);directory.mkdir(parents=True);(directory/'process.tek').write_text(tech)
             # Stop the original immediately after keyword normalization. Its
             # subsequent batch-name loop reads unwritten text and may hang.
-            (directory/'normalize.asit').write_text(case.get('prelude','')+'\nSWEEP '+case['keywords']+'\n')
+            (directory/'normalize.asit').write_text(case.get('prelude','')+'\n'+search+' '+case['keywords']+'\n')
             normalize='''set pagination off
 set confirm off
 set disable-randomization off
@@ -41,9 +41,9 @@ quit
             normalized=json.loads((directory/'normalized.json').read_text());q={**p,**normalized,'FREQ':normalized['FREQUENCY_HZ']/1e9}
             # Feed those exact normalized doubles to the original prompted grid.
             # No original registers, memory, executable or saved data are edited.
-            command='SWEEP'
+            command=search
             (directory/'input.asit').write_text(case.get('prelude','')+'\nEDDY FALSE\nCELL 1000 1000 1000\nCCELL 1000 1000\n'+command+'\n')
-            answers=[p['FNAME'],p['NAME'],q['FREQ'],f"{q['LMIN']} {q['LMAX']}",q['MINQ'],f"{q['AMIN']} {q['AINC']} {q['AMAX']}",f"{q['SMIN']} {q['SINC']} {q['SMAX']}",f"{q['WMIN']} {q['WINC']} {q['WMAX']}",q['METAL'],q['EXIT'],q['SIDES'],q['SIMTYPE']]
+            answers=[p['FNAME'],p['NAME'],q['FREQ'],f"{q['LMIN']} {q['LMAX']}",q['MINQ'],f"{q['AMIN']} {q['AINC']} {q['AMAX']}",f"{q['SMIN']} {q['SINC']} {q['SMAX']}",f"{q['WMIN']} {q['WINC']} {q['WMAX']}",q['METAL'],q['EXIT'],q['SIDES']]+([q['SIMTYPE']] if search=='SWEEP' else [])
             (directory/'stdin.txt').write_text('\n'.join(map(str,answers))+('\n' if answers else '')+'EXIT\n')
             gdb='''set pagination off
 set confirm off
@@ -73,19 +73,19 @@ class Solved(gdb.FinishBreakpoint):
   records[-1]['pi']=[finite(v) for v in struct.unpack('<12d',read(0x80d8820,96))];return False
 class Solve(gdb.Breakpoint):
  def stop(self):Solved(gdb.newest_frame(),internal=True);return False
-Construct('*0x8056670',internal=True);Construct('*0x8057248',internal=True);Solve('*0x8050b2c',internal=True)
+Construct('*CONSTRUCTOR',internal=True);Construct('*0x8057248',internal=True);Solve('*0x8050b2c',internal=True)
 end
 run -g -t process.tek -x input.asit < stdin.txt
 python
 open('observations.json','w').write(json.dumps(records,allow_nan=False))
 end
 quit
-'''.replace('METALS',str(metals))
+'''.replace('METALS',str(metals)).replace('CONSTRUCTOR','0x805af5c' if search=='SWEEPMM' else '0x8056670')
             (directory/'capture.gdb').write_text(gdb);process=subprocess.run(['gdb','-q','-batch','-x','capture.gdb','--args',str(binary)],cwd=directory,env=env,text=True,capture_output=True,timeout=120,start_new_session=True,preexec_fn=limits)
             (directory/'gdb.log').write_text(process.stdout+process.stderr)
             if process.returncode or 'SIGSEGV' in process.stdout:raise RuntimeError(case['name']+': '+process.stdout+process.stderr)
             records=json.loads((directory/'observations.json').read_text());assert records and all('geometry' in r and 'pi' in r for r in records),(case['name'],records)
-            output=(directory/p['FNAME']).read_text();rows=[re.findall(r'[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?|[-+]?nan|[-+]?inf',line,re.I) for line in output.splitlines() if line.strip() and line.strip()[0] not in '#!']
+            output=(directory/p['FNAME']).read_text();rows=[re.findall(r'[-+]?(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?|[-+]?nan|[-+]?inf',line,re.I) for line in output.splitlines() if line.strip() and re.match(r'[-+.0-9]',line.strip())]
             assert all(len(row)==13 for row in rows),(case['name'],rows)
             snapshots.append(dict(normalized=normalized,candidates=records,accepted_printed=rows))
         # Keyword SWEEP's constructor name comes from unwritten stack text;
@@ -93,6 +93,6 @@ quit
         assert json.dumps(snapshots[0],sort_keys=True,allow_nan=False)==json.dumps(snapshots[1],sort_keys=True,allow_nan=False),case['name']+' original outputs vary'
         print(case['name']+': '+str(len(records))+' original candidates and '+str(len(rows))+' accepted reports repeat',flush=True);return dict(name=case['name'],**snapshots[0])
     with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:captured=list(pool.map(capture,cases))
-    output=ROOT/'tests/fixtures/original-optimization.json';output.write_text(json.dumps(dict(reference='Two original keyword-normalization return observations and two fresh original prompted SWEEP runs per case using those normalized values; read-only constructor/solver observations and native output rows; undefined name/mesh padding excluded',executable_sha256=ORIGINAL_SHA256,case_definition_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),technology_sha256={name:hashlib.sha256(text.encode()).hexdigest() for name,text in technologies.items()},cases=captured),indent=2)+'\n');print(output);print('Raw proof:',work)
+    output=args.output;output.write_text(json.dumps(dict(reference='Two original keyword-normalization return observations and two fresh original prompted SWEEP runs per case using those normalized values; read-only constructor/solver observations and native output rows; undefined name/mesh padding excluded',executable_sha256=ORIGINAL_SHA256,case_definition_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),technology_sha256={name:hashlib.sha256(text.encode()).hexdigest() for name,text in technologies.items()},cases=captured),indent=2)+'\n');print(output);print('Raw proof:',work)
 
 if __name__=='__main__':main()
