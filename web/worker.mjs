@@ -2,7 +2,7 @@ import createKernel from './asitic.js';
 import {solverCells,meshResult} from './mesh-policy.mjs';
 import {portSampleSummary} from './port-sweep.mjs';
 import {validateThreePortBacking,allocateThreePortBacking} from './three-port.mjs';
-import {parseTechnology,configureKernel,generateGeometry,createGeometry} from './technology.mjs';
+import {parseTechnology,configureKernel,generateGeometry,createGeometry,editGeometry} from './technology.mjs';
 const kernel=await createKernel();let epoch=0,processTechnology=null,hasLayout=false,currentLayout=null;
 function frequency(data,value=data.frequency_ghz) {
   const result=value===undefined?data.frequency:kernel._normalize_value(Number(value),5,.1,0);
@@ -60,6 +60,10 @@ self.onmessage=async({data})=>{
   const task=++epoch;const action=data.action??'generate';
   try{
     if(action==='cancel'){postMessage({id:data.id,cancelled:true});return;}
+    if(action==='edit'){
+      if(!processTechnology||!hasLayout)throw Error('Generate a layout before editing geometry.');
+      const layout=editGeometry(kernel,data.commands,{...data.options,domain:processTechnology.domain});currentLayout=layout;hasLayout=true;postMessage({id:data.id,layout,technology:processTechnology,edited:true});return;
+    }
     if(action==='analyze'){
       const analysis=JSON.parse(kernel.UTF8ToString(kernel._analyze(frequency(data))));
       if(analysis.error)throw Error(analysis.error);

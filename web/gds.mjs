@@ -1,7 +1,8 @@
 // GDSII boundaries from native ribbon edges. User units: µm; database: 1 nm.
-export function* polygons(layout,technology) {
+export function* segmentRecords(segments){for(const segment of segments){yield segment;if(segment.branches)yield* segmentRecords(segment.branches);}}
+export function* polygons(layout,technology,{visibleOnly=false}={}) {
   const n=technology.metals.length;
-  for(const shape of layout.shapes)for(const s of shape.segments) {
+  for(const shape of layout.shapes.filter(s=>!visibleOnly||!s.hidden))for(const s of segmentRecords(shape.segments)) {
     const add=points=>points.map(([x,y])=>[x+shape.origin[0],y+shape.origin[1]]);
     if(s.metal<n){yield {layer:s.metal+1,points:add([s.points[2],s.points[3],s.points[5],s.points[4]])};continue;}
     const via=technology.vias[s.metal-n];if(!via)throw Error('Unknown via layer');

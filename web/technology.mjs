@@ -66,3 +66,9 @@ export function createGeometry(kernel,id,keywords='',answers='',options={}) {
     if(result.error)throw Error(result.error);result.warnings=kernel.UTF8ToString(kernel._last_warnings());return result;
   }));
 }
+
+export function editGeometry(kernel,commands,options={}) {
+  if(typeof commands!=='string'||commands.includes('\0'))throw Error('Enter geometry edit commands without NUL characters.');
+  const domain=options.domain??{x:512,y:512};
+  return withString(kernel,commands,text=>{const result=JSON.parse(kernel.UTF8ToString(kernel._edit_geometry(text,domain.x,domain.y,options.grid??.1,options.snap===false?0:1)));if(result.error)throw Error(result.error);result.warnings=kernel.UTF8ToString(kernel._last_warnings());return result;});
+}

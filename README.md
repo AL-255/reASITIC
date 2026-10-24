@@ -38,6 +38,34 @@ results, cancellation, combined native records and sweep metrics/S CSV exports.
 Original 3PORT provides three-winding models and S/Y/Z conversion. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
+The layout editor runs the original geometry command parser and all 21 recovered
+editing/assembly commands in C++: COPY, RENAME, ERASE, PHASE, MOVE/MOVEX/MOVEY,
+MOVETO, ROTATE, FLIPV/FLIPH, FLIP, JOIN, JOINSHUNT, SPLIT, BEFRIEND/UNFRIEND,
+SPTOWIRE, HIDE and SELECT/UNSELECT. Native aliases and the selected-shape `.`
+reference work. Enter multiple commands in the editor to apply them as a batch.
+Editing clears stale simulation results; subsequent solves use the committed
+layout. Hidden shapes remain in physical GDS export and simulation.
+
+Each edit batch clones the complete shape/segment graph, including paired
+windings, parallel branches and their shared next-record links. Failed commands,
+invalid geometry and late JSON export failures release the candidate and retain
+the live layout. Destructive edits clear references to removed records.
+JOINSHUNT's original fallthrough reads a deleted source pointer as a phase;
+production explicitly selects positive phase, keeping allocator address bits out
+of the mathematical model. Historical arithmetic mode retains the original
+fallthrough for diagnostic comparisons.
+
+Edit batches are limited to 32 KiB, 128 commands and a 32 MiB allocation budget;
+shape names are printable ASCII up to 79 characters (65 before SPTOWIRE).
+Admission guards reject native empty-tail, zero-side, self-join, duplicate-name,
+invalid-partner and excessive shunt-source cases. All twelve creator layouts
+survive graph cloning unchanged. Eight repeated original edit batches cover
+1,813 exact physical binary64 fields, 19 original LMAT matrices, byte-identical
+GDS generation and independent GDS-reader checks for 291 polygons. Transaction
+checks include partial edits, export-buffer exhaustion, lifetime recovery,
+selection, paired movements, parallel branches, empty layouts and subsequent
+simulation. Browser visual QA remains unverified.
+
 Automatic cell sizing (AUTOCELL) applies to LMAT, CAP, PI2, PIX, PI4,
 CALCTRANS and 3PORT, including each saved sweep frequency. The recovered C++ rule
 uses the last technology metal: longitudinal size is `alpha * c / (4 f)`;
@@ -136,6 +164,9 @@ node tests/portable-three-port.mjs
 node tests/three-port-sweep.mjs
 node tests/worker-three-port-sweep.mjs
 node tests/native-creators.mjs
+node tests/geometry-edits.mjs
+node tests/worker-geometry-edits.mjs
+python3 tests/gds_edits_reader.py
 node tests/original-creator-binary.mjs
 node tests/parity.mjs
 node tests/original-geometry.mjs
@@ -555,6 +586,7 @@ python3 tools/capture_maxnw.py --reference ~/github/asitic-re
 python3 tools/capture_maxnw_ports.py --reference ~/github/asitic-re
 python3 tools/capture_automatic_cells.py --reference ~/github/asitic-re # requires GDB
 python3 tools/capture_creators.py --reference ~/github/asitic-re
+python3 tools/capture_geometry_edits.py --reference ~/github/asitic-re
 python3 tools/capture_capacitance.py --reference ~/github/asitic-re
 python3 tools/capture_eddy.py --reference ~/github/asitic-re
 python3 tools/capture_network.py --reference ~/github/asitic-re
@@ -581,8 +613,7 @@ valid descriptor values are passed unchanged to the original builders. Native
 unwritten parser/history and mesh words use explicit zero initial state, rather
 than claiming process-independent parity for uninitialized bytes.
 
-Next recreation work includes native geometry editing and assembly commands,
-broader original-executable creator/input coverage,
+Next recreation work includes broader original-executable creator/input coverage,
 additional validation of stable full-network metrics, and original-executable
 end-to-end parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.

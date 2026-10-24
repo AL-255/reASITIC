@@ -33,12 +33,12 @@ namespace asitic { bool create_native_geometry(int,CommandArguments&,ConsoleGeom
 extern "C" void abort();
 using namespace asitic;
 namespace {
-GeometryShape* head=nullptr;
+GeometryShape* head=nullptr;GeometryShape* selected=nullptr;
 MetalLayer metals[32]{};ViaLayer vias[32]{};double heights[32]{};int metal_count=0,via_count=0,max_width_cells=500;
 double substrate[32]{};SubstrateLayer dielectric[32]{};int substrate_count=0;
 double origin_x=0,origin_y=0,parsed_ring_gap=0;int winding_phase=1;bool has_parsed_gap=false;
 char result[4*1024*1024],message[1024],warnings[4096];unsigned warning_length=0;
-jmp_buf creator_jump;bool creator_active=false;
+jmp_buf creator_jump;bool creator_active=false;bool editing_active=false,edit_rejected=false;
 struct alignas(16) Allocation { Allocation* previous;Allocation* next;bool tracked; };
 Allocation* pending=nullptr;unsigned pending_bytes=0,pending_count=0;
 void fail_creator(const char*);
@@ -54,7 +54,7 @@ void release(void* p,void*) {
     if(a->tracked) { if(a->previous)a->previous->next=a->next;else pending=a->next;if(a->next)a->next->previous=a->previous; }
     free(a);
 }
-void warn(const char* s,void*) { if(warning_length>=sizeof(warnings)-2)return;while(*s && warning_length<sizeof(warnings)-2)warnings[warning_length++]=*s++;warnings[warning_length++]='\n';warnings[warning_length]=0; }
+void warn(const char* s,void*) { if(editing_active && __builtin_strncmp(s,"Error",5)==0)edit_rejected=true; if(warning_length>=sizeof(warnings)-2)return;while(*s && warning_length<sizeof(warnings)-2)warnings[warning_length++]=*s++;warnings[warning_length++]='\n';warnings[warning_length]=0; }
 void fail_creator(const char* text) { warn(text,nullptr);longjmp(creator_jump,1); }
 void terminate(int,void*) { if(creator_active)fail_creator("Original creator terminated");abort(); }
 void invalid(void*) { if(creator_active)fail_creator("Original creator rejected these arguments");abort(); }
@@ -62,7 +62,7 @@ int random(void*) { return 65; }
 double& number(GeometryShape& s,unsigned offset) { return *reinterpret_cast<double*>(s.filaments.prefix+offset); }
 int& integer(GeometryShape& s,unsigned offset) { return *reinterpret_cast<int*>(s.filaments.prefix+offset); }
 GeometryRuntime geometry{{{allocate,nullptr},release},{warn,nullptr},terminate,nullptr};
-void clear() { reasitic::release_simulation_result();reasitic::release_capacitance_result();while(head) { auto* next=head->next;head->next=nullptr;if(head->filaments.first)release_geometry_shapes(head,geometry.memory);else release(head,nullptr);head=next; }warning_length=0;warnings[0]=0; }
+void clear() { selected=nullptr;reasitic::release_simulation_result();reasitic::release_capacitance_result();while(head) { auto* next=head->next;head->next=nullptr;if(head->filaments.first)release_geometry_shapes(head,geometry.memory);else release(head,nullptr);head=next; }warning_length=0;warnings[0]=0; }
 // C locale tables use the recovered glibc signed-char table layout.
 unsigned short classes[384];int upper[384],lower[384];
 CharacterTables character_tables() {
@@ -110,25 +110,29 @@ bool safe_keywords(const char* line) {
     return token_found;
 }
 
+char* serialize_segment(char* out,const ConductorSegment& s,bool branches) {
+    if(out-result>static_cast<int>(sizeof(result))-2048)return nullptr;
+    out+=sprintf(out,"{\"metal\":%d,\"width\":%.17g,\"thickness\":%.17g,\"nx\":%d,\"ny\":%d,\"points\":[",s.metal,s.width,s.metal<metal_count?s.thickness:0.,s.width_count,s.thickness_count);
+    const double* points[]={s.endpoints,s.endpoints+3,s.outer_start,s.outer_end,s.inner_start,s.inner_end};
+    for(int j=0;j<6;++j)for(int k=0;k<3;++k)if(!__builtin_isfinite(points[j][k]))return nullptr;
+    for(int j=0;j<6;++j)out+=sprintf(out,"%s[%.17g,%.17g,%.17g]",j?",":"",points[j][0],points[j][1],points[j][2]);
+    out+=sprintf(out,"]");
+    if(branches&&s.group_next_address){out+=sprintf(out,",\"branches\":[");int n=0;for(auto* child=reinterpret_cast<const ConductorSegment*>(s.group_next_address);child;child=reinterpret_cast<const ConductorSegment*>(child->group_next_address)){if(n++)out+=sprintf(out,",");out=serialize_segment(out,*child,false);if(!out)return nullptr;}out+=sprintf(out,"]");}
+    out+=sprintf(out,"}");return out;
+}
 const char* serialize_geometry() {
     char* out=result;out+=sprintf(out,"{\"shapes\":[");int index=0;
     for(auto* shape=head;shape;shape=shape->next,++index) {
+        if(out-result>static_cast<int>(sizeof(result))-2048)return "{\"error\":\"Geometry exceeds export buffer\"}";
         const double resistance=x87::binary64(shape_resistance_dc(shape->filaments,{metals,vias,metal_count}));
         if(!__builtin_isfinite(resistance))return "{\"error\":\"Original geometry produced nonfinite resistance\"}";
         out+=sprintf(out,"%s{\"name\":",index?",":"");out=reasitic::json_string(out,reinterpret_cast<const char*>(shape->filaments.prefix));
+        if(shape->suffix[0])out+=sprintf(out,",\"hidden\":true");
         out+=sprintf(out,",\"resistance_dc\":%.17g,\"origin\":[%.17g,%.17g],\"segments\":[",resistance,number(*shape,0x54),number(*shape,0x5c));
-        int count=0;
-        for(auto* s=shape->filaments.first;s;s=reinterpret_cast<const ConductorSegment*>(s->next_address),++count) {
-            if(out-result>static_cast<int>(sizeof(result))-2048)return "{\"error\":\"Geometry exceeds export buffer\"}";
-            out+=sprintf(out,"%s{\"metal\":%d,\"width\":%.17g,\"thickness\":%.17g,\"nx\":%d,\"ny\":%d,\"points\":[",count?",":"",s->metal,s->width,s->metal<metal_count?s->thickness:0.,s->width_count,s->thickness_count);
-            const double* points[]={s->endpoints,s->endpoints+3,s->outer_start,s->outer_end,s->inner_start,s->inner_end};
-            for(int j=0;j<6;++j)for(int k=0;k<3;++k)if(!__builtin_isfinite(points[j][k]))return "{\"error\":\"Original geometry produced nonfinite coordinates\"}";
-            for(int j=0;j<6;++j)out+=sprintf(out,"%s[%.17g,%.17g,%.17g]",j?",":"",points[j][0],points[j][1],points[j][2]);
-            out+=sprintf(out,"]}");
-        }
+        int count=0;for(auto* s=shape->filaments.first;s;s=reinterpret_cast<const ConductorSegment*>(s->next_address)){if(count++)out+=sprintf(out,",");out=serialize_segment(out,*s,true);if(!out)return "{\"error\":\"Geometry is nonfinite or exceeds export buffer\"}";}
         out+=sprintf(out,"]}");
     }
-    sprintf(out,"]}");return result;
+    out+=sprintf(out,"]");if(selected){out+=sprintf(out,",\"selected\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(selected));}sprintf(out,"}");return result;
 }
 
 }
@@ -193,12 +197,12 @@ const char* create_geometry(int id,const char* keywords,const char* input,double
     if(keywords && *keywords && !safe_keywords(keywords))return "{\"error\":\"Invalid or oversized creator arguments\"}";
     if(!append)clear();else { reasitic::release_simulation_result();reasitic::clear_diagnostics(); }
     original_head=head;creator_state={};creator_arguments={};answers=input;
-    auto& state=creator_state;state.head=head;state.geometry=geometry;
+    auto& state=creator_state;state.head=head;state.selected=selected;state.geometry=geometry;
     state.technology={metals,vias,heights,metal_count};
-    CommandRuntime parser{character_tables(),sscanf,strtok,bounded_format,message,{warn,nullptr},head,nullptr,1e9,1e-6,grid,snap!=0};
+    CommandRuntime parser{character_tables(),sscanf,strtok,bounded_format,message,{warn,nullptr},head,selected,1e9,1e-6,grid,snap!=0};
     state.prompt={parser,state.technology,via_count,chip_x,chip_y,invalid,nullptr};
     state.creation={state.prompt,read_answer,nullptr,cells_x,cells_y};
-    state.commands={{geometry,via_count,{warn,nullptr},bounded_format,message,invalid,nullptr},nullptr,geometry.memory,random,nullptr};
+    state.commands={{geometry,via_count,{warn,nullptr},bounded_format,message,invalid,nullptr},selected,geometry.memory,random,nullptr};
     // Unwritten native mesh words have no process-independent value. Start at
     // zero, as in original pre-analysis SAVE fixtures, until the solver meshes.
     state.invalid=invalid;pending=nullptr;pending_bytes=pending_count=0;
@@ -214,6 +218,7 @@ const char* create_geometry(int id,const char* keywords,const char* input,double
     if(serialized!=result)fail_creator("Generated layout is nonfinite or exceeds the export size limit");
     creator_active=false;
     while(pending) { pending->tracked=false;pending=pending->next; }
+    selected=state.selected;
     if(head==original_head)return "{\"error\":\"Original creator did not produce geometry\"}";
     return serialized;
 }
@@ -281,3 +286,5 @@ const char* generate(int kind,const double* p) {
     return serialize_geometry();
 }
 }
+
+#include "geometry_edit_bridge.inc"

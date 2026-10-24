@@ -1,0 +1,68 @@
+{
+  "cases": [
+    {
+      "name": "rigid-phase-selection",
+      "creator": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=80:WID=12:METAL=M1:XORG=100:YORG=100"
+      },
+      "commands": "CP A B M3 160 120\nMOVE B .26 -1.24\nMOVEX A 10\nMOVEY A -2\nMOVETO B 180 140\nROTATE A 37\nFLIPV B\nFLIPH A\nPHASE B -1\nFLIP B\nRENAME B D\nSELECT A\nMOVE . .3 -.2\nHIDE D\nUNSELECT"
+    },
+    {
+      "name": "join-split",
+      "creator": {
+        "id": 0,
+        "keywords": "NAME=A:LEN=160:WID=180:W=8:S=4:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100"
+      },
+      "commands": "CP A B M3\nMOVE B 250 0\nJOIN A B\nSPLIT A 3 C\nRENAME C TAIL"
+    },
+    {
+      "name": "shunt-branch-transform",
+      "creator": {
+        "id": 0,
+        "keywords": "NAME=A:LEN=160:WID=180:W=8:S=4:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100"
+      },
+      "commands": "CP A B M3\nMOVE B 0 250\nPHASE A -1\nJOINSHUNT A B\nCP A C\nROTATE C 90\nFLIPH C"
+    },
+    {
+      "name": "wire-conversion",
+      "creator": {
+        "id": 0,
+        "keywords": "NAME=A:LEN=160:WID=180:W=8:S=4:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100"
+      },
+      "commands": "SPTOWIRE A"
+    },
+    {
+      "name": "paired-move",
+      "creator": {
+        "id": 3,
+        "keywords": "PNAME=P:SNAME=S:LEN=120:WID=140:W=8:S=4:NP=1:NS=1:METAL=M5:EXIT=M4:XORG=100:YORG=100"
+      },
+      "commands": "MOVE P 10 20\nMOVETO S 300 300\nUNFRIEND P S\nMOVE P 5 -5"
+    },
+    {
+      "name": "friendship",
+      "creator": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=80:WID=12:METAL=M1:XORG=100:YORG=100"
+      },
+      "commands": "CP A B\nBEFRIEND A B\nMOVE A 10 20\nMOVETO B 300 300\nUNFRIEND A B\nMOVE A 5 -5\nERASE B"
+    },
+    {
+      "name": "delete-selected",
+      "creator": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=80:WID=12:METAL=M1:XORG=100:YORG=100"
+      },
+      "commands": "CP A B\nSELECT B\nERASE B\nCP A C\nSELECT C\nHIDE C\nSELECT A"
+    },
+    {
+      "name": "negative-split",
+      "creator": {
+        "id": 0,
+        "keywords": "NAME=A:LEN=160:WID=180:W=8:S=4:N=1.5:METAL=M5:EXIT=M4:XORG=100:YORG=100"
+      },
+      "commands": "CP A B\nSPLIT B -1 C\nFLIP C\nJOIN A C\nERASE B"
+    }
+  ]
+}
