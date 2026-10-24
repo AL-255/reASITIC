@@ -1,0 +1,255 @@
+{
+  "cases": [
+    {
+      "name": "wires-default-sweep",
+      "case": {
+        "creators": [
+          {
+            "id": 2,
+            "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=C:LEN=100:WID=40:METAL=M5:XORG=100:YORG=260"
+          }
+        ],
+        "names": [
+          "A",
+          "B",
+          "C"
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "name": "wires-default"
+      },
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "reference": "original"
+    },
+    {
+      "name": "wires-subdivision-sweep",
+      "case": {
+        "creators": [
+          {
+            "id": 2,
+            "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=C:LEN=100:WID=40:METAL=M5:XORG=100:YORG=260"
+          }
+        ],
+        "names": [
+          "A",
+          "B",
+          "C"
+        ],
+        "cells": [
+          40,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          40,
+          40
+        ],
+        "grid": [
+          32,
+          32
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "name": "wires-subdivision"
+      },
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "reference": "original"
+    },
+    {
+      "name": "wires-two-layer-sweep",
+      "case": {
+        "creators": [
+          {
+            "id": 2,
+            "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=C:LEN=100:WID=40:METAL=M5:XORG=100:YORG=260"
+          }
+        ],
+        "names": [
+          "A",
+          "B",
+          "C"
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 1,
+        "layers": [
+          0,
+          1
+        ],
+        "name": "wires-two-layer"
+      },
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "reference": "original"
+    },
+    {
+      "name": "wires-native-decimal-sweep",
+      "case": {
+        "creators": [
+          {
+            "id": 2,
+            "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=C:LEN=100:WID=40:METAL=M5:XORG=100:YORG=260"
+          }
+        ],
+        "names": [
+          "A",
+          "B",
+          "C"
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "name": "wires-default"
+      },
+      "range_ghz": [
+        0.1,
+        0.3,
+        0.1
+      ],
+      "reference": "original"
+    },
+    {
+      "name": "wires-separate-reference-sweep",
+      "case": {
+        "creators": [
+          {
+            "id": 2,
+            "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=C:LEN=100:WID=40:METAL=M5:XORG=100:YORG=260"
+          }
+        ],
+        "names": [
+          "A",
+          "B",
+          "C"
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "name": "wires-default",
+        "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100"
+      },
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "reference": "independent-nodal"
+    }
+  ]
+}

@@ -44,6 +44,21 @@ function solveNetwork(data,hz){
       const result=JSON.parse(kernel.UTF8ToString(solver(data.winding??0,...pads,data.ground??-1,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000)));
       if(result.error)throw Error(result.error);return result;
 }
+async function solveThreePort(data,hz,task){
+      if(!processTechnology || !hasLayout)throw Error('Generate three windings before running 3PORT.');
+      const indices=data.windings??[0,1,2];if(!Array.isArray(indices)||indices.length!==3||new Set(indices).size!==3||indices.some(i=>!Number.isInteger(i)||i<0||!currentLayout.shapes[i]))throw Error('Select three distinct winding records.');
+      const domain=processTechnology.domain,mesh=data.mesh??{},contact=data.contact_mesh??{},e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[];
+      if(!Array.isArray(layers)||layers.length>2||layers.some(i=>!Number.isInteger(i)||i<0))throw Error('Select up to two substrate layers.');
+      const cells=[mesh.length??50,mesh.width??1.5,mesh.thickness??.5,contact.length??50,contact.width??20],parsed=data.nativeInput?cells.map(v=>kernel._normalize_value(Number(v),7,data.grid??.1,data.snap===false?0:1)):cells,ground=data.ground??-1;
+      const args=[...indices,ground,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000];let result;
+      if(data.backing){
+        const h=validateThreePortBacking(data.backing),names=indices.map(i=>currentLayout.shapes[i].name),reference=currentLayout.shapes[ground<0?indices[0]:ground]?.name;
+        if(JSON.stringify(h.names)!==JSON.stringify(names)||h.ground!==reference||h.frequency_hz!==hz)throw Error('Captured backing winding order, reference or frequency differs from this request.');
+        const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(processTechnology.source))),v=>v.toString(16).padStart(2,'0')).join('');if(task!==epoch)return;if(digest!==h.technology_sha256)throw Error('Captured backing uses a different technology file.');
+        const memory=allocateThreePortBacking(kernel,h);try{result=JSON.parse(kernel.UTF8ToString(kernel._probe_three_port(...args,memory.cap,memory.ind,memory.cells,memory.addresses)));}finally{memory.release();}
+      }else result=JSON.parse(kernel.UTF8ToString(kernel._simulate_three_port(...args)));
+      if(result.error)throw Error(result.error);return result;
+}
 self.onmessage=async({data})=>{
   const task=++epoch;const action=data.action??'generate';
   try{
@@ -53,36 +68,24 @@ self.onmessage=async({data})=>{
       if(analysis.error)throw Error(analysis.error);
       postMessage({id:data.id,analysis,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
     }
-    if(action==='three-port'){
-      if(!processTechnology || !hasLayout)throw Error('Generate three windings before running 3PORT.');
-      const indices=data.windings??[0,1,2];if(!Array.isArray(indices)||indices.length!==3||new Set(indices).size!==3||indices.some(i=>!Number.isInteger(i)||i<0||!currentLayout.shapes[i]))throw Error('Select three distinct winding records.');
-      const domain=processTechnology.domain,mesh=data.mesh??{},contact=data.contact_mesh??{},e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[];
-      if(!Array.isArray(layers)||layers.length>2||layers.some(i=>!Number.isInteger(i)||i<0))throw Error('Select up to two substrate layers.');
-      const cells=[mesh.length??50,mesh.width??1.5,mesh.thickness??.5,contact.length??50,contact.width??20],parsed=data.nativeInput?cells.map(v=>kernel._normalize_value(Number(v),7,data.grid??.1,data.snap===false?0:1)):cells,hz=frequency(data),ground=data.ground??-1;
-      const args=[...indices,ground,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000];let result;
-      if(data.backing){
-        const h=validateThreePortBacking(data.backing),names=indices.map(i=>currentLayout.shapes[i].name),reference=currentLayout.shapes[ground<0?indices[0]:ground]?.name;
-        if(JSON.stringify(h.names)!==JSON.stringify(names)||h.ground!==reference||h.frequency_hz!==hz)throw Error('Captured backing winding order, reference or frequency differs from this request.');
-        const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(processTechnology.source))),v=>v.toString(16).padStart(2,'0')).join('');if(task!==epoch)return;if(digest!==h.technology_sha256)throw Error('Captured backing uses a different technology file.');
-        const memory=allocateThreePortBacking(kernel,h);try{result=JSON.parse(kernel.UTF8ToString(kernel._probe_three_port(...args,memory.cap,memory.ind,memory.cells,memory.addresses)));}finally{memory.release();}
-      }else result=JSON.parse(kernel.UTF8ToString(kernel._simulate_three_port(...args)));
-      if(result.error)throw Error(result.error);postMessage({id:data.id,three_port:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
-    }
+    if(action==='three-port'){const result=await solveThreePort(data,frequency(data),task);if(task!==epoch)return;postMessage({id:data.id,three_port:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
     if(action==='transformer'){const result=solveTransformer(data,frequency(data));postMessage({id:data.id,transformer:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
     if(action==='network'){const result=solveNetwork(data,frequency(data));postMessage({id:data.id,network:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
     if(action==='port-sweep'){
-      const target=data.port_kind??'network';if(!['network','transformer'].includes(target))throw Error('Select a network or transformer sweep.');
+      const target=data.port_kind??'network';if(!['network','transformer','three-port'].includes(target))throw Error('Select a network, transformer or three-port sweep.');
       if(!processTechnology||!hasLayout)throw Error('Generate a layout before running a port sweep.');
       const range=['start_ghz','stop_ghz','step_ghz'].map(key=>{if(typeof data[key]!=='number')throw Error('Enter start, stop and step frequencies in GHz.');return frequency(data,data[key]);});
       const limit=data.sample_limit??101;if(!Number.isInteger(limit))throw Error('Use an integer port sample limit.');
       const plan=JSON.parse(kernel.UTF8ToString(kernel._port_frequency_schedule(...range,limit)));if(plan.error)throw Error(plan.error);
-      const solvePort=target==='transformer'?solveTransformer:solveNetwork;
+      if(target==='three-port'&&data.backing&&plan.frequencies_hz.length>1)throw Error('A native-state capture is valid at one frequency. Clear the capture to sweep the numerical three-port model.');
+      const solvePort=target==='three-port'?solveThreePort:target==='transformer'?solveTransformer:solveNetwork,field=target==='three-port'?'three_port':target;
       for(const [index,hz] of plan.frequencies_hz.entries()){
         if(task!==epoch)return;let result;
-        try{result=solvePort(data,hz);}catch(error){throw Error(`Port sample ${index+1}/${plan.frequencies_hz.length} at ${hz} Hz: ${error.message}`);}
+        try{result=await solvePort(data,hz,task);}catch(error){throw Error(`Port sample ${index+1}/${plan.frequencies_hz.length} at ${hz} Hz: ${error.message}`);}
+        if(task!==epoch)return;
         const done=index===plan.frequencies_hz.length-1;
         const summary=portSampleSummary(result);
-        postMessage({id:data.id,[target]:done?result:summary,port_sweep:{index,total:plan.frequencies_hz.length,done,target},warnings:kernel.UTF8ToString(kernel._last_warnings())});
+        postMessage({id:data.id,[field]:done?result:summary,port_sweep:{index,total:plan.frequencies_hz.length,done,target},warnings:kernel.UTF8ToString(kernel._last_warnings())});
         if(!done)await new Promise(resolve=>setTimeout(resolve,0));
       }
       return;

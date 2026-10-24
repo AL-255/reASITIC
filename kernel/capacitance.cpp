@@ -166,6 +166,13 @@ char* three_records_json(char* out,const ThreePortImpedance& impedance,double fr
         out+=sprintf(out,"%s\"%s\":",parameter>1?",":"",keys[parameter-1]);out=reasitic::json_string(out,record);
     }return out+sprintf(out,"}");
 }
+char* three_headers_json(char* out,bool polar) {
+    out+=sprintf(out,"{");const char* keys[]={"s","y","z"};
+    for(int parameter=1;parameter<=3;++parameter){char text[4096]{};RecordBuffer buffer{text,0,sizeof(text)};
+        const PortOutputRuntime runtime{record_print,{},{},{}};write_three_port_header(&buffer,parameter,polar?1:0,runtime);
+        out+=sprintf(out,"%s\"%s\":",parameter>1?",":"",keys[parameter-1]);out=reasitic::json_string(out,text);
+    }return out+sprintf(out,"}");
+}
 
 }
 namespace asitic {
@@ -332,6 +339,7 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
             out+=sprintf(out,",\"capacitance_matrix\":");out=matrix_json(out,intermediate.capacitance);out+=sprintf(out,",\"inductance_impedance_matrix\":");out=matrix_json(out,intermediate.inductance);out+=sprintf(out,",\"system_before\":");out=matrix_json(out,intermediate.system_before);out+=sprintf(out,",\"system_matrix\":");out=matrix_json(out,intermediate.system_after);
             if(network->history_cells)out+=sprintf(out,",\"backing\":{\"captured\":true,\"cells\":%d,\"prefix_matches\":true}",network->history_cells);
             out+=sprintf(out,",\"records\":");out=three_records_json(out,state3.impedance,frequency,memory,engine.warnings,false);out+=sprintf(out,",\"polar_records\":");out=three_records_json(out,state3.impedance,frequency,memory,engine.warnings,true);
+            out+=sprintf(out,",\"headers\":");out=three_headers_json(out,false);out+=sprintf(out,",\"polar_headers\":");out=three_headers_json(out,true);
             sprintf(out,",\"green_table_hash\":\"%016llx\"}",table_hash(state3.capacitance.cache,nx,ny,pairs));return output;
         }else if(transformer) {
             if(boundary<1 || boundary>=expected_groups)return "{\"error\":\"Transformer ports require metal conductor groups in both windings\"}";

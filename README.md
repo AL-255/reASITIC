@@ -82,6 +82,8 @@ node tests/port-schedule.mjs
 node tests/port-sweep.mjs
 node tests/worker-port-sweep.mjs
 node tests/portable-three-port.mjs
+node tests/three-port-sweep.mjs
+node tests/worker-three-port-sweep.mjs
 node tests/native-creators.mjs
 node tests/original-creator-binary.mjs
 node tests/parity.mjs
@@ -275,8 +277,9 @@ file sections match in reference mode. Production S entries agree to eight
 significant digits in these cases. Another 259 native/WASM scheduling cases
 exercise the unrounded stop boundary and saved-double recurrence; actual worker
 tests cover all four models, streaming, exports, invalid ranges, solver failure
-and cancellation recovery. Three-port sweep integration and broader original
-command coverage remain outstanding.
+and cancellation recovery. Three-port sweeps use the same native schedule and
+stream the numerical three-winding model, including separate references. Broader original
+command coverage remains outstanding.
 
 The worker protocol is tested with actual WASM startup, original wire matrices,
 streamed frequency samples, cancellation and error recovery. Scientific export
@@ -421,6 +424,20 @@ Geometry, contact and filament budgets use native counts and preserve
 the original subdivision/mesh arithmetic. The source geometry remains private
 and unchanged across successful or rejected calls.
 
+Three-port sweeps retain compact S/Y/Z and model samples, with full node/stage
+matrices only on the final point. The workbench offers start/stop/step controls,
+per-panel cancellation, combined native rectangular/polar S/Y/Z records, all-cell
+raw matrix CSVs and sweep metrics. C++ produces both native column headers and
+records, preserving the original Hz field, entry order, repeated/zero cells and
+polar behavior. Four repeated unmodified original sweeps provide 12 exact saved
+frequencies and 24 complete numerical sections; a separately grounded sweep adds
+three independent 80-digit nodal checks. Actual worker tests verify saved-frequency
+single-solve agreement, compact/final payloads, all exports, budget/range failure,
+cancellation and recovery. A historical process-state capture is valid only at
+its recorded frequency: one-point replay is supported, and a multi-point sweep
+requires clearing that capture to use the numerical model.
+
+
 A separately named reference triggers an original defect: the legacy driver
 increases its node count beyond the reduced matrix dimensions. The node routine reads
 unwritten/out-of-bounds data, including bytes aliased to its live LU workspace.
@@ -510,10 +527,9 @@ valid descriptor values are passed unchanged to the original builders. Native
 unwritten parser/history and mesh words use explicit zero initial state, rather
 than claiming process-independent parity for uninitialized bytes.
 
-Next recreation work includes broader original-executable creator/input coverage,
-additional validation of stable full-network metrics,
-three-port sweeps, and original-executable end-to-end
-parity for every supported path. All recovered source is already pinned here for
+Next recreation work includes native automatic-cell controls, broader
+original-executable creator/input coverage, additional validation of stable full-network metrics, and original-executable
+end-to-end parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.
 
 GitHub Actions rebuilds the module, runs these checks, retains the numerical
