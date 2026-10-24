@@ -48,6 +48,8 @@ jobs:
           node tests/eddy-runtime.mjs
           node tests/eddy-lifecycle.mjs
           node tests/worker-eddy.mjs
+          lscpu
+          node tests/pad-rounding.mjs
           node tests/pad.mjs
           node tests/pad-lifecycle.mjs
           node tests/worker-pad.mjs

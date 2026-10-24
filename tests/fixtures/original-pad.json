@@ -1,5 +1,20 @@
 {
   "reference": "Unmodified PI4, ZIN and SHUNTR commands twice per case; read-only GDB stage, admittance and pi captures twice per case",
+  "hardware": {
+    "vendor_id": "AuthenticAMD",
+    "model name": "AMD Ryzen 9 7940HX with Radeon Graphics",
+    "log_operand": [
+      1,
+      2582902255,
+      2422332881,
+      16366
+    ],
+    "log_signature": {
+      "low": 3249069103,
+      "high": 3130780910,
+      "exponent": 49154
+    }
+  },
   "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
   "libm_sha256": "6ff63f39b4c1fc4a04b91cc86da32aceec1d758e3b440b753b937f95ce1690b6",
   "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",

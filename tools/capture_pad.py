@@ -94,6 +94,14 @@ quit
         if snapshots[0]!=snapshots[1]:raise RuntimeError(case['name']+': original observations differ between fresh processes')
         print(case['name']+': two fresh PI4 runs and two read-only raw captures match',flush=True);return {'name':case['name'],**snapshots[0]}
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:captured=list(pool.map(capture,cases))
-    document={'reference':'Unmodified PI4, ZIN and SHUNTR commands twice per case; read-only GDB stage, admittance and pi captures twice per case','executable_sha256':ORIGINAL_SHA256,'libm_sha256':hashlib.sha256(Path('/lib/i386-linux-gnu/libm.so.6').read_bytes()).hexdigest(),'technology_sha256':hashlib.sha256(technology.read_bytes()).hexdigest(),'case_definition_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'raw_matrix_order':'Column major for capacitance, inductance and pad capacitance; row major for both admittances; contiguous PiEquivalent fields','cases':captured}
+    hardware={}
+    for line in Path('/proc/cpuinfo').read_text().splitlines():
+        if ':' in line:
+            key,value=line.split(':',1)
+            if key.strip() in ['vendor_id','model name'] and key.strip() not in hardware:hardware[key.strip()]=value.strip()
+    operand=[1,0x99f3f5ef,0x9061ddd1,0x3fee]
+    probe=json.loads(subprocess.check_output([str(ROOT/'build/native-geometry'),'--x87-raw',*map(str,operand)],text=True))
+    hardware['log_operand']=operand;hardware['log_signature']={key:probe[key] for key in ['low','high','exponent']}
+    document={'reference':'Unmodified PI4, ZIN and SHUNTR commands twice per case; read-only GDB stage, admittance and pi captures twice per case','hardware':hardware,'executable_sha256':ORIGINAL_SHA256,'libm_sha256':hashlib.sha256(Path('/lib/i386-linux-gnu/libm.so.6').read_bytes()).hexdigest(),'technology_sha256':hashlib.sha256(technology.read_bytes()).hexdigest(),'case_definition_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'raw_matrix_order':'Column major for capacitance, inductance and pad capacitance; row major for both admittances; contiguous PiEquivalent fields','cases':captured}
     args.output.write_text(json.dumps(document,indent=2,allow_nan=False)+'\n');print(args.output);print('Raw proof:',work)
 if __name__=='__main__':main()

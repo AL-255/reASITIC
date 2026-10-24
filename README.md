@@ -277,8 +277,13 @@ resets its mesh. Negative native metrics are retained.
 
 **PI4 is not yet verified identical in WASM.** Fourteen repeated original cases
 include seven exact raw WASM comparisons, four finite WASM rounding discrepancies
-and three native nonfinite outputs (reported as errors). The x87 recovered source
-matches all finite raw executable observations. The new discrepancies first appear
+and three native nonfinite outputs (reported as errors). The x87 recovered source on the AMD Ryzen 9 7940HX reference machine
+matches all finite raw executable observations. Captures include the CPU identity
+and an exact FLDLN2/FYL2X instruction signature. A CI machine with a different
+signature is retained as a separate hardware observation; its inductance-derived
+raw differences cannot replace the original reference. WASM still compares directly
+with the same captured original bytes on every host. Capacitance and all other
+independent stages remain strict even across differing instruction signatures. The new discrepancies first appear
 in filament inductance; both offset-pad eddy sample/value traces match x87 exactly.
 One mutual-inductance pair was traced to FLDLN2/FYL2X input binary80 words
 `9061ddd199f3f5ef:3fee`: the software result ends in `c1a8dc2e`, hardware in
