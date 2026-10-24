@@ -11,3 +11,8 @@ export function networkMetricsCSV(result){
   const columns=Object.keys(values).map(key=>['resistance','resistance_first','resistance_second','shunt_single','shunt_differential'].includes(key)?key+'_ohm':key);
   return [columns.join(','),Object.values(values).map(number).join(',')].join('\n')+'\n';
 }
+
+export function networkVectorsCSV(result){
+  if(!result?.currents || !result?.voltages)throw Error('Run PIX before exporting current and voltage vectors.');
+  return ['frequency_hz,node,current_real_ampere,current_imag_ampere,voltage_real_volt,voltage_imag_volt',...result.currents.map((row,i)=>[result.frequency_hz,i,...row[0],...result.voltages[i][0]].map(number).join(','))].join('\n')+'\n';
+}

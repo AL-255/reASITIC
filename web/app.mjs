@@ -4,14 +4,14 @@ import {creatorRecipe,parseCreatorCommand} from './creators.mjs';
 import {capacitanceMatrixCSV,capacitanceDiagnostics} from './capacitance.mjs';
 import {validateThreePortBacking,threePortRecord,threePortMatrixCSV,threePortMetricsCSV} from './three-port.mjs';
 import {transformerImpedanceCSV,transformerMetricsCSV} from './transformer.mjs';
-import {networkMatrixCSV,networkMetricsCSV} from './network.mjs';
+import {networkMatrixCSV,networkMetricsCSV,networkVectorsCSV} from './network.mjs';
 import {frequencySweep,matrixCSV,sweepCSV,plotSeries} from './simulation.mjs';
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
 const colors=['#d8ba69','#8ab9df','#b89bde','#b4e887','#e1b486','#cf83a6','#80c9c3','#ece7bb'];
 let importedText='',technologyText='',layout,technology,ready=false,busy=false,request=0,view,initialView,drag;
 let samples=[],selectedSimulation=null,sampleRequest=null,sampleKey='',capacitanceResult=null,networkResult=null,transformerResult=null,threeResult=null,threeBacking=null;
 const worker=new Worker(new URL('./worker.mjs',import.meta.url),{type:'module'});
-const simulationControls=['simulate','sweep','sim-winding','cell-length','cell-width','cell-thickness','cell-trigger','filament-limit','sweep-start','sweep-stop','sweep-count','frequency-scale','frequency','cap-solve','cap-winding','cap-ground','cap-frequency','cap-length','cap-width','cap-fftx','cap-ffty','contact-limit','cap-mode','eddy-mode','eddy-layer-count','eddy-layer-1','eddy-layer-2','green-budget','network-solve','trans-primary','trans-secondary','trans-termination','trans-solve','three-first','three-second','three-third','three-parameter','three-format','three-backing-file','three-solve'];
+const simulationControls=['simulate','sweep','sim-winding','cell-length','cell-width','cell-thickness','cell-trigger','filament-limit','sweep-start','sweep-stop','sweep-count','frequency-scale','frequency','cap-solve','cap-winding','cap-ground','cap-frequency','cap-length','cap-width','cap-fftx','cap-ffty','contact-limit','cap-mode','eddy-mode','eddy-layer-count','eddy-layer-1','eddy-layer-2','green-budget','network-model','network-solve','trans-primary','trans-secondary','trans-termination','trans-solve','three-first','three-second','three-third','three-parameter','three-format','three-backing-file','three-solve'];
 function setBusy(value,stoppable=false){
   busy=value;for(const element of $('controls').elements)element.disabled=!ready||value||Boolean(element.closest('label')?.hidden)||Boolean(element.closest('.fields') && $('native-command').value.trim())||Boolean(element.id==='append-layout' && !layout);
   for(const id of simulationControls)$(id).disabled=!ready||!layout||value;
@@ -19,7 +19,7 @@ function setBusy(value,stoppable=false){
   $('cap-matrix-csv').disabled=value||!capacitanceResult;$('potential-matrix-csv').disabled=value||!capacitanceResult;
   for(const id of ['three-record','three-raw-csv','three-metrics-csv'])$(id).disabled=value||!threeResult;$('three-clear-backing').disabled=value||!threeBacking;
   for(const id of ['trans-y-csv','trans-z-csv','trans-metrics-csv'])$(id).disabled=value||!transformerResult;
-  $('network-matrix-csv').disabled=value||!networkResult;$('network-metrics-csv').disabled=value||!networkResult;
+  $('network-matrix-csv').disabled=value||!networkResult;$('network-metrics-csv').disabled=value||!networkResult;$('network-vectors-csv').disabled=value||!networkResult?.currents;
   $('matrix-csv').disabled=value||!selectedSimulation?.matrix;$('results-csv').disabled=value||!samples.length;
 }
 function failure(message){$('status').textContent=message;$('loading').textContent='';setBusy(false);}
@@ -49,7 +49,7 @@ worker.onmessage=({data})=>{
   if(data.network){
     networkResult=data.network;const n=networkResult,p=n.pi,show=(x,scale=1,unit='')=>x===null?'Undefined':(x*scale).toPrecision(7)+(unit?' '+unit:'');setBusy(false);
     $('network-l').textContent=show(p.inductance_h,1e9,'nH');$('network-r').textContent=show(p.resistance,1,'Ω');$('network-q').textContent=show(p.quality_differential);
-    $('network-details').textContent=`${n.name} · ${show(n.frequency_hz,1e-9,'GHz')} · ${n.contacts} contacts · ${n.groups} conductor groups · ${n.filaments} filaments
+    $('network-details').textContent=`${n.model??'PI2'} · ${n.name} · ${show(n.frequency_hz,1e-9,'GHz')} · ${n.contacts} contacts · ${n.groups} conductor groups · ${n.filaments} filaments
 `+
       `Cs1 = ${show(p.capacitance_second_f,1e15,'fF')} · Rs1 = ${show(p.resistance_second,1,'Ω')} · Cs2 = ${show(p.capacitance_first_f,1e15,'fF')} · Rs2 = ${show(p.resistance_first,1,'Ω')}
 `+
@@ -59,7 +59,7 @@ worker.onmessage=({data})=>{
 `+
       `Shunt resistance (single / differential): ${show(p.shunt_single,1,'Ω')} / ${show(p.shunt_differential,1,'Ω')} · ${n.eddy.evaluations} Green evaluations`;
     const diagnostics=capacitanceDiagnostics(data.warnings||''),quadErrors=n.eddy.quadrature_status.reduce((a,b)=>a+b,0);
-    $('status').textContent=`Original combined network solve complete${quadErrors?' with QUADPACK nonconvergence':''}.`+(diagnostics?'\n'+diagnostics:'');return;
+    $('status').textContent=`Original ${n.model??'PI2'} solve complete${quadErrors?' with QUADPACK nonconvergence':''}.`+(diagnostics?'\n'+diagnostics:'');return;
   }
   if(data.capacitance){
     capacitanceResult=data.capacitance;const c=capacitanceResult;setBusy(false);
@@ -134,7 +134,7 @@ $('three-solve').onclick=()=>{try{const config=simulationRequest();$('status').t
 function clearTransformer(){transformerResult=null;for(const id of ['trans-l1','trans-l2','trans-k'])$(id).textContent='—';$('trans-details').textContent='Generate or add two windings, then solve the original narrowband transformer model.';}
 $('trans-solve').onclick=()=>{try{const config=simulationRequest();$('status').textContent='Composing the windings and solving the original transformer network…';send({...config,action:'transformer',primary:Number($('trans-primary').value),secondary:Number($('trans-secondary').value),ground:Number($('cap-ground').value),frequency_ghz:Number($('cap-frequency').value),termination_ohm:Number($('trans-termination').value),contact_mesh:{length:Number($('cap-length').value),width:Number($('cap-width').value)},fft_x:Number($('cap-fftx').value),fft_y:Number($('cap-ffty').value),contact_limit:Number($('contact-limit').value)});}catch(e){failure(e.message);}};
 function clearNetwork(){networkResult=null;for(const id of ['network-l','network-r','network-q'])$(id).textContent='—';$('network-details').textContent='Run the combined solve to inspect shunt branches, port quality factors, input impedance and the pi resonance estimate.';}
-$('network-solve').onclick=()=>{try{const config=simulationRequest();$('status').textContent='Solving the original capacitance, inductance and node equations…';send({...config,action:'network',winding:Number($('cap-winding').value),ground:Number($('cap-ground').value),frequency_ghz:Number($('cap-frequency').value),contact_mesh:{length:Number($('cap-length').value),width:Number($('cap-width').value)},fft_x:Number($('cap-fftx').value),fft_y:Number($('cap-ffty').value),contact_limit:Number($('contact-limit').value)});}catch(e){failure(e.message);}};
+$('network-solve').onclick=()=>{try{const config=simulationRequest();$('status').textContent='Solving the original capacitance, inductance and node equations…';send({...config,action:'network',model:$('network-model').value,winding:Number($('cap-winding').value),ground:Number($('cap-ground').value),frequency_ghz:Number($('cap-frequency').value),contact_mesh:{length:Number($('cap-length').value),width:Number($('cap-width').value)},fft_x:Number($('cap-fftx').value),fft_y:Number($('cap-ffty').value),contact_limit:Number($('contact-limit').value)});}catch(e){failure(e.message);}};
 function clearCapacitance(){capacitanceResult=null;for(const id of ['cap-total','cap-resistance','cap-contacts'])$(id).textContent='—';$('cap-details').textContent='Choose a device, optional ground and contact/FFT mesh, then run the original CAP solve.';}
 $('cap-solve').onclick=()=>{try{const o=options(),frequencyGHz=Number($('cap-frequency').value);if(!(frequencyGHz>0))throw Error('Enter a positive CAP frequency.');$('status').textContent='Generating layered Green tables and solving the original CAP matrix…';send({action:'capacitance',winding:Number($('cap-winding').value),ground:Number($('cap-ground').value),frequency_ghz:frequencyGHz,mesh:{length:Number($('cap-length').value),width:Number($('cap-width').value)},fft_x:Number($('cap-fftx').value),fft_y:Number($('cap-ffty').value),contact_limit:Number($('contact-limit').value),unfolded:$('cap-mode').value==='unfolded',nativeInput:true,grid:o.grid,snap:o.snap});}catch(e){failure(e.message);}};
 function clearSimulation(){samples=[];selectedSimulation=null;sampleRequest=null;sampleKey='';for(const id of ['sim-l','sim-r','sim-q'])$(id).textContent='—';$('sim-details').textContent='Choose a winding and mesh, then run the original filament solver.';renderPlot();}
@@ -171,6 +171,7 @@ $('three-metrics-csv').onclick=()=>{try{download(threePortMetricsCSV(threeResult
 $('trans-y-csv').onclick=()=>{try{download(networkMatrixCSV(transformerResult),'reASITIC-transformer-admittance.csv','text/csv');}catch(e){failure(e.message);}};
 $('trans-z-csv').onclick=()=>{try{download(transformerImpedanceCSV(transformerResult),'reASITIC-transformer-impedance.csv','text/csv');}catch(e){failure(e.message);}};
 $('trans-metrics-csv').onclick=()=>{try{download(transformerMetricsCSV(transformerResult),'reASITIC-transformer-metrics.csv','text/csv');}catch(e){failure(e.message);}};
+$('network-vectors-csv').onclick=()=>{try{download(networkVectorsCSV(networkResult),'reASITIC-pix-vectors.csv','text/csv');}catch(e){failure(e.message);}};
 $('network-matrix-csv').onclick=()=>{try{download(networkMatrixCSV(networkResult),'reASITIC-network-admittance.csv','text/csv');}catch(e){failure(e.message);}};
 $('network-metrics-csv').onclick=()=>{try{download(networkMetricsCSV(networkResult),'reASITIC-pi-model.csv','text/csv');}catch(e){failure(e.message);}};
 $('matrix-csv').onclick=()=>{try{download(matrixCSV(selectedSimulation),`reASITIC-${selectedSimulation.name}-matrix.csv`,'text/csv');}catch(e){failure(e.message);}};

@@ -28,8 +28,8 @@ The original layered CAP solver is also available, with substrate conductivity
 and permittivity. The original eddy Green kernels, QUADPACK integration and
 matrix stamping are integrated. PI2 combines the original capacitance, inductance
 and node-equation solvers into a two-port admittance matrix and pi model.
-CALCTRANS adds original coupled-winding narrowband simulation. Extended,
-deembedded paths and two-port S-parameter/sweep integration remain outstanding.
+CALCTRANS adds original coupled-winding narrowband simulation. PIX adds the
+original extended two-port node system. Pad deembedding and two-port S-parameter/sweep integration remain outstanding.
 Original 3PORT provides three-winding models and S/Y/Z conversion. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
@@ -51,6 +51,9 @@ node tests/eddy.mjs
 node tests/eddy-runtime.mjs
 node tests/eddy-lifecycle.mjs
 node tests/worker-eddy.mjs
+node tests/extended.mjs
+node tests/extended-lifecycle.mjs
+node tests/worker-extended.mjs
 node tests/network.mjs
 node tests/network-lifecycle.mjs
 node tests/worker-network.mjs
@@ -241,8 +244,19 @@ allocations. Ground type-8 acquisition preserves its native -1/-1 mesh behavior,
 including explicit self-ground. Stage matrices are copied at original snapshot
 boundaries for comparison; all private state is released after every solve.
 Worker and lifecycle checks cover budget recovery, alternating CAP/LMAT/network
-requests, immutable source geometry and bounded repeated allocations. The full
-extended and deembedded paths remain to be exposed.
+requests, immutable source geometry and bounded repeated allocations. The model selector also exposes original PIX via
+`simulate_extended_network` with the same arguments as `simulate_network`.
+PIX uses unfolded capacitance, impedance-form inductance and the original
+extended node equations. Its raw current/voltage CSV gives the first unit-voltage
+excitation in A/V; the native current-file writer instead normalizes its vector.
+The PIX result includes both raw vectors and the two input matrices. Twelve
+fixtures compare 1,251 x87 numeric fields, 448 original printed values and 856 raw
+binary64 fields read directly from the unchanged executable. The raw observations
+cover admittance, pi fields, reduced capacitance/impedance and both vectors.
+`tools/capture_extended.py` repeats native commands and read-only GDB captures
+in fresh processes; it does not change numerical memory or registers. Admission,
+eddy recovery, alternating PI2/CAP/PIX solves and bounded repeated allocations
+are regression gates. Pad deembedding remains to be exposed.
 
 The coupled-winding panel runs the original CALCTRANS backend and extracts its
 narrowband transformer model: primary/secondary L and R, mutual inductance,

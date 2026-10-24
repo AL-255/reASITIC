@@ -48,6 +48,9 @@ jobs:
           node tests/eddy-runtime.mjs
           node tests/eddy-lifecycle.mjs
           node tests/worker-eddy.mjs
+          node tests/extended.mjs
+          node tests/extended-lifecycle.mjs
+          node tests/worker-extended.mjs
           node tests/network.mjs
           node tests/network-lifecycle.mjs
           node tests/worker-network.mjs

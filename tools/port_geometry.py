@@ -7,7 +7,7 @@ from pathlib import Path
 import re,json
 from implicit_stores import expose
 ROOT=Path(__file__).resolve().parents[1]
-SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','port_records']
+SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','port_records','extended_node','extended_driver']
 
 def translate(name,s):
     # Loads/stores of finite double values. Signaling NaN status is not exposed.
@@ -68,6 +68,9 @@ def translate(name,s):
     for input_ in ['in','value']:
         s=s.replace(f'asm volatile("fldl %1" : "=t"(out) : "m"({input_}));',f'out={input_};')
     s=s.replace('asm volatile("fldl %1":"=t"(out):"m"(value));','out=value;')
+    for out,inp in [('r','x'),('f','frequency')]:
+        s=s.replace(f'asm volatile("fldl %1":"=t"({out}):"m"({inp}));',f'{out}={inp};')
+    s=s.replace('asm volatile("fldl %1; faddl %2":"=t"(r):"m"(a),"m"(b));','r=static_cast<long double>(a)+b;')
     if re.search(r'\basm\s*(?:volatile)?\s*\(',s):raise ValueError(f'Untranslated assembly in {name}')
     s=s.replace('#include "x87.hpp"','#include "x87_port.hpp"')
     # Preserve all literal bits using a binary128 host literal before conversion.
@@ -99,6 +102,14 @@ def source(name):
         needle='    remove_geometry_shape(state.shapes,joined,memory);\n    if(!solve_node_equations('
         s=s.replace(needle,'    if(o.inductance.snapshot)o.inductance.snapshot("YM.out",inductance,o.inductance.snapshot_user);\n'+needle,1)
         return s
+    if name=='extended_driver':
+        s=(ROOT/'vendor/asitic/src/extended_twoport.cpp').read_text()
+        # Verbatim PIX driver and its timer helpers. Host command dispatch is
+        # excluded, as it also requires unrelated analytical model state.
+        s=s[:s.index('void set_options(')]+'}\n'+s[s.index('bool solve_extended_twoport_network('):s.index('bool analyze_extended_twoport(')]+'}\n'
+        needle='    stop(ind_time,o);start(node_time,o);remove_geometry_shape(s.shapes,clone,memory);'
+        assert s.count(needle)==1
+        return s.replace(needle,'    if(options.snapshot){options.snapshot("ZC.out",capacitance,options.snapshot_user);options.snapshot("YM.out",inductance,options.snapshot_user);}\n'+needle)
     if name=='port_records':
         s=(ROOT/'vendor/asitic/src/port_output.cpp').read_text()
         return s[:s.index('void write_port_shape_summary(')]+'}\n'
@@ -148,7 +159,7 @@ def generate(clang=None):
     proof={}
     for name in SOURCES:
         native=source(name)
-        if name.startswith('shape_') or name=='native_creators' or name in ('legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','port_records'):
+        if name.startswith('shape_') or name=='native_creators' or name in ('legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','port_records','extended_node','extended_driver'):
             native,proof[name]=expose(name,native,clang)
         (target/(name+'.cpp')).write_text(translate(name,native))
     evidence=ROOT/'build/evidence';evidence.mkdir(exist_ok=True)
