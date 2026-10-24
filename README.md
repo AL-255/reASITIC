@@ -149,6 +149,26 @@ software guard precision instead of a logarithm/exponential sequence. The
 portable fallback is pinned LibBF C with explicit rounding and its SIMD path
 disabled; the vendored MIT license is included in deployment.
 
+PI2 and PI4 compute their small shunt admittances by a common-mode drive rather
+than summing large, nearly opposite port Y entries. Writing every node voltage
+as `1 + delta` makes the forcing term the raw capacitance diagonal. Internal
+voltage changes are solved with 128 bits of software precision; the endpoint
+currents directly give the two shunts. For PI4, each pad's raw self-capacitance
+is subtracted before storing the shunt. The original pi extraction formulas
+then consume these stable branches. Returned `pi_shunts` records the values
+actually used: the rounded port matrix can lose conductances that the shunt
+calculation retains. Historical arithmetic mode keeps the original extraction.
+
+`tests/portable-pi-shunts.mjs` checks an exact rational RC circuit whose shunt
+conductance disappears entirely when rounded port entries are added, plus
+one-segment and zero-capacitance limits, invalid/singular inputs and recovery.
+`tests/portable-two-port.mjs` checks 26 PI2/PI4 cases using an independent
+80-digit endpoint Schur complement, including pad subtraction and full-precision
+pi, impedance and resonance metrics. All 23 finite cases also compare the
+same C++ common-mode solve in native and WASM builds bit for bit; three original
+nonfinite cases retain their rejection. The largest circuit-metric relative
+error in these cases fell from about `3.7e-7` to below `5.2e-12`.
+
 The primary numerical checks compare the same C++ implementation compiled for a
 native host and WASM against independent mpmath references: 203 geometric-mean
 distances and 1,040 error-power values. Geometry tests include analytic square and
@@ -177,8 +197,10 @@ python3 tools/build_native.py             # GCC i386 + libc.so.6 reference audit
 python3 tools/build_portable_math.py       # native/WASM software-math verification
 node tests/portable-gmd.mjs
 node tests/portable-error-power.mjs
+node tests/portable-pi-shunts.mjs
 node tests/portable-simulation.mjs
 node tests/portable-pad.mjs
+node tests/portable-two-port.mjs
 node tests/two-port-output.mjs
 node tests/port-schedule.mjs
 node tests/self-resonance-plan.mjs

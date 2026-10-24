@@ -18,6 +18,8 @@ namespace asitic { GeometryShape* prepare_transformer_geometry(const GeometrySha
 #include "asitic/legacy_complex.hpp"
 #ifdef __EMSCRIPTEN__
 #include "x87_port.hpp"
+#include "pi_shunts.hpp"
+namespace asitic { PiEquivalent extract_pi_equivalent_with_shunts(const TwoPortAdmittance&,double,ComplexValue,ComplexValue); }
 using Real=SoftReal;
 #else
 #include "x87.hpp"
@@ -356,6 +358,13 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         const auto& y=transformer?coupled.ports:combined.ports;const ComplexValue ports[]={y.y11,y.y12,y.y21,y.y22};
         if(!ok || !finite_matrix(intermediate.capacitance) || !finite_matrix(intermediate.inductance))return "{\"error\":\"Original combined solver did not produce finite matrices\"}";
         for(const auto z:ports)if(!__builtin_isfinite(z.real) || !__builtin_isfinite(z.imag))return "{\"error\":\"Original node equations produced nonfinite admittance\"}";
+#ifdef __EMSCRIPTEN__
+        reasitic::PiShunts shunts{};const bool stable_shunts=!transformer&&!network->extended&&!reasitic::reference_numerics();
+        if(stable_shunts){
+            if(!reasitic::common_mode_shunts(reinterpret_cast<const double*>(intermediate.capacitance.data),reinterpret_cast<const double*>(intermediate.inductance.data),intermediate.capacitance.rows,intermediate.capacitance.stride,intermediate.inductance.stride,padbed?reinterpret_cast<const double*>(intermediate.pads.data):nullptr,intermediate.pads.stride,shunts))return "{\"error\":\"Common-mode shunt solve failed\"}";
+            combined.pi=extract_pi_equivalent_with_shunts(y,frequency,{shunts.first_real,shunts.first_imag},{shunts.second_real,shunts.second_imag});
+        }
+#endif
         const unsigned capacity=64u*(intermediate.capacitance.elements+intermediate.inductance.elements+intermediate.node_capacitance.elements+intermediate.currents.rows*intermediate.currents.columns+intermediate.voltages.rows*intermediate.voltages.columns+intermediate.pads.elements+intermediate.with_pads.elements)+16384u;
         output=static_cast<char*>(calloc(1,capacity));if(!output)return "{\"error\":\"Unable to allocate network output\"}";char* out=output;
         out+=sprintf(out,"{\"name\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_source));out+=sprintf(out,",\"ground\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_reference));
@@ -376,6 +385,9 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         const auto* values=reinterpret_cast<const double*>(&combined.pi);
         for(int i=0;i<12;++i){out+=sprintf(out,"%s\"%s\":",i?",":"",names[i]);out=number_json(out,values[i]);}
         out+=sprintf(out,"},\"resonance_hz\":");out=number_json(out,x87::binary64(pi_resonant_frequency(combined.pi)));
+#ifdef __EMSCRIPTEN__
+        if(stable_shunts)out+=sprintf(out,",\"pi_shunts\":{\"first\":[%.17g,%.17g],\"second\":[%.17g,%.17g],\"precision_bits\":128}",shunts.first_real,shunts.first_imag,shunts.second_real,shunts.second_imag);
+#endif
         }
         out+=sprintf(out,",\"input_impedance\":[");out=complex_json(out,two_port_impedance(y,false,1));out+=sprintf(out,",");out=complex_json(out,two_port_impedance(y,false,2));out+=sprintf(out,",");out=complex_json(out,two_port_impedance(y,true,1));out+=sprintf(out,"],\"eddy\":");out=reasitic::eddy_metadata(out,*network->eddy);
         out+=sprintf(out,",\"capacitance_matrix\":");out=matrix_json(out,intermediate.capacitance);out+=sprintf(out,network->extended?",\"inductance_impedance_matrix\":":",\"inductance_admittance_matrix\":");out=matrix_json(out,intermediate.inductance);
