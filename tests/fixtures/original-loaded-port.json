@@ -1,0 +1,558 @@
+{
+  "reference": "Unmodified 2PZIN after original PI2, PIX, PI4 and CALCTRANS; two fresh processes; read-only entry/return observations",
+  "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+  "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+  "case_definition_sha256": "8e03909dde5385c3a0a99689103bd4298e2075833fb42b0bd4e956f7b10800e6",
+  "cases": [
+    {
+      "name": "wire-default",
+      "case": {
+        "name": "wire-coarse",
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+        "grid": [
+          8,
+          8
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "base": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "dab96a7757dc48408cf73de346c012c0"
+      },
+      "loaded": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "dab96a7757dc48408cf73de346c012c0"
+      },
+      "after": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "dab96a7757dc48408cf73de346c012c0"
+      },
+      "printed": [
+        "49.721 + j -4.69",
+        "49.721 + j -4.69",
+        "49.721 + j -4.69"
+      ]
+    },
+    {
+      "name": "wire-opposite-port",
+      "case": {
+        "name": "wire-coarse",
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+        "grid": [
+          8,
+          8
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "base": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "dab96a7757dc48408cf73de346c012c0"
+      },
+      "loaded": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000002440",
+        "port": 2,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "ab6a56fe55d74940dddd3a389b001540"
+      },
+      "after": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "dab96a7757dc48408cf73de346c012c0"
+      },
+      "printed": [
+        "49.721 + j -4.69",
+        "51.682 + j  5.25",
+        "49.721 + j -4.69"
+      ]
+    },
+    {
+      "name": "wire-shunt-capacitors",
+      "case": {
+        "name": "wire-coarse",
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+        "grid": [
+          8,
+          8
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "base": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "dab96a7757dc48408cf73de346c012c0"
+      },
+      "loaded": {
+        "admittance_hex": "c78d24ce4fbcf83f65e8d63b694005c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83ff8a56a98334905c0",
+        "load_hex": "00000000009042400000000000c028c0",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "42f4d84db532314028e937453f2834c0"
+      },
+      "after": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "dab96a7757dc48408cf73de346c012c0"
+      },
+      "printed": [
+        "49.721 + j -4.69",
+        "17.198 + j -20.16",
+        "49.721 + j -4.69"
+      ]
+    },
+    {
+      "name": "wire-fractional-input",
+      "case": {
+        "name": "wire-coarse",
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+        "grid": [
+          8,
+          8
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "base": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "dab96a7757dc48408cf73de346c012c0"
+      },
+      "loaded": {
+        "admittance_hex": "c78d24ce4fbcf83f52ce23582a5d05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fd091d2e12e4605c0",
+        "load_hex": "000000a0aaaa404000000040dd9abf3f",
+        "port": 2,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "fbfcb606fd2c3f4046aeaf482e4920c0"
+      },
+      "after": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "dab96a7757dc48408cf73de346c012c0"
+      },
+      "printed": [
+        "49.721 + j -4.69",
+        "31.176 + j -8.14",
+        "49.721 + j -4.69"
+      ]
+    },
+    {
+      "name": "wire-subdivision",
+      "case": {
+        "name": "wire-subdivision",
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M4:XORG=100:YORG=100",
+        "grid": [
+          32,
+          32
+        ],
+        "frequency_ghz": 2,
+        "cells": [
+          40,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          40,
+          20
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "base": {
+        "admittance_hex": "bdc35423353bd53f5b0fc4240947f8bf5c4a766d353bd5bf65b72b55a247f83f5c4a766d353bd5bf65b72b55a247f83f7e002bca353bd53f99da3e0b7146f8bf",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cddd41",
+        "impedance_hex": "d2b827a4de104940e26ebfc9f7f4ddbf"
+      },
+      "loaded": {
+        "admittance_hex": "bdc35423353bd53ff087fa1a9837f8bf5c4a766d353bd5bf65b72b55a247f83f5c4a766d353bd5bf65b72b55a247f83f7e002bca353bd53f4d445faf253cf8bf",
+        "load_hex": "0000000000c0524000000000000034c0",
+        "port": 1,
+        "frequency_hex": "0000000065cddd41",
+        "impedance_hex": "ae2aceef3f774840c37d18f0b16643c0"
+      },
+      "after": {
+        "admittance_hex": "bdc35423353bd53f5b0fc4240947f8bf5c4a766d353bd5bf65b72b55a247f83f5c4a766d353bd5bf65b72b55a247f83f7e002bca353bd53f99da3e0b7146f8bf",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cddd41",
+        "impedance_hex": "d2b827a4de104940e26ebfc9f7f4ddbf"
+      },
+      "printed": [
+        "50.132 + j -0.47",
+        "48.932 + j -38.80",
+        "50.132 + j -0.47"
+      ]
+    },
+    {
+      "name": "square-network",
+      "case": {
+        "name": "square-no-eddy",
+        "id": 0,
+        "keywords": "NAME=A:LEN=200:WID=220:W=32:S=16:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100",
+        "grid": [
+          32,
+          32
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "base": {
+        "admittance_hex": "74da192cdcd2b83fda45003e1946cbbff8d8504496d3b8bf753660a5ea5fcb3ff8d8504496d3b8bf753660a5ea5fcb3fa5a92e6859d4b83f6862635cbb3dcbbf",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "ad9e753ad5dd4940484912dc7746ecbf"
+      },
+      "loaded": {
+        "admittance_hex": "74da192cdcd2b83fabec81ceeb1ccbbff8d8504496d3b8bf753660a5ea5fcb3ff8d8504496d3b8bf753660a5ea5fcb3fa5a92e6859d4b83fd035a4a42429cbbf",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 2,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "77902077e1654940ddf2dd10e46916c0"
+      },
+      "after": {
+        "admittance_hex": "74da192cdcd2b83fda45003e1946cbbff8d8504496d3b8bf753660a5ea5fcb3ff8d8504496d3b8bf753660a5ea5fcb3fa5a92e6859d4b83f6862635cbb3dcbbf",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "ad9e753ad5dd4940484912dc7746ecbf"
+      },
+      "printed": [
+        "51.733 + j -0.88",
+        "50.796 + j -5.60",
+        "51.733 + j -0.88"
+      ]
+    },
+    {
+      "name": "wire-extended",
+      "case": {
+        "name": "wire-coarse",
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+        "grid": [
+          8,
+          8
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "base": {
+        "admittance_hex": "1d935ee04fbcf83f560ffaab205905c07488eabb4fbcf8bf00651d972a5b05407588eabb4fbcf8bffe641d972a5b05401d935ee04fbcf83f580ffaab205905c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "c88c867030d94840165b5d5e40ab12c0"
+      },
+      "loaded": {
+        "admittance_hex": "1d935ee04fbcf83f913d4546643f05c07488eabb4fbcf8bf00651d972a5b05407588eabb4fbcf8bffe641d972a5b05401d935ee04fbcf83f76a61f79424c05c0",
+        "load_hex": "00000000000049400000000000002440",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "1b9298bf28653d405b60fea59baf39c0"
+      },
+      "after": {
+        "admittance_hex": "1d935ee04fbcf83f560ffaab205905c07488eabb4fbcf8bf00651d972a5b05407588eabb4fbcf8bffe641d972a5b05401d935ee04fbcf83f580ffaab205905c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "c88c867030d94840165b5d5e40ab12c0"
+      },
+      "printed": [
+        "49.697 + j -4.67",
+        "29.395 + j -25.69",
+        "49.697 + j -4.67"
+      ]
+    },
+    {
+      "name": "wire-pad-deembedding",
+      "case": {
+        "name": "wire-distinct-ground",
+        "device": {
+          "id": 2,
+          "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+        },
+        "pads": [
+          {
+            "id": 2,
+            "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+          }
+        ],
+        "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "base": {
+        "admittance_hex": "c1061ccab3e1da3fe68a54dc36e0f1bf46871ba9d9e1dabf1465708420e1f13f46871ba9d9e1dabf1465708420e1f13f5f48fd5a01e2da3fa23b7d134edaf1bf",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "ce5d91c1b4fc48403f34cccc8eaf0fc0"
+      },
+      "loaded": {
+        "admittance_hex": "c1061ccab3e1da3fc0bf642e11dbf1bf46871ba9d9e1dabf1465708420e1f13f46871ba9d9e1dabf1465708420e1f13f5f48fd5a01e2da3f0f56853cbbd7f1bf",
+        "load_hex": "0000000000c052400000000000001440",
+        "port": 2,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "fd41153f901752409e03a290dbf02dc0"
+      },
+      "after": {
+        "admittance_hex": "c1061ccab3e1da3fe68a54dc36e0f1bf46871ba9d9e1dabf1465708420e1f13f46871ba9d9e1dabf1465708420e1f13f5f48fd5a01e2da3fa23b7d134edaf1bf",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "ce5d91c1b4fc48403f34cccc8eaf0fc0"
+      },
+      "printed": [
+        "49.974 + j -3.96",
+        "72.368 + j -14.97",
+        "49.974 + j -3.96"
+      ]
+    },
+    {
+      "name": "coupled-transformer",
+      "case": {
+        "primary": {
+          "id": 2,
+          "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+        },
+        "secondary": {
+          "id": 2,
+          "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+        },
+        "grid": [
+          16,
+          16
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "termination": 0,
+        "name": "wires-default"
+      },
+      "base": {
+        "admittance_hex": "8e707f5efe42f93f235032c8971d07c055c5d46e7324e43f2de8ffc70176d8bf55c5d46e7324e43f2de8ffc70176d8bf3143afa8c15efb3f0ae50820945f05c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "238b52957ed2c43faf3b97ab15f5d13f"
+      },
+      "loaded": {
+        "admittance_hex": "8e707f5efe42f93f906a3af1041b07c055c5d46e7324e43f2de8ffc70176d8bf55c5d46e7324e43f2de8ffc70176d8bf3143afa8c15efb3f41f28cb44a5e05c0",
+        "load_hex": "00000000000049400000000000002440",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "1bfba6d83cd4c43ffe4054cc66f5d13f"
+      },
+      "after": {
+        "admittance_hex": "8e707f5efe42f93f235032c8971d07c055c5d46e7324e43f2de8ffc70176d8bf55c5d46e7324e43f2de8ffc70176d8bf3143afa8c15efb3f0ae50820945f05c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "238b52957ed2c43faf3b97ab15f5d13f"
+      },
+      "printed": [
+        "0.163 + j  0.28",
+        "0.163 + j  0.28",
+        "0.163 + j  0.28"
+      ]
+    },
+    {
+      "name": "zero-ohm-load-diagnostic",
+      "case": {
+        "name": "wire-coarse",
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+        "grid": [
+          8,
+          8
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "base": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "dab96a7757dc48408cf73de346c012c0"
+      },
+      "loaded": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000000000000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "000000000000f8ff000000000000f8ff"
+      },
+      "after": {
+        "admittance_hex": "c78d24ce4fbcf83f2aba8ba1255a05c0ca8d24ce4fbcf8bf2cba8ba1255a0540ca8d24ce4fbcf8bf2cba8ba1255a05401ba30c1750bcf83fda0e45cb115605c0",
+        "load_hex": "00000000000049400000000000000000",
+        "port": 1,
+        "frequency_hex": "0000000065cdcd41",
+        "impedance_hex": "dab96a7757dc48408cf73de346c012c0"
+      },
+      "printed": [
+        "49.721 + j -4.69",
+        " -nan + j  -nan",
+        "49.721 + j -4.69"
+      ]
+    }
+  ]
+}

@@ -39,6 +39,9 @@ original extended two-port node system. PI4 pad deembedding retains original
 reported model precision with the stable formulation; broader validation continues.
 PI2, PIX, PI4 and CALCTRANS export the recovered C++ two-port S conversion,
 native rectangular/polar S/Y/model records, and raw scattering CSVs.
+The loaded-input panel adds the original `2PZIN` metric after PI2, PIX, PI4 or
+CALCTRANS: select either port, a complex load and optional shunt capacitors.
+It uses the selected result's frequency and exports the input impedance as CSV.
 PI2, PIX, PI4 and CALCTRANS also support stepped port frequency sweeps, streamed
 results, cancellation, combined native records and sweep metrics/S CSV exports.
 Original 3PORT provides three-winding models and S/Y/Z conversion. GDSII uses native ribbon boundaries, real via cuts and
@@ -399,6 +402,27 @@ and resonance limits, subnormal inputs and an 1800-bit admittance scale range.
 Native and WASM values agree bit for bit; all four native rounding modes give
 identical raw results. Physical PI2/PI4/PIX tests also verify this same evaluator
 is used for the returned input impedances and differential Q.
+
+Loaded input impedance (`2PZIN`) uses the same two-port circuit and original port
+order: port 1 drives `y22`, capacitor 1 shunts `y22`, and capacitor 2 shunts `y11`.
+For drive/other diagonal entries `a,b`, cross entries `c,d` and load `Z`,
+the C++ kernel evaluates `(1 + b*Z) / (a + (a*b-c*d)*Z)`.
+Capacitor stamps, products and sums retain exact dyadic coefficients, and the
+complex quotient rounds directly to IEEE binary64, including subnormals.
+Multiplying through by the load removes `1/Z`; a short circuit therefore gives
+`1/a`. The original instead produces NaNs for a zero-ohm load. This observation
+is kept in the fixture, while production uses the physical circuit limit.
+Poles, indeterminate circuits and output overflow have explicit result statuses.
+
+`tests/loaded-port.mjs` checks 30 circuits against exact rational nodal
+elimination, with native/WASM bit identity and all four host rounding modes.
+`tests/worker-loaded-port.mjs` checks ten scenarios captured in twenty fresh
+original processes after PI2, PIX, PI4 and CALCTRANS, including complex loads,
+binary32 input normalization and asymmetric shunt capacitances. All nine finite
+original reports match. Calculations preserve the saved model; layout changes
+invalidate it, rejected requests preserve it, and sweeps use the last completed
+sample's frequency. Only the 2x2 matrix and frequency are retained in the worker.
+
 `tests/portable-two-port.mjs` checks 26 PI2/PI4 cases using an independent
 80-digit endpoint Schur complement, including pad subtraction and full-precision
 pi, impedance and resonance metrics. All 23 finite cases also compare the
@@ -462,6 +486,8 @@ python3 tools/build_portable_math.py       # native/WASM software-math verificat
 node tests/portable-gmd.mjs
 node tests/portable-error-power.mjs
 node tests/portable-pi-shunts.mjs
+node tests/loaded-port.mjs
+node tests/worker-loaded-port.mjs
 node tests/portable-extended-shunts.mjs
 node tests/portable-extended-ports.mjs
 node tests/portable-folded-ports.mjs
@@ -1019,6 +1045,7 @@ python3 tools/capture_geometry_edits.py --reference ~/github/asitic-re
 python3 tools/capture_capacitance.py --reference ~/github/asitic-re
 python3 tools/capture_eddy.py --reference ~/github/asitic-re
 python3 tools/capture_network.py --reference ~/github/asitic-re
+python3 tools/capture_loaded_port.py --reference ~/github/asitic-re # requires GDB
 python3 tools/capture_transformer.py --reference ~/github/asitic-re
 python3 tools/capture_three_port.py --reference ~/github/asitic-re # also requires GDB
 python3 tools/audit_three_port_backing.py --reference ~/github/asitic-re

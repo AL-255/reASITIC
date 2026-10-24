@@ -3,12 +3,15 @@ import {resonancePlan,capacitorPortMatrix,capacitorPortResponse} from './self-re
 import {optimizationPlan,createOptimizationCandidate,optimizationAccept} from './optimization.mjs';
 import {solverCells,meshResult} from './mesh-policy.mjs';
 import {windingIndex,filamentBudget,eddySettings,portSampleBudget} from './solver-request.mjs';
+import {loadedPortImpedance} from './loaded-port.mjs';
 import {portSampleSummary} from './port-sweep.mjs';
 import {validateThreePortBacking,allocateThreePortBacking} from './three-port.mjs';
 import {parseTechnology,configureKernel,generateGeometry,createGeometry,editGeometry} from './technology.mjs';
 const kernel=await createKernel();
-if(typeof kernel._max_contact_count!=='function'||typeof kernel._potential_grid_fits!=='function'||typeof kernel._solver_limits!=='function')throw Error('Part of the workbench is out of date. Reload to update it.');
+if(typeof kernel._max_contact_count!=='function'||typeof kernel._potential_grid_fits!=='function'||typeof kernel._solver_limits!=='function'||typeof kernel._loaded_port_impedance!=='function')throw Error('Part of the workbench is out of date. Reload to update it.');
 let epoch=0,processTechnology=null,hasLayout=false,currentLayout=null,optimizationKernel=null,optimizationState=null;
+let savedTwoPorts={};
+function rememberTwoPort(source,result){savedTwoPorts[source]={matrix:result.matrix,frequency_hz:result.frequency_hz};}
 function frequency(data,value=data.frequency_ghz) {
   const result=value===undefined?data.frequency:kernel._normalize_value(Number(value),5,.1,0);
   if(!Number.isFinite(result) || result<=0)throw Error('Enter a positive native ASITIC frequency.');return result;
@@ -115,11 +118,12 @@ self.onmessage=async({data})=>{
       createOptimizationCandidate(target,plan.name,plan.candidates[data.index]);
       if(processTechnology?.source!==technology.source)configureKernel(kernel,technology);
       const layout=createOptimizationCandidate(kernel,plan.name,plan.candidates[data.index],append);processTechnology=technology;currentLayout=layout;hasLayout=true;
+      savedTwoPorts={};
       postMessage({id:data.id,layout,technology,optimization_candidate:{index:data.index,descriptor:plan.candidates[data.index]}});return;
     }
     if(action==='edit'){
       if(!processTechnology||!hasLayout)throw Error('Generate a layout before editing geometry.');
-      const layout=editGeometry(kernel,data.commands,{...data.options,domain:processTechnology.domain});currentLayout=layout;hasLayout=true;postMessage({id:data.id,layout,technology:processTechnology,edited:true});return;
+      const layout=editGeometry(kernel,data.commands,{...data.options,domain:processTechnology.domain});currentLayout=layout;hasLayout=true;savedTwoPorts={};postMessage({id:data.id,layout,technology:processTechnology,edited:true});return;
     }
     if(action==='coupling'){
       const first=data.first,second=data.second,limit=data.pair_limit??250000;
@@ -135,8 +139,12 @@ self.onmessage=async({data})=>{
       postMessage({id:data.id,analysis,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
     }
     if(action==='three-port'){const result=await solveThreePort(data,frequency(data),task);if(task!==epoch)return;postMessage({id:data.id,three_port:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
-    if(action==='transformer'){const result=solveTransformer(data,frequency(data));postMessage({id:data.id,transformer:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
-    if(action==='network'){const result=solveNetwork(data,frequency(data));postMessage({id:data.id,network:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
+    if(action==='transformer'){const result=solveTransformer(data,frequency(data));rememberTwoPort('transformer',result);postMessage({id:data.id,transformer:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
+    if(action==='network'){const result=solveNetwork(data,frequency(data));rememberTwoPort('network',result);postMessage({id:data.id,network:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
+    if(action==='loaded-port'){
+      const source=data.source??'network';if(!['network','transformer'].includes(source))throw Error('Select a combined network or transformer result.');
+      const result=loadedPortImpedance(kernel,savedTwoPorts[source],data);postMessage({id:data.id,loaded_port:{...result,source}});return;
+    }
     if(action==='resonance'){
       if(!processTechnology||!hasLayout)throw Error('Generate a layout before searching for self resonance.');
       const winding=windingIndex(data.winding,0,currentLayout),ground=windingIndex(data.ground,-1,currentLayout,'ground winding',true),kind=kernel._shape_kind(winding);if(kind<0)throw Error('Select a valid winding for SELFRES.');
@@ -174,6 +182,7 @@ self.onmessage=async({data})=>{
         if(task!==epoch)return;let result;
         try{result=target==='network'?solveNetwork(data,hz,undefined,true):await solvePort(data,hz,task);}catch(error){throw Error(`Port sample ${index+1}/${plan.frequencies_hz.length} at ${hz} Hz: ${error.message}`);}
         if(task!==epoch)return;
+        if(target!=='three-port')rememberTwoPort(target,result);
         const done=index===plan.frequencies_hz.length-1;
         const summary=portSampleSummary(result);
         postMessage({id:data.id,[field]:done?result:summary,port_sweep:{index,total:plan.frequencies_hz.length,done,target},warnings:[result.dispatch?.warning,kernel.UTF8ToString(kernel._last_warnings())].filter(Boolean).join('\n')});
@@ -209,8 +218,8 @@ self.onmessage=async({data})=>{
     const append=Boolean(data.options?.append);
     if(append && (!hasLayout || !data.creator || data.technology!==processTechnology?.source))throw Error('Add to layout requires an existing layout, an original creator command, and the same technology.');
     const technology=append?processTechnology:parseTechnology(data.technology);
-    if(!append){hasLayout=false;currentLayout=null,optimizationKernel=null,optimizationState=null;configureKernel(kernel,technology);processTechnology=technology;}
-    const layout=data.creator?createGeometry(kernel,data.creator.id,data.creator.keywords,data.creator.answers,{...data.options,domain:technology.domain}):generateGeometry(kernel,data.kind,data.parameters,data.options);hasLayout=true;currentLayout=layout;postMessage({id:data.id,layout,technology});
+    if(!append){hasLayout=false;currentLayout=null,optimizationKernel=null,optimizationState=null;savedTwoPorts={};configureKernel(kernel,technology);processTechnology=technology;}
+    const layout=data.creator?createGeometry(kernel,data.creator.id,data.creator.keywords,data.creator.answers,{...data.options,domain:technology.domain}):generateGeometry(kernel,data.kind,data.parameters,data.options);hasLayout=true;currentLayout=layout;savedTwoPorts={};postMessage({id:data.id,layout,technology});
   }catch(error){postMessage({id:data.id,error:error.message,action,append:Boolean(data.options?.append)});}
 };
 postMessage({ready:true});

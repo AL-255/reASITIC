@@ -80,6 +80,37 @@ bool solve(Values& a,Values& rhs,Complex* solution,int m,int columns=1){
 
 }
 namespace reasitic {
+bool loaded_port_impedance(const double* admittance,const double* load,int port,
+                           double frequency,double first_cap,double second_cap,
+                           double* impedance,int& status){
+    if(!admittance||!load||!impedance||(port!=1&&port!=2)||!__builtin_isfinite(frequency)||frequency<=0||!__builtin_isfinite(first_cap)||!__builtin_isfinite(second_cap))return false;
+    for(int i=0;i<8;++i)if(!__builtin_isfinite(admittance[i]))return false;
+    for(int i=0;i<2;++i)if(!__builtin_isfinite(load[i]))return false;
+    Context c;const double unity[]={1,0};const Complex one(c,unity),z(c,load);
+    Complex first(c,admittance+6),second(c,admittance);
+    const auto angular=exact_product(Number(c,frequency),Number(c,0x1.921fb54442d18p+2));
+    first.imag=exact_sum(first.imag,exact_product(angular,Number(c,first_cap)));
+    second.imag=exact_sum(second.imag,exact_product(angular,Number(c,second_cap)));
+    const auto determinant=exact_sum(exact_product(first,second),exact_product(Complex(c,admittance+2),Complex(c,admittance+4)),true);
+    // Eliminate the un-driven port, then multiply through by Zload. This
+    // avoids 1/Zload and includes a zero-ohm termination as a circuit limit.
+    const auto numerator=exact_sum(one,exact_product(port==1?second:first,z));
+    const auto denominator=exact_sum(port==1?first:second,exact_product(determinant,z));
+    if(c.status&BF_ST_MEM_ERROR)return false;
+    if(bf_is_zero(&denominator.real.value)&&bf_is_zero(&denominator.imag.value)){
+        status=bf_is_zero(&numerator.real.value)&&bf_is_zero(&numerator.imag.value)?2:1;
+        impedance[0]=impedance[1]=__builtin_nan("");return true;
+    }
+    const auto norm=exact_sum(exact_product(denominator.real,denominator.real),exact_product(denominator.imag,denominator.imag));
+    const Number components[]={exact_sum(exact_product(numerator.real,denominator.real),exact_product(numerator.imag,denominator.imag)),
+                               exact_sum(exact_product(numerator.imag,denominator.real),exact_product(numerator.real,denominator.imag),true)};
+    // Round the exact rational components directly to binary64, including
+    // its subnormal exponent range. There is no intermediate rounded Y bank
+    // or host floating-point operation in the loaded circuit reduction.
+    for(int i=0;i<2;++i){Number quotient(c);c.status|=bf_div(&quotient.value,&components[i].value,&norm.value,53,BF_RNDN|BF_FLAG_SUBNORMAL|bf_set_exp_bits(11));impedance[i]=quotient.rounded();}
+    if(c.status&BF_ST_MEM_ERROR)return false;
+    status=__builtin_isfinite(impedance[0])&&__builtin_isfinite(impedance[1])?0:3;return true;
+}
 bool pi_branch_impedances(const double* series,const PiShunts& shunts,double* impedances,double& differential_quality){
     if(!series||!impedances)return false;
     const double values[]={series[0],series[1],shunts.first_real,shunts.first_imag,shunts.second_real,shunts.second_imag};
@@ -285,4 +316,12 @@ extern "C" const char* probe_extended_pi_shunts(const double* cap,const double* 
     static char output[256];reasitic::PiShunts result;
     if(!reasitic::extended_common_mode_shunts(cap,impedance,n,n,n,result))return "{\"error\":\"Extended common-mode shunt solve failed\"}";
     sprintf(output,"{\"first\":[%.17g,%.17g],\"second\":[%.17g,%.17g],\"precision_bits\":128}",result.first_real,result.first_imag,result.second_real,result.second_imag);return output;
+}
+
+extern "C" const char* loaded_port_impedance(const double* admittance,double load_real,double load_imag,int port,double frequency,double first_cap,double second_cap){
+    static char output[256];const double load[]={load_real,load_imag};double result[2];int status;
+    if(!reasitic::loaded_port_impedance(admittance,load,port,frequency,first_cap,second_cap,result,status))return "{\"error\":\"Use a finite 2x2 admittance, complex load, capacitances, positive frequency and port 1 or 2\"}";
+    const char* names[]={"finite","pole","indeterminate","overflow"};
+    char* out=output;out+=sprintf(out,"{\"status\":\"%s\",\"impedance_ohm\":[",names[status]);
+    for(int i=0;i<2;++i){if(i)out+=sprintf(out,",");out+=__builtin_isfinite(result[i])?sprintf(out,"%.17g",result[i]):sprintf(out,"null");}sprintf(out,"]}");return output;
 }

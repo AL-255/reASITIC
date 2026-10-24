@@ -1,0 +1,12 @@
+{"cases":[
+ {"name":"wire-default","family":"network","reference_case":"wire-coarse","model":"PI2","load":[50,0],"port":1,"caps":[0,0]},
+ {"name":"wire-opposite-port","family":"network","reference_case":"wire-coarse","model":"PI2","load":[50,10],"port":2,"caps":[0,0]},
+ {"name":"wire-shunt-capacitors","family":"network","reference_case":"wire-coarse","model":"PI2","load":[37.125,-12.375],"port":1,"caps":[1e-12,2e-12]},
+ {"name":"wire-fractional-input","family":"network","reference_case":"wire-coarse","model":"PI2","load":[33.333333333333,0.123456789],"port":2,"caps":[1.23456789e-12,-2.3456789e-13]},
+ {"name":"wire-subdivision","family":"network","reference_case":"wire-subdivision","model":"PI2","load":[75,-20],"port":1,"caps":[2e-13,3e-13]},
+ {"name":"square-network","family":"network","reference_case":"square-no-eddy","model":"PI2","load":[50,0],"port":2,"caps":[1e-13,2e-13]},
+ {"name":"wire-extended","family":"extended","reference_case":"wire-coarse","model":"PIX","load":[50,10],"port":1,"caps":[1e-12,2e-12]},
+ {"name":"wire-pad-deembedding","family":"pad","reference_case":"wire-distinct-ground","model":"PI4","load":[75,5],"port":2,"caps":[1e-13,2e-13]},
+ {"name":"coupled-transformer","family":"transformer","reference_case":"wires-default","model":"CALCTRANS","load":[50,10],"port":1,"caps":[1e-13,2e-13]},
+ {"name":"zero-ohm-load-diagnostic","family":"network","reference_case":"wire-coarse","model":"PI2","load":[0,0],"port":1,"caps":[0,0],"original_nonfinite":true}
+]}

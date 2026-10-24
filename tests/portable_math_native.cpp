@@ -10,7 +10,18 @@ extern "C" const char* probe_extended_pi_shunts(const double*,const double*,int)
 extern "C" const char* probe_extended_ports(const double*,const double*,int);
 extern "C" const char* probe_folded_ports(const double*,const double*,int,const double*,int);
 extern "C" const char* probe_pi_impedance(const double*);
+extern "C" const char* loaded_port_impedance(const double*,double,double,int,double,double,double);
 int main(int argc,char** argv){
+    if(argc==3&&(!std::strcmp(argv[1],"--loaded-port")||!std::strcmp(argv[1],"--loaded-port-rounding"))){
+        auto* file=fopen(argv[2],"rb");if(!file)return 2;double v[14];const bool read=fread(v,8,14,file)==14;fclose(file);if(!read)return 2;
+        if(!std::strcmp(argv[1],"--loaded-port")){puts(loaded_port_impedance(v,v[8],v[9],static_cast<int>(v[10]),v[11],v[12],v[13]));return 0;}
+        const int saved=fegetround(),modes[]={FE_TONEAREST,FE_DOWNWARD,FE_UPWARD,FE_TOWARDZERO};double baseline[2],actual[2];int baseline_status=0,status=0,index=0;bool identical=true;
+        for(int mode:modes){
+            if(fesetround(mode)||!reasitic::loaded_port_impedance(v,v+8,static_cast<int>(v[10]),v[11],v[12],v[13],actual,status)){identical=false;break;}
+            if(index++==0){memcpy(baseline,actual,sizeof(actual));baseline_status=status;}else if(status!=baseline_status||memcmp(baseline,actual,sizeof(actual)))identical=false;
+        }
+        fesetround(saved);puts(identical?"{\"rounding_modes\":4,\"identical\":true}":"{\"error\":\"Host rounding mode changed loaded input impedance\"}");return identical?0:1;
+    }
     if(argc==3&&(!std::strcmp(argv[1],"--pi-impedance")||!std::strcmp(argv[1],"--pi-impedance-rounding"))){
         auto* file=fopen(argv[2],"rb");if(!file)return 2;double values[6];const bool read=fread(values,8,6,file)==6;fclose(file);if(!read)return 2;
         if(!std::strcmp(argv[1],"--pi-impedance")){puts(probe_pi_impedance(values));return 0;}

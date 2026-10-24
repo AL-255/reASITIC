@@ -1,5 +1,12 @@
 #pragma once
 namespace reasitic {
+// Original 2PZIN port order: port 1 drives y22. Capacitor 1 shunts y22,
+// capacitor 2 shunts y11. Evaluate the loaded nodal equations with exact
+// dyadic coefficients and one IEEE binary64 division per result component.
+// Status: 0 finite, 1 pole, 2 indeterminate, 3 binary64 overflow.
+bool loaded_port_impedance(const double* admittance,const double* load,int port,
+                           double frequency,double first_cap,double second_cap,
+                           double* impedance,int& status);
 struct PiShunts { double first_real,first_imag,second_real,second_imag; };
 // Reciprocal Pi circuit: grounded endpoint impedances and differential
 // impedance, in the original port order. Evaluate from the physical branches

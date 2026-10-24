@@ -59,6 +59,10 @@ try{
   let id=0;async function send(data){worker.postMessage({id:++id,...data});const response=await next();assert.equal(response.id,id);assert.ok(!response.error,response.error);return response;}
   assert.equal((await next()).ready,true);const technology=readFileSync(join(folder,'technology/CMOS.tek'),'utf8'),layout=(await send({technology,creator:{id:2,keywords:'NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100'}})).layout;
   const cap=(await send({action:'capacitance',frequency_ghz:1,mesh:{length:1000,width:1000},fft_x:8,fft_y:8,contact_limit:128,nativeInput:true})).capacitance;assert.equal(cap.capacitance_f,3.168713072636854e-13);assert.equal(cap.green_table_hash,'d9ec835ccc4a4f7e');
+  await send({action:'network',frequency_ghz:1,mesh:{length:1000,width:1000,thickness:1000},contact_mesh:{length:1000,width:1000},fft_x:8,fft_y:8,eddy:{mode:0,layers:[]},nativeInput:true});
+  const loaded=(await send({action:'loaded-port',nativeInput:true})).loaded_port,observed=JSON.parse(readFileSync('tests/fixtures/original-loaded-port.json','utf8')).cases.find(c=>c.name==='wire-default').printed[1].match(/([-+\d.e]+)\s*\+ j\s*([-+\d.e]+)/i).slice(1).map(Number);
+  assert.equal(loaded.status,'finite');assert.equal(Number(loaded.impedance_ohm[0].toFixed(3)),observed[0]);assert.equal(Number(loaded.impedance_ohm[1].toFixed(2)),observed[1]);
+  const loadedExport=await import(pathToFileURL(join(folder,'loaded-port.mjs')).href);assert.ok(loadedExport.loadedPortCSV(loaded).includes('input_real_ohm'));
   const exported=await import(pathToFileURL(join(folder,'gds.mjs')).href),gds=exported.writeGDS(layout,parseTechnology(technology));assert.deepEqual(gds,writeGDS(layout,parseTechnology(technology)));
   // Deploying a newer site may remove this release after the main kernel is
   // already running. Its first optimizer must still create a private instance.
