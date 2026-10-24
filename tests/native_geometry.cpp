@@ -53,7 +53,7 @@ extern "C" int main(int argc,char** argv,char**) {
     if(argc==6 && argv[1][0]=='-') { puts(probe_math(atoi(argv[2]),strtod(argv[3],nullptr),strtod(argv[4],nullptr),strtod(argv[5],nullptr)));return 0; }
     if(argc==5 && (argv[1][0]!='-' || argv[1][1]!='-' || argv[1][2]!='a'))return 2;
     if(argc==8 && (argv[1][0]!='-' || argv[1][1]!='-' || argv[1][2]!='m'))return 2;
-    if(argc!=4 && argc!=8 && argc!=5 && argc!=26 && argc!=22 && argc!=10 && argc!=12 && argc!=7 && argc!=14 && argc!=15 && argc!=19 && argc!=20 && argc!=21 && argc!=23)return 2;
+    if(argc!=4 && argc!=8 && argc!=5 && argc!=26 && argc!=22 && argc!=10 && argc!=12 && argc!=7 && argc!=14 && argc!=15 && argc!=19 && argc!=20 && argc!=21 && argc!=23 && !(argc==13 && __builtin_strcmp(argv[1],"--cap")==0))return 2;
     reset_technology();set_substrate(0,700.);set_substrate(1,50.);set_substrate_material(0,11.9,1e-3);set_substrate_material(1,3.9,1e10);finalize_technology();
     double height[]={1.3,2.4,3.5,4.5,6},sheet[]={65,55,55,55,30};
     for(int i=0;i<5;++i)set_metal(i,height[i],i==4?1.:.5,sheet[i],1);
@@ -73,10 +73,10 @@ extern "C" int main(int argc,char** argv,char**) {
     if(argc==8 && argv[1][2]=='m') { create_geometry(2,argv[2],"",512,512,128,128,.1,1,0);if(!set_max_width_cells(atoi(argv[7])))return 2;puts(simulate(0,strtod(argv[3],nullptr),strtod(argv[4],nullptr),strtod(argv[5],nullptr),strtod(argv[6],nullptr),strtod(argv[4],nullptr),1024));return 0; }
     if((argc==5 || argc==7) && argv[1][2]=='a') { if(argc==7)set_metal(4,6.,strtod(argv[5],nullptr),strtod(argv[6],nullptr),1);puts(automatic_cell_limits(strtod(argv[2],nullptr),strtod(argv[3],nullptr),strtod(argv[4],nullptr)));return 0; }
     if(argc==7 && argv[1][2]=='c') { puts(create_geometry(atoi(argv[2]),argv[3],argv[4],512,512,128,128,strtod(argv[5],nullptr),atoi(argv[6]),0));return 0; }
-    if(argc==12 && argv[1][2]=='c') {
+    if((argc==12 || argc==13) && argv[1][2]=='c') {
         create_geometry(atoi(argv[2]),argv[3],"",512,512,128,128,.1,1,0);const bool ground=*argv[5];
         if(ground)create_geometry(atoi(argv[4]),argv[5],"",512,512,128,128,.1,1,1);
-        puts(simulate_capacitance(ground?1:0,ground?0:-1,strtod(argv[6],nullptr),strtod(argv[7],nullptr),strtod(argv[8],nullptr),512,512,atoi(argv[9]),atoi(argv[10]),512,atoi(argv[11])));return 0;
+        puts(simulate_capacitance(ground?1:0,ground?0:-1,strtod(argv[6],nullptr),strtod(argv[7],nullptr),strtod(argv[8],nullptr),512,512,atoi(argv[9]),atoi(argv[10]),argc==13?atoi(argv[12]):512,atoi(argv[11])));return 0;
     }
     if(argc==10 && argv[1][2]=='g') { puts(probe_green(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),strtod(argv[5],nullptr),strtod(argv[6],nullptr),strtod(argv[7],nullptr),strtod(argv[8],nullptr),atoi(argv[9])));return 0; }
     if(argc==22 && argv[1][2]=='p') {

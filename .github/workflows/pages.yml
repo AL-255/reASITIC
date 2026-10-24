@@ -149,8 +149,42 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+  dense-contact-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [CAP, PI2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: '6.0.6'
+          actions-cache-folder: emsdk-cache
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install the i386 comparison runtime
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
+          sudo apt-get install -y g++-multilib libc6:i386
+      - run: python tools/build.py
+      - run: python tools/build_native.py
+      - name: Verify original dense-contact CAP and PI2 solves
+        run: node tests/contact-budget.mjs --model ${{ matrix.model }}
+      - name: Retain dense-contact evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: contact-budget-${{ matrix.model }}
+          path: build/evidence
   deploy:
-    needs: build
+    needs: [build, dense-contact-audit]
     runs-on: ubuntu-latest
     permissions:
       pages: write

@@ -33,6 +33,12 @@ extern "C" void abort();
 using namespace asitic;
 namespace {
 char* output=nullptr;double total_capacitance=0,total_resistance=0;
+// The solver stores dense n-by-n complex matrices. Bound their storage,
+// independently of processor arithmetic or the native contact-selection rules.
+constexpr unsigned contact_matrix_bytes=16u*1024u*1024u;
+constexpr int contact_count_limit(){int n=0;while(static_cast<unsigned long long>(n+1)*(n+1)<=contact_matrix_bytes/sizeof(ComplexValue))++n;return n;}
+constexpr int max_contacts=contact_count_limit();
+bool contact_budget(int n){return n>=1&&static_cast<unsigned long long>(n)*n<=contact_matrix_bytes/sizeof(ComplexValue);}
 struct Allocation { void* pointer;Allocation* next; };
 struct Workspace {
     Allocation* allocations=nullptr;int nx,ny;unsigned matrix_request=0,matrix_backing=0;
@@ -106,8 +112,8 @@ bool admissible(const GeometryShape& shape,const PotentialContactOptions& option
             PotentialContactGroup* head=nullptr;PotentialContactGroup* current=nullptr;
             const bool ok=prepare_potential_contact_group(*segment,shape.filaments,current,false,head,options,memory,warnings);
             if(!ok)return false;
-            const int n=current->length_cells*current->width_cells;memory.put(head);
-            if(n<1 || n>limit-count)return false;count+=n;
+            const auto n=static_cast<long long>(current->length_cells)*current->width_cells;memory.put(head);
+            if(n<1 || n>limit-count)return false;count+=static_cast<int>(n);
         }
         ++groups;
     }
@@ -191,8 +197,9 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
     if(winding<0 || ground< -1 || !__builtin_isfinite(frequency) || frequency<=0 ||
        !__builtin_isfinite(length_cell) || length_cell<=0 || !__builtin_isfinite(width_cell) || width_cell<=0 ||
        !__builtin_isfinite(chip_x) || chip_x<=0 || !__builtin_isfinite(chip_y) || chip_y<=0 ||
-       nx<1 || nx>256 || ny<1 || ny>256 || (nx&(nx-1)) || (ny&(ny-1)) || contact_limit<1 || contact_limit>512)
-        return "{\"error\":\"Use positive frequency, cells and chip dimensions, power-of-two FFT sizes from 1 to 256, and 1–512 contacts\"}";
+       nx<1 || nx>256 || ny<1 || ny>256 || (nx&(nx-1)) || (ny&(ny-1)) || !contact_budget(contact_limit)){
+        static char error[384];sprintf(error,"{\"error\":\"Use positive frequency, cells and chip dimensions, power-of-two FFT sizes from 1 to 256, and 1–%d contacts (16 MiB dense-matrix budget)\"}",max_contacts);return error;
+    }
     auto* source=engine.shapes;for(int i=0;source && i<winding;++i)source=source->next;
     auto* reference=engine.shapes;for(int i=0;reference && i<ground;++i)reference=reference->next;if(ground<0)reference=source;
     GeometryShape* secondary=nullptr;GeometryShape* third=nullptr;const bool three=network && network->third>=0,transformer=network && network->secondary>=0 && !three;
@@ -429,6 +436,7 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
     out+=sprintf(out,",\"green_table_hash\":\"%016llx\",\"matrix\":",table_hash(state.cache,nx,ny,pairs));out=matrix_json(out,matrix);out+=sprintf(out,",\"potential_matrix\":");out=matrix_json(out,snapshots.potential);sprintf(out,"}");return output;
 }
 
+extern "C" int max_contact_count(){return max_contacts;}
 extern "C" const char* simulate_capacitance(int winding,int ground,double frequency,double length_cell,double width_cell,double chip_x,double chip_y,int nx,int ny,int contact_limit,int unfolded) {
     return simulate_capacitance_impl(winding,ground,frequency,length_cell,width_cell,chip_x,chip_y,nx,ny,contact_limit,unfolded,nullptr);
 }

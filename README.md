@@ -508,6 +508,7 @@ node tests/optimization.mjs --multimetal
 node tests/worker-optimization.mjs --multimetal
 python3 tests/gds_optimization_reader.py --multimetal
 node tests/capacitance.mjs
+node tests/contact-budget.mjs             # dense CAP/PI2 references; may take minutes
 node tests/capacitance-data.mjs
 node tests/capacitance-grids.mjs
 node tests/worker-capacitance.mjs
@@ -656,12 +657,24 @@ observed through an added callback without replacing numerical expressions.
 
 `simulate_capacitance(winding, ground, frequency_hz, length_cell, width_cell,
 chip_x, chip_y, fft_x, fft_y, contact_limit, unfolded)` uses ground -1 for the
-default same-name reference. Power-of-two FFT sizes 1–256, a 1–512 contact limit,
-and a 128 MiB table budget bound computation. Collapsed/out-of-bounds contacts
+default same-name reference. Power-of-two FFT sizes 1–256, a 16 MiB budget per
+dense complex contact matrix (currently 1–1024 contacts), and a 128 MiB table
+budget bound computation. `max_contact_count()` exposes the derived contact
+limit to the worker, which validates integer budgets before crossing the WASM
+ABI. Collapsed/out-of-bounds contacts
 and native fault cases are rejected before matrix indexing. There is no
 persistent browser table cache yet; fine grids can take tens of seconds. The
 original nonsquare indexing is preserved with sufficient zero backing storage;
 original-executable parity is currently measured on square FFT grids only.
+
+Two further original cases use 660 and 661 contacts for CAP and grounded PI2.
+Fresh repeated original runs retain the complete 660×660 potential matrix,
+folded capacitance/node stages, printed metrics and raw Green-table hashes.
+WASM and worker checks preserve the native mesh, validate the original reports,
+and verify rejection/recovery at the selected budget. The resource budget does
+not coarsen contacts or alter FFT resolution; native CCELL pitch normalization
+still applies. Dense refinement can take minutes in WASM. These longer checks
+run in a separate parallel CI job, and deployment requires both jobs to pass.
 PI2/PIX/PI4 and CALCTRANS now include the native two-port numerical writer.
 The original fixed 50-ohm conversion, diagonal formulas, reciprocal Y output,
 S entry order, GHz frequency stores and truncated column headers are preserved.

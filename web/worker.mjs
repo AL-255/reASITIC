@@ -10,6 +10,10 @@ function frequency(data,value=data.frequency_ghz) {
   const result=value===undefined?data.frequency:kernel._normalize_value(Number(value),5,.1,0);
   if(!Number.isFinite(result) || result<=0)throw Error('Enter a positive native ASITIC frequency.');return result;
 }
+function contactBudget(data,target=kernel){
+  const n=data.contact_limit??128,limit=target._max_contact_count();
+  if(!Number.isInteger(n)||n<1||n>limit)throw Error(`Use an integer budget from 1 to ${limit} contacts.`);return n;
+}
 function solve(data,hz) {
   const selection=solverCells(kernel,data,hz,'inductance'),parsed=selection.cells;
   let pointer;
@@ -29,7 +33,7 @@ function solveTransformer(data,hz){
       if(termination!==0 && (data.ground??-1)<0)throw Error('Choose an explicit ground for a nonzero CALCTRANS termination.');
       const selection=solverCells(kernel,data,hz,'network'),parsed=selection.cells;
       const resistance=data.nativeInput?kernel._normalize_value(termination,4,.1,0):termination;
-      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_transformer(data.primary??0,data.secondary??1,data.ground??-1,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,resistance,e.evaluation_limit??250000)));
+      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_transformer(data.primary??0,data.secondary??1,data.ground??-1,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,contactBudget(data),data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,resistance,e.evaluation_limit??250000)));
       return meshResult(result,selection);
 }
 function solveNetwork(data,hz,context,portCommand=false){
@@ -53,11 +57,11 @@ function solveNetwork(data,hz,context,portCommand=false){
       if(!Array.isArray(layers) || layers.length>2 || layers.some(i=>!Number.isInteger(i) || i<0))throw Error('Select up to two substrate layers.');
       if(model==='CAP'){
         const selection=solverCells(target,{...data,mesh:data.contact_mesh??{}},hz,'capacitance');
-        const cap=meshResult(JSON.parse(target.UTF8ToString(target._simulate_capacitance(winding,ground,hz,...selection.cells,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,0))),selection);
+        const cap=meshResult(JSON.parse(target.UTF8ToString(target._simulate_capacitance(winding,ground,hz,...selection.cells,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,contactBudget(data,target),0))),selection);
         return {...cap,...capacitorPortResponse(target,cap),capacitance_matrix:cap.matrix,dispatch};
       }
       const selection=solverCells(target,data,hz,'network'),parsed=selection.cells;
-      const result=JSON.parse(target.UTF8ToString(solver(winding,...pads,ground,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000)));
+      const result=JSON.parse(target.UTF8ToString(solver(winding,...pads,ground,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,contactBudget(data,target),data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000)));
       const solved=meshResult(result,selection);if(dispatch)solved.dispatch=dispatch;return solved;
 }
 async function solveThreePort(data,hz,task){
@@ -66,7 +70,7 @@ async function solveThreePort(data,hz,task){
       const domain=processTechnology.domain,e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[];
       if(!Array.isArray(layers)||layers.length>2||layers.some(i=>!Number.isInteger(i)||i<0))throw Error('Select up to two substrate layers.');
       const selection=solverCells(kernel,data,hz,'network'),parsed=selection.cells,ground=data.ground??-1;
-      const args=[...indices,ground,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000];let result;
+      const args=[...indices,ground,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,contactBudget(data),data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000];let result;
       if(data.backing){
         const h=validateThreePortBacking(data.backing),names=indices.map(i=>currentLayout.shapes[i].name),reference=currentLayout.shapes[ground<0?indices[0]:ground]?.name;
         if(JSON.stringify(h.names)!==JSON.stringify(names)||h.ground!==reference||h.frequency_hz!==hz)throw Error('Captured backing winding order, reference or frequency differs from this request.');
@@ -142,7 +146,7 @@ self.onmessage=async({data})=>{
         try{
           if(kind===4){
             const domain=processTechnology.domain,selection=solverCells(kernel,{...data,mesh:data.contact_mesh??{}},hz,'capacitance');
-            const cap=meshResult(JSON.parse(kernel.UTF8ToString(kernel._simulate_capacitance(data.winding??0,data.ground??-1,hz,...selection.cells,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,0))),selection);
+            const cap=meshResult(JSON.parse(kernel.UTF8ToString(kernel._simulate_capacitance(data.winding??0,data.ground??-1,hz,...selection.cells,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,contactBudget(data),0))),selection);
             result={name:cap.name,ground:cap.ground,frequency_hz:hz,matrix:capacitorPortMatrix(kernel,cap),mesh:cap.mesh,contacts:cap.contacts,...(cap.automatic_cells?{automatic_cells:cap.automatic_cells}:{})};
           }else result=solveNetwork({...data,model:'PI2'},hz);
         }catch(error){throw Error(`SELFRES analysis ${history.length+1} at ${hz} Hz: ${error.message}`);}
@@ -175,7 +179,7 @@ self.onmessage=async({data})=>{
     if(action==='capacitance'){
       if(!processTechnology)throw Error('Generate a layout before running CAP.');
       const domain=processTechnology.domain,hz=frequency(data),selection=solverCells(kernel,data,hz,'capacitance'),parsed=selection.cells;
-      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_capacitance(data.winding??0,data.ground??-1,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.unfolded?1:0)));
+      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_capacitance(data.winding??0,data.ground??-1,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,contactBudget(data),data.unfolded?1:0)));
       meshResult(result,selection);postMessage({id:data.id,capacitance:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
     }
     if(action==='simulate'){

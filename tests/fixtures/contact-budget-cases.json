@@ -1,0 +1,27 @@
+{
+  "cases": [
+    {
+      "name": "refined-wire-cap",
+      "model": "CAP",
+      "id": 2,
+      "keywords": "NAME=A:LEN=400:WID=40:METAL=M4:XORG=50:YORG=100",
+      "frequency_ghz": 1,
+      "cells": [1000, 1000, 1000],
+      "contact_cells": [12, 2],
+      "grid": [256, 256],
+      "contact_limit": 1024
+    },
+    {
+      "name": "refined-wire-grounded-pi2",
+      "model": "PI2",
+      "id": 2,
+      "keywords": "NAME=A:LEN=400:WID=40:METAL=M4:XORG=50:YORG=100",
+      "ground": "NAME=G:LEN=10:WID=2:METAL=M2:XORG=200:YORG=110",
+      "frequency_ghz": 1,
+      "cells": [1000, 1000, 1000],
+      "contact_cells": [12, 2],
+      "grid": [256, 256],
+      "contact_limit": 1024
+    }
+  ]
+}
