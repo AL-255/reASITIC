@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';
+import make from '../dist/asitic.js';
+import {configureKernel,parseTechnology,createGeometry,editGeometry} from '../web/technology.mjs';
+const k=await make(),text=readFileSync('web/technology/CMOS.tek','utf8'),stats=()=>JSON.parse(k.UTF8ToString(k._potential_memo_stats()));
+function setup(eps=3.9){const t=parseTechnology(text);t.dielectric[1].permittivity=eps;configureKernel(k,t);createGeometry(k,2,'NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100');}
+function solve(frequency=1e9,x=512,nx=8,ny=8){const r=JSON.parse(k.UTF8ToString(k._simulate_capacitance(0,-1,frequency,1000,1000,x,512,nx,ny,128,0)));assert.ok(!r.error,r.error);return r;}
+const reports=[];assert.equal(stats().enabled,false);setup();const baseline=solve();k._set_potential_memo(1);assert.deepEqual(solve(),baseline);assert.equal(stats().writes,1);assert.deepEqual(solve(),baseline);assert.equal(stats().hits,1);
+for(const [name,frequency,x,nx,ny,eps]of [['frequency-alias',1e9+1,512,8,8,3.9],['chip-size',1e9,513,8,8,3.9],['fft-size',1e9,512,16,16,3.9],['process',1e9,512,8,8,4.2],['rectangular',1e9,512,8,16,3.9]]){
+  k._set_potential_memo(0);setup(eps);const fresh=solve(frequency,x,nx,ny);k._set_potential_memo(1);assert.deepEqual(solve(frequency,x,nx,ny),fresh,name+' miss changed result');const writes=stats().writes;assert.deepEqual(solve(frequency,x,nx,ny),fresh,name+' hit changed result');assert.equal(stats().writes,writes,name+' repeated generation');assert.equal(stats().hits,nx===ny?1:0,name+' cache eligibility');reports.push({name,...stats()});
+}
+k._set_potential_memo(0);setup();k._set_potential_memo(1);const a=solve();const before=stats();editGeometry(k,'MOVEX A 4');solve();assert.equal(stats().hits,before.hits+1,'Geometry invalidated geometry-independent Green tables');
+const exact=solve(1e9+1);assert.equal(stats().writes,before.writes+1,'Two frequencies with the same native filename shared tables');assert.notEqual(exact.frequency_hz,a.frequency_hz);
+const unchanged=stats();const bad=JSON.parse(k.UTF8ToString(k._simulate_capacitance(0,-1,1e9,1000,1000,512,512,7,8,128,0)));assert.ok(bad.error);assert.deepEqual(stats(),unchanged,'Rejected admission changed the cache');
+k._set_reference_numerics(1);solve();const diagnostic=stats();solve();assert.equal(stats().hits,diagnostic.hits+1);k._set_reference_numerics(0);const production=stats();solve(1e9+1);assert.equal(stats().hits,production.hits+1,'Historical mode evicted production tables');
+k._set_potential_memo(0);assert.deepEqual(stats(),{enabled:false,hits:0,misses:0,writes:0,bytes:0});
+mkdirSync('build/evidence',{recursive:true});writeFileSync('build/evidence/potential-memo.json',JSON.stringify({freshAndCachedFieldsExact:true,exactFrequencyKey:true,arithmeticIsolation:true,explicitRelease:true,reports},null,2)+'\n');console.log('Potential memo: exact fresh/cached outputs, frequency aliases, process/chip/FFT keys, geometry independence, arithmetic isolation, rectangular recomputation, admission recovery and release pass');

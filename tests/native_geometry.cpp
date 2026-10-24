@@ -8,6 +8,8 @@ extern "C" const char* simulate_capacitance(int,int,double,double,double,double,
 extern "C" void finalize_technology();
 extern "C" const char* analyze(double);
 extern "C" const char* coupling(int,int,int);
+extern "C" const char* optimization_plan(const char*,double,double,double,int,int);
+extern "C" const char* optimization_create(const char*,const double*,int);
 extern "C" const char* probe_runtime_trig(int,double);
 extern "C" const char* probe_retained_math(int,unsigned,unsigned,int);
 extern "C" const char* probe_math(int,double,double,double);
@@ -50,7 +52,7 @@ extern "C" int main(int argc,char** argv,char**) {
     if(argc==6 && argv[1][0]=='-') { puts(probe_math(atoi(argv[2]),strtod(argv[3],nullptr),strtod(argv[4],nullptr),strtod(argv[5],nullptr)));return 0; }
     if(argc==5 && (argv[1][0]!='-' || argv[1][1]!='-' || argv[1][2]!='a'))return 2;
     if(argc==8 && (argv[1][0]!='-' || argv[1][1]!='-' || argv[1][2]!='m'))return 2;
-    if(argc!=8 && argc!=5 && argc!=26 && argc!=22 && argc!=10 && argc!=12 && argc!=7 && argc!=14 && argc!=15 && argc!=19 && argc!=20 && argc!=21 && argc!=23)return 2;
+    if(argc!=4 && argc!=8 && argc!=5 && argc!=26 && argc!=22 && argc!=10 && argc!=12 && argc!=7 && argc!=14 && argc!=15 && argc!=19 && argc!=20 && argc!=21 && argc!=23)return 2;
     reset_technology();set_substrate(0,700.);set_substrate(1,50.);set_substrate_material(0,11.9,1e-3);set_substrate_material(1,3.9,1e10);finalize_technology();
     double height[]={1.3,2.4,3.5,4.5,6},sheet[]={65,55,55,55,30};
     for(int i=0;i<5;++i)set_metal(i,height[i],i==4?1.:.5,sheet[i],1);
@@ -60,6 +62,8 @@ extern "C" int main(int argc,char** argv,char**) {
         const auto* spacing=getenv("REASITIC_SMIN");const auto* width=getenv("REASITIC_WMIN");if(!spacing||!width)return 2;
         const auto* rules=set_metal_rules(atoi(metal),strtod(spacing,nullptr),strtod(width,nullptr));if(__builtin_strncmp(rules,"{\"error\":",9)==0){puts(rules);return 2;}
     }
+    if(argc==4 && __builtin_strcmp(argv[1],"--grid")==0){puts(optimization_plan(argv[2],512,512,.1,1,atoi(argv[3])));return 0;}
+    if(argc==14 && __builtin_strcmp(argv[1],"--grid-create")==0){double values[10];for(int i=0;i<10;++i)values[i]=strtod(argv[i+3],nullptr);puts(optimization_create(argv[2],values,atoi(argv[13])));return 0;}
     if(argc==7 && __builtin_strcmp(argv[1],"--coupling")==0) {
         create_geometry(atoi(argv[2]),argv[3],"",512,512,128,128,.1,1,0);create_geometry(atoi(argv[4]),argv[5],"",512,512,128,128,.1,1,1);puts(coupling(1,0,atoi(argv[6])));return 0;
     }

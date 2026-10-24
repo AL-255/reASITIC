@@ -133,6 +133,45 @@ Neumann integral, reciprocity, original zero limits, request/budget recovery,
 source immutability and bounded heap use. Host x87 rounding is recorded separately
 with a `1e-12` bound; `--strict-native` requests exact host instruction identity.
 
+The numerical `SWEEP` coil-design search is available for square and polygon
+spirals. Its C++ planner extracts the original range loops, maximum-turn routine,
+binary32 keyword normalization, fractional turn stepping and acceptance predicate.
+Candidate descriptors go directly into the C++ constructors, avoiding a second
+parse or grid snap. A private worker kernel streams candidate metrics and failures
+without replacing the live layout. Stop retains completed candidates; applying a
+candidate makes it available for the normal simulation and GDS controls. Geometry
+can be applied even when its current contact mesh fails. CSV export includes all
+completed candidates and their pi metrics.
+
+The original acceptance predicate compares LMIN in nH, LMAX in µH and first-port
+Q; this unit asymmetry is displayed explicitly. SIMTYPE=2 uses PI2. SIMTYPE=3
+validates TAP but the original grid still analyzes the candidate against itself;
+that behavior is retained. The original FAST conductor model faults and is
+rejected. The web path uses the supplied NAME instead of reading the original
+batch loop's unwritten constructor-name buffer. Candidate and range-iteration
+budgets reject a search without silently truncating its parameter grid.
+
+Ten repeated original searches cover both process stacks, square/polygon grids,
+fractional ranges, quality/inductance filtering and TAP validation. Captures stop
+read-only after original keyword normalization, then feed those exact normalized
+values to fresh original prompted searches, bypassing the native batch-name hang.
+They retain 54 descriptors/geometries, 38 accepted rows and 12 nonfinite models.
+Historical metrics are compared with native captures; production metrics are
+checked against an independent 80-digit circuit reduction. Small shunt-conductance
+cancellation can change full-precision legacy resistance values, so these are
+recorded separately from production accuracy. The largest relative metric error
+against that reduction is below `2.5e-12` in production, versus about `2.1e-8` in the
+original on these cases. An independent GDS reader checks all 54 libraries and
+1,811 polygons. Browser visual QA remains unverified.
+
+Search kernels enable the original Green-table cache file protocol using bounded
+RAM files. Exact frequency bits, full substrate/metal records, FFT/chip dimensions and
+arithmetic mode select entries, preventing the native rounded filename from
+aliasing different frequencies. Two entries use at most 32 MiB total. Ordinary
+solver requests keep their existing cache policy. Nonsquare grids and larger
+tables still recompute. Fresh/cached matrices and hashes are checked exactly,
+including process changes, frequency aliases, arithmetic isolation and release.
+
 The original numerical `SELFRES` search is available separately from the
 pi-model resonance estimate. It repeatedly analyzes the selected device and
 ground with the original PI2 SLOW driver and searches single-ended or
@@ -316,6 +355,10 @@ node tests/original-geometry.mjs
 node tests/estimates.mjs
 node tests/connected-analysis.mjs
 node tests/coupling.mjs
+node tests/potential-memo.mjs
+node tests/optimization.mjs
+node tests/worker-optimization.mjs
+python3 tests/gds_optimization_reader.py
 node tests/capacitance.mjs
 node tests/capacitance-data.mjs
 node tests/capacitance-grids.mjs

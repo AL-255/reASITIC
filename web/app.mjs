@@ -1,3 +1,4 @@
+import {optimizationCSV} from './optimization.mjs';
 import {resonanceHistoryCSV} from './self-resonance.mjs';
 import {polygons,writeGDS,segmentRecords} from './gds.mjs';
 import {parseTechnology} from './technology.mjs';
@@ -13,17 +14,22 @@ const colors=['#d8ba69','#8ab9df','#b89bde','#b4e887','#e1b486','#cf83a6','#80c9
 let importedText='',technologyText='',layout,technology,ready=false,busy=false,request=0,view,initialView,drag;
 let samples=[],selectedSimulation=null,sampleRequest=null,sampleKey='',capacitanceResult=null,networkResult=null,transformerResult=null,threeResult=null,threeBacking=null;
 const portSamples={network:[],transformer:[],'three-port':[]};let activePortSweep=null,activeSelfResonance=false,selfResonanceResult=null,selfResonanceSamples=[];
+let activeOptimization=false,optimizationSamples=[];
 const worker=new Worker(new URL('./worker.mjs',import.meta.url),{type:'module'});
 const simulationControls=['coupling-first','coupling-second','selfres-search','selfres-start','selfres-end','selfres-step','selfres-mode','selfres-budget','max-width-cells','cell-policy','cell-alpha','cell-beta','simulate','sweep','sim-winding','cell-length','cell-width','cell-thickness','cell-trigger','filament-limit','sweep-start','sweep-stop','sweep-count','frequency-scale','frequency','cap-solve','cap-winding','cap-ground','cap-frequency','cap-length','cap-width','cap-fftx','cap-ffty','contact-limit','cap-mode','eddy-mode','eddy-layer-count','eddy-layer-1','eddy-layer-2','green-budget','network-model','network-pad1','network-pad2','network-solve','network-sweep','network-start','network-end','network-step','trans-sweep','trans-start','trans-end','trans-step','network-parameter','network-format','trans-parameter','trans-format','trans-primary','trans-secondary','trans-termination','trans-solve','three-first','three-second','three-third','three-parameter','three-format','three-backing-file','three-solve','three-sweep','three-start','three-end','three-step'];
 function setBusy(value,stoppable=false){
   busy=value;for(const element of $('controls').elements)element.disabled=!ready||value||Boolean(element.closest('label')?.hidden)||Boolean(element.closest('.fields') && $('native-command').value.trim())||Boolean(element.id==='append-layout' && !layout);
+  for(const id of ['opt-search','opt-keywords','opt-limit'])$(id).disabled=!ready||value;
+  $('opt-choice').disabled=value||!optimizationSamples.length;$('opt-stop').disabled=!value||!activeOptimization;$('opt-csv').disabled=value||!optimizationSamples.length;
+  const selected=optimizationSamples.find(s=>s.index===Number($('opt-choice').value));$('opt-apply').disabled=value||!selected||!selected.geometry_valid;
+
   for(const id of simulationControls)$(id).disabled=!ready||!layout?.shapes.length||value;
   const automatic=$('cell-policy').value==='automatic';
   for(const id of ['cell-length','cell-width','cell-thickness','cell-trigger','cap-length','cap-width'])$(id).disabled=!ready||!layout?.shapes.length||value||automatic;
   for(const id of ['cell-alpha','cell-beta'])$(id).disabled=!ready||!layout?.shapes.length||value||!automatic;
   $('apply-edit').disabled=!ready||!layout?.shapes.length||value;
   $('coupling').disabled=!ready||(layout?.shapes.length??0)<2||value;
-  $('analyze').disabled=!ready||!layout?.shapes.length||value;$('stop').disabled=!value||!stoppable||activePortSweep!==null||activeSelfResonance;
+  $('analyze').disabled=!ready||!layout?.shapes.length||value;$('stop').disabled=!value||!stoppable||activePortSweep!==null||activeSelfResonance||activeOptimization;
   $('selfres-stop').disabled=!value||!stoppable||!activeSelfResonance;$('selfres-csv').disabled=value||!selfResonanceSamples.length;
   $('network-stop').disabled=!value||!stoppable||activePortSweep!=='network';$('trans-stop').disabled=!value||!stoppable||activePortSweep!=='transformer';$('three-stop').disabled=!value||!stoppable||activePortSweep!=='three-port';
   $('network-sweep-csv').disabled=value||!portSamples.network.length;$('trans-sweep-csv').disabled=value||!portSamples.transformer.length;$('three-sweep-csv').disabled=value||!portSamples['three-port'].length;
@@ -34,12 +40,12 @@ function setBusy(value,stoppable=false){
   $('network-matrix-csv').disabled=value||!networkResult;$('network-metrics-csv').disabled=value||!networkResult;$('network-vectors-csv').disabled=value||!networkResult?.currents;
   $('matrix-csv').disabled=value||!selectedSimulation?.matrix;$('results-csv').disabled=value||!samples.length;
 }
-function failure(message){if(activeSelfResonance)$('selfres-state').textContent=`Search stopped after an error. ${selfResonanceSamples.length} analyses retained.`;activePortSweep=null;activeSelfResonance=false;$('status').textContent=message;$('loading').textContent='';setBusy(false);}
+function failure(message){if(activeOptimization){activeOptimization=false;$('opt-state').textContent=`Search stopped after ${optimizationSamples.length} completed candidates. ${message}`;}if(activeSelfResonance)$('selfres-state').textContent=`Search stopped after an error. ${selfResonanceSamples.length} analyses retained.`;activePortSweep=null;activeSelfResonance=false;$('status').textContent=message;$('loading').textContent='';setBusy(false);}
 worker.onerror=event=>{ready=false;$('engine').textContent='Kernel unavailable';failure(event.message||'Unable to load the WebAssembly kernel.');};
 worker.onmessage=({data})=>{
   if(data.ready){ready=true;$('engine').textContent='● C++ / WASM ready';setBusy(false);if(technologyText)generate();return;}
   if(data.id!==request)return;
-  if(data.cancelled){const search=activeSelfResonance,count=search?selfResonanceSamples.length:activePortSweep?portSamples[activePortSweep].length:samples.length;activePortSweep=null;activeSelfResonance=false;setBusy(false);$('status').textContent=`${search?'Search':'Sweep'} stopped. ${count} completed samples retained.`;if(search)$('selfres-state').textContent=`Search stopped after ${count} analyses.`;return;}
+  if(data.cancelled){if(activeOptimization){activeOptimization=false;setBusy(false);$('opt-state').textContent=`Search stopped after ${optimizationSamples.length} completed candidates.`;$('status').textContent='Coil-design search stopped.';return;}const search=activeSelfResonance,count=search?selfResonanceSamples.length:activePortSweep?portSamples[activePortSweep].length:samples.length;activePortSweep=null;activeSelfResonance=false;setBusy(false);$('status').textContent=`${search?'Search':'Sweep'} stopped. ${count} completed samples retained.`;if(search)$('selfres-state').textContent=`Search stopped after ${count} analyses.`;return;}
   if(data.error){if(data.action==='generate' && !data.append){layout=undefined;view=initialView=undefined;$('download').disabled=true;$('preview').replaceChildren();for(const id of ['footprint','segments','resistance'])$(id).textContent='—';clearSimulation();clearCapacitance();clearNetwork();clearTransformer();clearThreePort();clearSelfResonance();}failure(data.error);return;}
   if(data.resonance){
     selfResonanceResult=data.resonance;selfResonanceSamples.push(data.resonance.sample);activeSelfResonance=!data.resonance.done;renderSelfResonance();setBusy(activeSelfResonance,activeSelfResonance);$('status').textContent=data.resonance.done?'SELFRES search finished.':'Searching with the original SELFRES algorithm…';return;
@@ -104,8 +110,14 @@ worker.onmessage=({data})=>{
   }
   setBusy(false);$('loading').textContent='';
   if(data.coupling){const c=data.coupling;$('coupling-result').textContent=`${c.first} ↔ ${c.second} · k = ${c.coefficient.toPrecision(7)} · M = ${c.mutual_nh.toPrecision(7)} nH`;$('status').textContent=data.warnings||'Original conductor coupling estimate calculated.';return;}
+  if(data.optimization){
+    const r=data.optimization;activeOptimization=!r.done;
+    if(r.sample){const s=r.sample;optimizationSamples.push(s);const option=document.createElement('option');option.value=s.index;option.textContent=`${s.index+1}: A ${s.descriptor[4].toPrecision(5)}, W ${s.descriptor[5].toPrecision(4)}, S ${s.descriptor[6].toPrecision(4)}, N ${s.descriptor[7].toPrecision(4)} · ${s.error?'solve failed':`L ${(s.pi.inductance_h*1e9).toPrecision(4)} nH · Q1 ${s.pi.quality_first.toPrecision(4)} · ${s.accepted?'matched':'filtered'}`}`;$('opt-choice').append(option);}
+    setBusy(!r.done,!r.done);$('opt-state').textContent=`${optimizationSamples.length}/${r.total} candidates completed · ${optimizationSamples.filter(s=>s.accepted).length} matched · ${optimizationSamples.filter(s=>s.error).length} failed · ${(r.frequency_hz/1e9).toPrecision(5)} GHz`;
+    $('status').textContent=r.done?'Coil-design search complete. Select a candidate to display or export.':'Searching original SWEEP candidates…';return;
+  }
   if(data.analysis){$('electrical').textContent=data.analysis.windings.map(w=>`${w.name} · L = ${w.inductance_nh.toPrecision(7)} nH · R(${(data.analysis.frequency_hz/1e9).toPrecision(4)} GHz) = ${w.resistance_hf.toPrecision(7)} Ω`).join('\n');$('status').textContent=data.warnings||'Original conductor estimates calculated. These do not include the distributed substrate network.';return;}
-  activePortSweep=null;layout=data.layout;technology=data.technology;$('engine').textContent='● C++ / WASM ready';render();if(data.edited)$('layout-title').textContent='EDITED LAYOUT';clearSimulation();clearCapacitance();clearNetwork();clearTransformer();clearThreePort();clearSelfResonance();
+  activePortSweep=null;layout=data.layout;technology=data.technology;$('engine').textContent='● C++ / WASM ready';render();if(data.edited)$('layout-title').textContent='EDITED LAYOUT';if(data.optimization_candidate)$('layout-title').textContent=data.optimization_candidate.descriptor[0]===0?'SWEEP SQUARE':'SWEEP POLYGON';clearSimulation();clearCapacitance();clearNetwork();clearTransformer();clearThreePort();clearSelfResonance();
   $('sim-winding').replaceChildren();layout.shapes.forEach((shape,i)=>{const option=document.createElement('option');option.value=i;option.textContent=shape.name;$('sim-winding').append(option);});
   for(const id of ['cap-winding','cap-ground']){$(id).replaceChildren();if(id==='cap-ground'){const option=document.createElement('option');option.value=-1;option.textContent='Substrate reference';$(id).append(option);}layout.shapes.forEach((shape,i)=>{const option=document.createElement('option');option.value=i;option.textContent=shape.name;$(id).append(option);});}
   for(const id of ['trans-primary','trans-secondary','network-pad1','network-pad2','coupling-first','coupling-second']){$(id).replaceChildren();layout.shapes.forEach((shape,i)=>{const option=document.createElement('option');option.value=i;option.textContent=shape.name;$(id).append(option);});}
@@ -124,6 +136,11 @@ function options(){return {nativeInput:true,x:Number($('origin-x').value),y:Numb
 function frequency(){const value=Number($('frequency').value);if(!Number.isFinite(value)||value<=0)throw Error('Enter a positive frequency.');return value;}
 function send(data,stoppable=false){setBusy(true,stoppable);worker.postMessage({id:++request,...data});}
 $('coupling').onclick=()=>{try{if(layout){$('status').textContent='Calculating original coupling estimate…';send({action:'coupling',first:Number($('coupling-first').value),second:Number($('coupling-second').value)});}}catch(e){failure(e.message);}};
+$('opt-search').onclick=()=>{try{optimizationSamples=[];$('opt-choice').replaceChildren();activeOptimization=true;$('status').textContent='Planning original SWEEP candidates…';send({...portRequest('network'),action:'optimize',technology:technologyText,keywords:$('opt-keywords').value,options:{grid:Number($('snap-grid').value),snap:$('snap').checked,candidate_limit:Number($('opt-limit').value)}},true);}catch(e){failure(e.message);}};
+$('opt-stop').onclick=()=>worker.postMessage({id:++request,action:'cancel'});
+$('opt-choice').onchange=()=>setBusy(busy);
+$('opt-csv').onclick=()=>download(optimizationCSV(optimizationSamples),'reASITIC-coil-designs.csv','text/csv');
+$('opt-apply').onclick=()=>{try{send({action:'optimization-apply',index:Number($('opt-choice').value)});}catch(e){failure(e.message);}};
 $('analyze').onclick=()=>{try{if(layout){$('status').textContent='Calculating original conductor estimates…';send({action:'analyze',frequency_ghz:frequency()});}}catch(e){failure(e.message);}};
 $('apply-edit').onclick=()=>{try{const o=options();$('status').textContent='Applying original geometry edits…';send({action:'edit',commands:$('edit-commands').value,options:{grid:o.grid,snap:o.snap}});}catch(e){failure(e.message);}};
 function generate(){if(!ready||!technologyText)return;try{const o=options(),creator=$('native-command').value.trim()?parseCreatorCommand($('native-command').value,$('native-answers').value):creatorRecipe(Number($('kind').value),parameters(),o);$('download').disabled=true;$('loading').textContent='Generating geometry…';send({creator,options:o,technology:technologyText});}catch(e){failure(e.message);}}

@@ -1,10 +1,11 @@
 import createKernel from './asitic.js';
 import {resonancePlan,capacitorPortMatrix} from './self-resonance.mjs';
+import {optimizationPlan,createOptimizationCandidate,optimizationAccept} from './optimization.mjs';
 import {solverCells,meshResult} from './mesh-policy.mjs';
 import {portSampleSummary} from './port-sweep.mjs';
 import {validateThreePortBacking,allocateThreePortBacking} from './three-port.mjs';
 import {parseTechnology,configureKernel,generateGeometry,createGeometry,editGeometry} from './technology.mjs';
-const kernel=await createKernel();let epoch=0,processTechnology=null,hasLayout=false,currentLayout=null;
+const kernel=await createKernel();let epoch=0,processTechnology=null,hasLayout=false,currentLayout=null,optimizationKernel=null,optimizationState=null;
 function frequency(data,value=data.frequency_ghz) {
   const result=value===undefined?data.frequency:kernel._normalize_value(Number(value),5,.1,0);
   if(!Number.isFinite(result) || result<=0)throw Error('Enter a positive native ASITIC frequency.');return result;
@@ -31,15 +32,16 @@ function solveTransformer(data,hz){
       const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_transformer(data.primary??0,data.secondary??1,data.ground??-1,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,resistance,e.evaluation_limit??250000)));
       return meshResult(result,selection);
 }
-function solveNetwork(data,hz){
+function solveNetwork(data,hz,context){
+      const target=context?.kernel??kernel,technology=context?.technology??processTechnology,layout=context?.layout??currentLayout;
       const model=data.model??'PI2';if(!['PI2','PIX','PI4'].includes(model))throw Error('Select PI2, PIX or PI4.');
-      const solver=model==='PI4'?kernel._simulate_pad_network:model==='PIX'?kernel._simulate_extended_network:kernel._simulate_network;
-      if(!processTechnology || !hasLayout)throw Error('Generate a layout before running the combined network.');
-      const pads=model==='PI4'?(data.pads??[]):[];if(model==='PI4'&&(!Array.isArray(pads)||pads.length!==2||pads.some(i=>!Number.isInteger(i)||i<0||!currentLayout.shapes[i])))throw Error('Select valid first and second PI4 pad records.');
-      const domain=processTechnology.domain,e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[];
+      const solver=model==='PI4'?target._simulate_pad_network:model==='PIX'?target._simulate_extended_network:target._simulate_network;
+      if(!technology || (context?!layout?.shapes.length:!hasLayout))throw Error('Generate a layout before running the combined network.');
+      const pads=model==='PI4'?(data.pads??[]):[];if(model==='PI4'&&(!Array.isArray(pads)||pads.length!==2||pads.some(i=>!Number.isInteger(i)||i<0||!layout.shapes[i])))throw Error('Select valid first and second PI4 pad records.');
+      const domain=technology.domain,e=data.eddy??{},layers=e.layers??technology.eddy_layers??[];
       if(!Array.isArray(layers) || layers.length>2 || layers.some(i=>!Number.isInteger(i) || i<0))throw Error('Select up to two substrate layers.');
-      const selection=solverCells(kernel,data,hz,'network'),parsed=selection.cells;
-      const result=JSON.parse(kernel.UTF8ToString(solver(data.winding??0,...pads,data.ground??-1,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000)));
+      const selection=solverCells(target,data,hz,'network'),parsed=selection.cells;
+      const result=JSON.parse(target.UTF8ToString(solver(data.winding??0,...pads,data.ground??-1,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000)));
       return meshResult(result,selection);
 }
 async function solveThreePort(data,hz,task){
@@ -61,6 +63,35 @@ self.onmessage=async({data})=>{
   const task=++epoch;const action=data.action??'generate';
   try{
     if(action==='cancel'){postMessage({id:data.id,cancelled:true});return;}
+    if(action==='optimize'){
+      const technology=data.technology?parseTechnology(data.technology):processTechnology;if(!technology)throw Error('Select a technology before running SWEEP.');
+      if(!optimizationKernel){optimizationKernel=await createKernel();optimizationKernel._set_potential_memo(1);}if(task!==epoch)return;
+      configureKernel(optimizationKernel,technology);
+      const planningKernel=processTechnology?.source===technology.source?kernel:optimizationKernel;
+      const plan=optimizationPlan(planningKernel,data.keywords,technology.domain,data.options),summary={name:plan.name,frequency_hz:plan.frequency_hz,inductance_min:plan.inductance_min,inductance_max:plan.inductance_max,minimum_quality:plan.minimum_quality,total:plan.candidates.length};
+      optimizationState={plan,technology,completed:new Set()};
+      if(!plan.candidates.length){postMessage({id:data.id,optimization:{...summary,done:true}});return;}
+      for(const [index,descriptor]of plan.candidates.entries()){
+        if(task!==epoch)return;const sample={index,descriptor,accepted:false,frequency_hz:plan.frequency_hz};
+        try{
+          const layout=createOptimizationCandidate(optimizationKernel,plan.name,descriptor);sample.geometry_valid=true;
+          const solved=solveNetwork({...data,model:'PI2',winding:0,ground:-1},plan.frequency_hz,{kernel:optimizationKernel,technology,layout});
+          sample.pi=solved.pi;sample.accepted=optimizationAccept(optimizationKernel,plan,solved.pi);sample.warnings=optimizationKernel.UTF8ToString(optimizationKernel._last_warnings());
+        }catch(error){sample.error=error.message;}
+        optimizationState.completed.add(index);const done=index===plan.candidates.length-1;postMessage({id:data.id,optimization:{...summary,sample,done}});if(!done)await new Promise(resolve=>setTimeout(resolve,0));
+      }return;
+    }
+    if(action==='optimization-apply'){
+      if(!optimizationState||!Number.isInteger(data.index)||!optimizationState.plan.candidates[data.index]||!optimizationState.completed.has(data.index))throw Error('Select a completed SWEEP candidate.');
+      const {plan,technology}=optimizationState,append=Boolean(data.options?.append);
+      if(append&&hasLayout&&technology.source!==processTechnology?.source)throw Error('Use the same technology when adding a SWEEP candidate.');
+      // Admit and construct privately before replacing the live process/layout.
+      configureKernel(optimizationKernel,technology);
+      createOptimizationCandidate(optimizationKernel,plan.name,plan.candidates[data.index]);
+      if(processTechnology?.source!==technology.source)configureKernel(kernel,technology);
+      const layout=createOptimizationCandidate(kernel,plan.name,plan.candidates[data.index],append);processTechnology=technology;currentLayout=layout;hasLayout=true;
+      postMessage({id:data.id,layout,technology,optimization_candidate:{index:data.index,descriptor:plan.candidates[data.index]}});return;
+    }
     if(action==='edit'){
       if(!processTechnology||!hasLayout)throw Error('Generate a layout before editing geometry.');
       const layout=editGeometry(kernel,data.commands,{...data.options,domain:processTechnology.domain});currentLayout=layout;hasLayout=true;postMessage({id:data.id,layout,technology:processTechnology,edited:true});return;
@@ -153,7 +184,7 @@ self.onmessage=async({data})=>{
     const append=Boolean(data.options?.append);
     if(append && (!hasLayout || !data.creator || data.technology!==processTechnology?.source))throw Error('Add to layout requires an existing layout, an original creator command, and the same technology.');
     const technology=append?processTechnology:parseTechnology(data.technology);
-    if(!append){hasLayout=false;currentLayout=null;configureKernel(kernel,technology);processTechnology=technology;}
+    if(!append){hasLayout=false;currentLayout=null,optimizationKernel=null,optimizationState=null;configureKernel(kernel,technology);processTechnology=technology;}
     const layout=data.creator?createGeometry(kernel,data.creator.id,data.creator.keywords,data.creator.answers,{...data.options,domain:technology.domain}):generateGeometry(kernel,data.kind,data.parameters,data.options);hasLayout=true;currentLayout=layout;postMessage({id:data.id,layout,technology});
   }catch(error){postMessage({id:data.id,error:error.message,action,append:Boolean(data.options?.append)});}
 };

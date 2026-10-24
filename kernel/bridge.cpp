@@ -302,3 +302,4 @@ const char* generate(int kind,const double* p) {
 }
 
 #include "geometry_edit_bridge.inc"
+#include "optimization_bridge.inc"

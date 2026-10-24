@@ -87,11 +87,12 @@ struct Snapshots {
         for(int j=0;j<matrix.columns;++j)for(int i=0;i<matrix.rows;++i)s.potential.view().at(i,j)=matrix.view().at(i,j);
     }
 };
-// The original file cache is disabled, so these callbacks are never consulted.
+// Ordinary requests disable file IO; RAM-cache requests supply other callbacks.
 void* no_open(const char*,const char*,void*) { return nullptr; }
 unsigned no_read(void*,unsigned,unsigned,void*,void*) { return 0; }
 unsigned no_write(const void*,unsigned,unsigned,void*,void*) { return 0; }
 int no_close(void*,void*) { return 0; }
+#include "potential_memo.inc"
 // Run the native count selection before native contact creation. Budget
 // rejection does not change counts, geometry, FFT resolution or cell sizes.
 bool admissible(const GeometryShape& shape,const PotentialContactOptions& options,int limit,int& count,int& groups,SolverMemory memory,WarningSink warnings) {
@@ -298,7 +299,8 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         release_potential_contacts(state.groups,memory);
     }
     if(!allocate_potential_cache(state.cache,nx,ny,engine.metal_count,memory,engine.warnings))return "{\"error\":\"Could not allocate original Green tables\"}";
-    Snapshots snapshots{memory};const PotentialCacheRuntime runtime{{no_open,no_read,no_write,no_close,sprintf,nullptr},"","",engine.warnings,engine.warnings};
+    PotentialMemoFile memo(engine,frequency,chip_x,chip_y,nx,ny);state.cache.enabled=memo.enabled;
+    Snapshots snapshots{memory};const PotentialCacheRuntime runtime{memo.enabled?memo.files():PotentialCacheFiles{no_open,no_read,no_write,no_close,sprintf,nullptr},"","",engine.warnings,engine.warnings};
     PotentialCapacitanceOptions options{contacts,{engine.substrate,engine.substrate_count,engine.metals,engine.metal_count},depths,runtime,true,true,Snapshots::record,&snapshots,{}};
     if(network) {
         const auto expected_groups=count_geometry_metals(*source,engine.metal_count);
@@ -470,4 +472,13 @@ extern "C" const char* probe_three_port(int first_winding,int second_winding,int
     reasitic::EddyScope scope(session);reasitic::clear_diagnostics();if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid three-port eddy configuration\"}";
     const NetworkRequest request{length_cell,width_cell,thickness_cell,filament_limit,session,second_winding,0,third_winding,cap_history,ind_history,history_cells,history_addresses};
     return simulate_capacitance_impl(first_winding,ground,frequency,contact_length,contact_width,chip_x,chip_y,nx,ny,contact_limit,0,&request);
+}
+
+extern "C" void set_potential_memo(int enabled){
+    potential_memo_enabled=enabled!=0;
+    if(!potential_memo_enabled){for(auto& entry:potential_memos){free(entry.data);entry={};}potential_memo_hits=potential_memo_misses=potential_memo_writes=0;}
+}
+extern "C" const char* potential_memo_stats(){
+    static char data[256];unsigned bytes=0;for(const auto& entry:potential_memos)bytes+=entry.size;
+    sprintf(data,"{\"enabled\":%s,\"hits\":%u,\"misses\":%u,\"writes\":%u,\"bytes\":%u}",potential_memo_enabled?"true":"false",potential_memo_hits,potential_memo_misses,potential_memo_writes,bytes);return data;
 }
