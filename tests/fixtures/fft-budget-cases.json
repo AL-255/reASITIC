@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "name": "narrow-wire-cap-512",
+      "model": "CAP",
+      "id": 2,
+      "keywords": "NAME=A:LEN=100:WID=1:METAL=M4:XORG=100:YORG=100",
+      "frequency_ghz": 1,
+      "cells": [1000, 1000, 1000],
+      "contact_cells": [1000, 1000],
+      "grid": [512, 512]
+    },
+    {
+      "name": "narrow-wire-pi2-512",
+      "model": "PI2",
+      "id": 2,
+      "keywords": "NAME=A:LEN=100:WID=1:METAL=M4:XORG=100:YORG=100",
+      "frequency_ghz": 1,
+      "cells": [1000, 1000, 1000],
+      "contact_cells": [1000, 1000],
+      "grid": [512, 512]
+    }
+  ]
+}

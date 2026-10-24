@@ -9,9 +9,9 @@ import {parseTechnology,configureKernel,createGeometry,editGeometry} from '../we
 const kernel=await createKernel(),text=readFileSync('web/technology/CMOS.tek','utf8'),technology=parseTechnology(text),fixture=JSON.parse(gunzipSync(readFileSync('tests/fixtures/original-potential-grid.json.gz'))),hash=x=>createHash('sha256').update(x).digest('hex');
 assert.equal(hash(text),fixture.technology_sha256);assert.equal(fixture.original_cases[0].returncode,0);assert.ok(fixture.original_cases.slice(1).every(c=>c.returncode<0&&c.fresh_repeats===2));
 const cases=[];
-for(const grid of [[1,1],[1,8],[8,1],[2,16],[16,2],[4,8],[8,4],[8,16],[16,8],[8,8],[16,16]]){
+for(const grid of [[1,1],[1,8],[8,1],[2,16],[16,2],[4,8],[8,4],[8,16],[16,8],[8,8],[16,16],[512,8],[8,512],[1024,1],[1,1024]]){
   const [nx,ny]=grid;
-  for(const [length,width,cell]of Math.min(nx,ny)===1?[[512,512,1000]]:Math.min(nx,ny)===2?[[128,128,1000]]:[[128,128,1000],[256,128,128],[256,256,128]]){
+  for(const [length,width,cell]of Math.max(nx,ny)>fixture.base_grid||Math.min(nx,ny)===1?[[512,512,1000]]:Math.min(nx,ny)===2?[[128,128,1000]]:[[128,128,1000],[256,128,128],[256,256,128]]){
     const origin=length===512?0:128,contacts=[];
     for(let i=0;i<Math.max(1,width/cell);i++)for(let j=0;j<Math.max(1,length/cell);j++){
       const stepX=Math.min(length,cell),stepY=Math.min(width,cell),x=origin+j*stepX,y=origin+width-(i+1)*stepY;

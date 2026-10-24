@@ -1,5 +1,6 @@
 #include "engine.hpp"
 #include "filament_policy.hpp"
+#include "potential_grid.hpp"
 #include "json.hpp"
 #include "eddy_runtime.hpp"
 #include "three_history.hpp"
@@ -199,8 +200,8 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
     if(winding<0 || ground< -1 || !__builtin_isfinite(frequency) || frequency<=0 ||
        !__builtin_isfinite(length_cell) || length_cell<=0 || !__builtin_isfinite(width_cell) || width_cell<=0 ||
        !__builtin_isfinite(chip_x) || chip_x<=0 || !__builtin_isfinite(chip_y) || chip_y<=0 ||
-       nx<1 || nx>256 || ny<1 || ny>256 || (nx&(nx-1)) || (ny&(ny-1)) || !contact_budget(contact_limit)){
-        static char error[384];sprintf(error,"{\"error\":\"Use positive frequency, cells and chip dimensions, power-of-two FFT sizes from 1 to 256, and 1–%d contacts (16 MiB dense-matrix budget)\"}",max_contacts);return error;
+       nx<1 || ny<1 || (nx&(nx-1)) || (ny&(ny-1)) || !contact_budget(contact_limit)){
+        static char error[384];sprintf(error,"{\"error\":\"Use positive frequency, cells and chip dimensions, positive power-of-two FFT sizes, and 1–%d contacts (16 MiB dense-matrix budget)\"}",max_contacts);return error;
     }
     auto* source=engine.shapes;for(int i=0;source && i<winding;++i)source=source->next;
     auto* reference=engine.shapes;for(int i=0;reference && i<ground;++i)reference=reference->next;if(ground<0)reference=source;
@@ -228,8 +229,8 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
     for(int i=0;i<engine.substrate_count;++i) { double eps;__builtin_memcpy(&eps,engine.substrate[i].prefix+4,8);
         if(!(eps>0) || !(engine.substrate[i].resistivity>0))return "{\"error\":\"Define positive layer permittivity and resistivity in the technology\"}"; }
     for(int i=0;i<engine.metal_count;++i) { int layer;__builtin_memcpy(&layer,engine.metals[i].prefix+0xa0,4);if(layer<=0 || layer>=engine.substrate_count)return "{\"error\":\"Every metal must lie above the first substrate layer\"}"; }
-    const unsigned largest=nx>ny?nx:ny,pairs=engine.metal_count*(engine.metal_count+1)/2;
-    if(pairs*((largest+1)*(largest+1)+4*largest)*16u>128u*1024u*1024u)return "{\"error\":\"The requested Green tables exceed the 128 MiB cache budget\"}";
+    const unsigned pairs=engine.metal_count*(engine.metal_count+1)/2;
+    if(!reasitic::potential_grid_fits(nx,ny,engine.metal_count,reasitic::reference_numerics()))return "{\"error\":\"The requested Green tables exceed the 128 MiB cache budget\"}";
     const Real x_pitch=Real(chip_x)/nx,y_pitch=Real(chip_y)/ny;
     if(length_cell<x_pitch || length_cell<y_pitch) { length_cell=x87::binary64(y_pitch<x_pitch?x_pitch:y_pitch);engine.warnings.emit("CCELL length raised to the native chip/FFT pitch"); }
     if(width_cell<x_pitch || width_cell<y_pitch) { width_cell=x87::binary64(y_pitch<x_pitch?x_pitch:y_pitch);engine.warnings.emit("CCELL width raised to the native chip/FFT pitch"); }
@@ -439,6 +440,7 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
 }
 
 extern "C" int max_contact_count(){return max_contacts;}
+extern "C" int potential_grid_fits(int nx,int ny){return reasitic::potential_grid_fits(nx,ny,reasitic::engine_view().metal_count,reasitic::reference_numerics())?1:0;}
 extern "C" const char* simulate_capacitance(int winding,int ground,double frequency,double length_cell,double width_cell,double chip_x,double chip_y,int nx,int ny,int contact_limit,int unfolded) {
     return simulate_capacitance_impl(winding,ground,frequency,length_cell,width_cell,chip_x,chip_y,nx,ny,contact_limit,unfolded,nullptr);
 }

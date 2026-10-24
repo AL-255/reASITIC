@@ -511,6 +511,8 @@ node tests/capacitance.mjs
 node tests/contact-budget.mjs             # dense CAP/PI2 references; may take minutes
 node tests/capacitance-data.mjs
 node tests/capacitance-grids.mjs
+node tests/fft-budget.mjs                  # original 512-grid thin-wire CAP/PI2
+node tests/potential-normalization.mjs
 node tests/worker-capacitance.mjs
 node tests/eddy.mjs
 node tests/eddy-runtime.mjs
@@ -657,13 +659,19 @@ observed through an added callback without replacing numerical expressions.
 
 `simulate_capacitance(winding, ground, frequency_hz, length_cell, width_cell,
 chip_x, chip_y, fft_x, fft_y, contact_limit, unfolded)` uses ground -1 for the
-default same-name reference. Power-of-two FFT sizes 1–256, a 16 MiB budget per
+default same-name reference. Positive power-of-two FFT sizes, a 16 MiB budget per
 dense complex contact matrix (currently 1–1024 contacts), and a 128 MiB table
-budget bound computation. `max_contact_count()` exposes the derived contact
-limit to the worker, which validates integer budgets before crossing the WASM
-ABI. Collapsed/out-of-bounds contacts
-and native fault cases are rejected before matrix indexing. There is no
-persistent browser table cache yet; fine grids can take tens of seconds. The
+budget bound computation. The Green budget counts `(nx+1)*(ny+1)+2*nx+2*ny`
+complex cells for each packed metal pair, using overflow-safe integer admission.
+There is no fixed 256-cell FFT ceiling. Grid squares and contact-index area
+products use exact wider integers before binary64 conversion, avoiding the
+original 32-bit normalization wrap. Synthetic full-domain and half-domain
+first-mode contacts verify the analytic two-layer potential through 1,048,576×1 and 1×1,048,576 using explicit spectral
+samples. `potential_grid_fits(nx,ny)` exposes the technology-dependent budget to the worker. FFT controls accept powers of two;
+the worker rejects fractional, out-of-range and wrapping dimensions before the
+WASM ABI. `max_contact_count()` similarly exposes the derived contact limit.
+Collapsed/out-of-bounds contacts and native fault cases are rejected before matrix indexing. There is no
+persistent browser table cache yet; fine grids can take several minutes. The
 original square-grid results remain identical. Rectangular grids use a consistent
 `ny+1` row stride through generation, FFT and contact lookup, with scratch sized
 for both axes. The original mixes `nx+1` and `ny+1` strides and undersizes its
@@ -675,11 +683,23 @@ transform, contact integrals and matrix solve. An independent 80-digit reference
 inverts a fresh original 32×32 Green cache with direct cosine sums, truncates its
 spectral modes to each requested grid, and analytically integrates the cosine
 basis over contacts. It checks potential matrices, inverse/folding and equivalent
-impedance in 23 one-/two-/four-contact cases, including both rectangular
-orientations and one-cell axes. Native/WASM, worker and cache round trips match
-exactly. Four two-segment rectangular PI2 cases also check the contact-to-network
+impedance in 27 one-/two-/four-contact cases, including both rectangular
+orientations and one-cell axes. Full-domain contact integrals also verify exact
+cosine orthogonality on 512×8, 8×512, 1024×1 and 1×1024 grids. Native/WASM, worker
+and cache round trips match exactly. Four two-segment rectangular PI2 cases also check the contact-to-network
 folding, independent nodal reduction and worker solve. This verifies the corrected
-mathematical layout; it does not claim numerical parity with an original rectangular run that aborts.
+mathematical layout; it does not claim numerical parity with an original
+rectangular run that aborts.
+
+A 1 µm-wide M4 wire collapses at 256×256 and gives NaN in the original, but
+512×512 resolves it and reports 6.218 fF. Two fresh original CAP and PI2 runs
+retain their stage matrices, reports and hashes of all 63,652,080 Green bytes.
+The fine-grid checks compare native/WASM/worker results, independent PI2 circuit
+reduction, unchanged contact meshes and rejection/recovery. Allocation admission
+also checks every pair of signed-32-bit power-of-two dimensions for one, two,
+five and 32 metals against independent BigInt counts, in both production and
+historical layouts. The numerical-budget CI matrix runs these longer checks
+separately from the standard audit and dense-contact cases.
 
 Two further original cases use 660 and 661 contacts for CAP and grounded PI2.
 Fresh repeated original runs retain the complete 660×660 potential matrix,

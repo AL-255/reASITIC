@@ -11,7 +11,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
       - uses: mymindstorm/setup-emsdk@v14
@@ -100,6 +100,7 @@ jobs:
           node tests/capacitance.mjs
           node tests/capacitance-data.mjs
           node tests/capacitance-grids.mjs
+          node tests/potential-normalization.mjs
           node tests/worker-capacitance.mjs
           node tests/eddy.mjs
           node tests/eddy-runtime.mjs
@@ -149,13 +150,13 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
-  dense-contact-audit:
+  numerical-budget-audit:
     runs-on: ubuntu-latest
     timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
-        model: [CAP, PI2]
+        model: [CAP, PI2, FFT-CAP, FFT-PI2]
     steps:
       - uses: actions/checkout@v4
       - uses: mymindstorm/setup-emsdk@v14
@@ -175,16 +176,23 @@ jobs:
           sudo apt-get install -y g++-multilib libc6:i386
       - run: python tools/build.py
       - run: python tools/build_native.py
-      - name: Verify original dense-contact CAP and PI2 solves
-        run: node tests/contact-budget.mjs --model ${{ matrix.model }}
-      - name: Retain dense-contact evidence
+      - name: Install independent circuit reference
+        run: pip install mpmath==1.3.0
+      - name: Verify original dense-contact and fine-grid solves
+        run: |
+          case "${{ matrix.model }}" in
+            FFT-CAP) node tests/fft-budget.mjs --model CAP ;;
+            FFT-PI2) node tests/fft-budget.mjs --model PI2 ;;
+            *) node tests/contact-budget.mjs --model "${{ matrix.model }}" ;;
+          esac
+      - name: Retain numerical-budget evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: contact-budget-${{ matrix.model }}
+          name: numerical-budget-${{ matrix.model }}
           path: build/evidence
   deploy:
-    needs: [build, dense-contact-audit]
+    needs: [build, numerical-budget-audit]
     runs-on: ubuntu-latest
     permissions:
       pages: write

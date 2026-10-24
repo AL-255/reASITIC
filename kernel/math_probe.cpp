@@ -81,3 +81,37 @@ extern "C" const char* probe_retained_math(int operation,unsigned low,unsigned h
     const double rounded=x87::binary64(value);if(!__builtin_isfinite(rounded))return "{\"error\":\"Nonfinite retained math output\"}";
     sprintf(output,"{\"value\":%.17g,\"low\":%u,\"high\":%u,\"exponent\":%u}",rounded,words_out[0],words_out[1],words_out[2]);return output;
 }
+
+// Analytic full-domain contact: all nonzero cosine modes integrate to zero.
+// Explicit constant/first-mode samples isolate index normalization from FFT cost.
+#include "potential_grid.hpp"
+#include "numerical_policy.hpp"
+#include "asitic/potential.hpp"
+extern "C" void* calloc(unsigned,unsigned);
+extern "C" void free(void*);
+extern "C" const char* probe_potential_contact(int nx,int ny){
+    static char output[256];
+    if(reasitic::reference_numerics()||!reasitic::potential_grid_fits(nx,ny,1))return "{\"error\":\"Invalid potential probe dimensions\"}";
+    using namespace asitic;
+    auto* xy=static_cast<ComplexValue*>(calloc(static_cast<unsigned>((nx+1)*(ny+1)),16));
+    auto* x=static_cast<ComplexValue*>(calloc(static_cast<unsigned>(2*nx),16));
+    auto* y=static_cast<ComplexValue*>(calloc(static_cast<unsigned>(2*ny),16));
+    if(!xy||!x||!y){free(xy);free(x);free(y);return "{\"error\":\"Potential probe allocation failed\"}";}
+    MetalLayer metal{};int layer=1;double height=32;__builtin_memcpy(metal.prefix+0xa0,&layer,4);__builtin_memcpy(metal.prefix+0xa8,&height,8);
+    ComplexValue coefficients[]={{1,0},{2,-1}};double depths[]={750,50,0};
+    PotentialContact a{};a.x1=nx;a.y1=ny;
+    const PotentialGeometry geometry{nx,ny,512,512,&metal,{coefficients,depths}};
+    const PotentialTables tables{x,y,xy};const auto z=contact_potential(a,a,geometry,tables);
+    ComplexValue half{};const bool has_half=nx>1||ny>1;
+    if(has_half){
+        // Required samples of the first cosine mode T(j)=2*(3-2i)*cos(pi*j/n).
+        // The midpoint is exactly zero; the remaining accessed values are +/-2G.
+        if(nx>=ny){x[0]={6,-4};x[nx]={-6,4};a.x1=nx/2;}
+        else{y[0]={6,-4};y[ny]={-6,4};a.y1=ny/2;}
+        half=contact_potential(a,a,geometry,tables);
+    }
+    free(xy);free(x);free(y);
+    if(!__builtin_isfinite(z.real)||!__builtin_isfinite(z.imag)||(has_half&&(!__builtin_isfinite(half.real)||!__builtin_isfinite(half.imag))))return "{\"error\":\"Nonfinite analytic contact potential\"}";
+    char* out=output;out+=sprintf(out,"{\"potential\":[%.17g,%.17g],\"half_domain_potential\":",z.real,z.imag);
+    if(has_half)sprintf(out,"[%.17g,%.17g]}",half.real,half.imag);else sprintf(out,"null}");return output;
+}

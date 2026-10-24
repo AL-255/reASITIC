@@ -200,6 +200,14 @@ using namespace asitic;
         # The original producer/lookup use nx+1 while its transform uses ny+1.
         # Keep the historical layout only behind the diagnostic boundary.
         if name=='potential':
+            area='const int area_x=wrap_mul(wrap_sub(b.x1,b.x0),wrap_sub(a.x1,a.x0)),\n        area_y=wrap_mul(wrap_sub(b.y1,b.y0),wrap_sub(a.y1,a.y0));'
+            wider='const double area_x=reasitic::reference_numerics()?wrap_mul(wrap_sub(b.x1,b.x0),wrap_sub(a.x1,a.x0)):reasitic::potential_index_product(wrap_sub(b.x1,b.x0),wrap_sub(a.x1,a.x0)),\n        area_y=reasitic::reference_numerics()?wrap_mul(wrap_sub(b.y1,b.y0),wrap_sub(a.y1,a.y0)):reasitic::potential_index_product(wrap_sub(b.y1,b.y0),wrap_sub(a.y1,a.y0));'
+            assert s.count(area)==1
+            s=s.replace(area,wider).replace('complex_scale(ExtendedValue a,int factor)','complex_scale(ExtendedValue a,double factor)')
+            for axis in ('nx','ny'):
+                product='wrap_mul(g.'+axis+',g.'+axis+')'
+                assert s.count(product)==2
+                s=s.replace(product,'(reasitic::reference_numerics()?'+product+':reasitic::potential_index_product(g.'+axis+',g.'+axis+'))')
             old='wrap_mul(rows[row],wrap_add(g.nx,1))'
             new='wrap_mul(rows[row],wrap_add(reasitic::reference_numerics()?g.nx:g.ny,1))'
         else:
@@ -209,7 +217,7 @@ using namespace asitic;
             assert s.count(scratch)==1
             s=s.replace(scratch,'memory.arrays.get(static_cast<unsigned>(reasitic::reference_numerics()?nx:(nx>ny?nx:ny))*32u)')
         assert s.count(old)==1
-        return '#include "numerical_policy.hpp"\n'+s.replace(old,new)
+        return '#include "numerical_policy.hpp"\n#include "potential_grid.hpp"\n'+s.replace(old,new)
     if name=='quadrature':
         s=(ROOT/'vendor/asitic/src/quadrature.cpp').read_text();needle='double error_power(double x) {'
         assert s.count(needle)==1

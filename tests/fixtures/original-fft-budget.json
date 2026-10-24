@@ -1,0 +1,118 @@
+{
+  "reference": "Two fresh unmodified original CAP/PI2 solves per 512-grid case; collapsed 256-grid outcome retained separately",
+  "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+  "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+  "case_definition_sha256": "45e7b474fcb10e889757099b9147e302a390177a26788ad87b195d7856091985",
+  "collapsed_grid": [
+    256,
+    256
+  ],
+  "collapsed_grid_runs": [
+    {
+      "returncode": 0,
+      "finite_capacitance": false,
+      "reported_capacitance": "-nan (fF)"
+    },
+    {
+      "returncode": 0,
+      "finite_capacitance": false,
+      "reported_capacitance": "-nan (fF)"
+    }
+  ],
+  "cases": [
+    {
+      "name": "narrow-wire-cap-512",
+      "frequency_hz": 1000000000.0,
+      "contacts": 1,
+      "green_table_hash": "bc7f7c4a833dc4ad",
+      "raw_cache_bytes": 63652080,
+      "raw_cache_sha256": "01f0f91cfe192f704ef856c35237fb71d72d50d79b48d71974a6582ce3cb27c4",
+      "stages": {
+        "Pmat.out": [
+          [
+            [
+              0.09375791825,
+              -25594.81281
+            ]
+          ]
+        ],
+        "YC.out": [
+          [
+            [
+              1.431212237e-10,
+              3.907041663e-05
+            ]
+          ]
+        ]
+      },
+      "capacitance_ff_printed": 6.218,
+      "resistance_printed": 0.094
+    },
+    {
+      "name": "narrow-wire-pi2-512",
+      "frequency_hz": 1000000000.0,
+      "contacts": 1,
+      "green_table_hash": "bc7f7c4a833dc4ad",
+      "raw_cache_bytes": 63652080,
+      "raw_cache_sha256": "01f0f91cfe192f704ef856c35237fb71d72d50d79b48d71974a6582ce3cb27c4",
+      "stages": {
+        "ZC.out": [
+          [
+            [
+              1.431212237e-10,
+              3.907041663e-05
+            ]
+          ]
+        ],
+        "YM.out": [
+          [
+            [
+              0.1790936285,
+              -0.02208959359
+            ]
+          ]
+        ],
+        "Ycap.out": [
+          [
+            [
+              1.431212237e-10,
+              3.907041663e-05
+            ]
+          ]
+        ]
+      },
+      "quality_printed": [
+        "0.123",
+        "0.123",
+        "0.123"
+      ],
+      "pi_printed": [
+        "0.108",
+        "5.5",
+        "6.22",
+        "0.0938",
+        "0",
+        "1e+15",
+        "194.07"
+      ],
+      "input_impedance_printed": [
+        [
+          "5.500",
+          "0.677"
+        ],
+        [
+          "5.500",
+          "0.678"
+        ],
+        [
+          "5.500",
+          "0.678"
+        ]
+      ],
+      "shunt_printed": [
+        "5.583672 Ohms.",
+        "-nan Ohms."
+      ]
+    }
+  ]
+}
