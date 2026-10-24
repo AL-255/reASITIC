@@ -1,8 +1,9 @@
 #include "asitic/port_commands.hpp"
+#include "solver_limits.hpp"
 extern "C" int sprintf(char*,const char*,...);
 namespace {
 struct Schedule {
-    double values[101]{};int count=0,limit;bool stalled=false,exceeded=false;
+    double values[reasitic::maximum_port_samples]{};int count=0,limit;bool stalled=false,exceeded=false;
 };
 void* open(const char*,const char*,void* user){return user;}
 int finish(void*,void*){return 0;}
@@ -24,7 +25,7 @@ bool sample(asitic::PortSweepKind,const asitic::GeometryShape* const*,double fre
 // The Ground callback contract permits a bounded stop before any solver runs.
 extern "C" const char* port_frequency_schedule(double first,double last,double step,int limit){
     static char output[4096];
-    if(!__builtin_isfinite(first)||!__builtin_isfinite(last)||!__builtin_isfinite(step)||first<=0||last<first||step<=0||limit<1||limit>101)
+    if(!__builtin_isfinite(first)||!__builtin_isfinite(last)||!__builtin_isfinite(step)||first<=0||last<first||step<=0||limit<1||limit>reasitic::maximum_port_samples)
         return "{\"error\":\"Use positive finite start/stop/step frequencies, an ascending range, and a sample limit from 1 to 101\"}";
     Schedule schedule{};schedule.limit=limit;
     asitic::PortSweepSettings settings{};settings.first_frequency=first;settings.last_frequency=last;settings.frequency_step=step;

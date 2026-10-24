@@ -2,11 +2,12 @@ import createKernel from './kernel.mjs';
 import {resonancePlan,capacitorPortMatrix,capacitorPortResponse} from './self-resonance.mjs';
 import {optimizationPlan,createOptimizationCandidate,optimizationAccept} from './optimization.mjs';
 import {solverCells,meshResult} from './mesh-policy.mjs';
+import {windingIndex,filamentBudget,eddySettings,portSampleBudget} from './solver-request.mjs';
 import {portSampleSummary} from './port-sweep.mjs';
 import {validateThreePortBacking,allocateThreePortBacking} from './three-port.mjs';
 import {parseTechnology,configureKernel,generateGeometry,createGeometry,editGeometry} from './technology.mjs';
 const kernel=await createKernel();
-if(typeof kernel._max_contact_count!=='function'||typeof kernel._potential_grid_fits!=='function')throw Error('Part of the workbench is out of date. Reload to update it.');
+if(typeof kernel._max_contact_count!=='function'||typeof kernel._potential_grid_fits!=='function'||typeof kernel._solver_limits!=='function')throw Error('Part of the workbench is out of date. Reload to update it.');
 let epoch=0,processTechnology=null,hasLayout=false,currentLayout=null,optimizationKernel=null,optimizationState=null;
 function frequency(data,value=data.frequency_ghz) {
   const result=value===undefined?data.frequency:kernel._normalize_value(Number(value),5,.1,0);
@@ -23,34 +24,27 @@ function fftGrid(data,technology=processTechnology,target=kernel){
   return grid;
 }
 function solve(data,hz) {
+  const winding=windingIndex(data.winding,0,currentLayout),limit=filamentBudget(kernel,data.filament_limit),e=data.eddy?eddySettings(kernel,data.eddy,processTechnology):null;
   const selection=solverCells(kernel,data,hz,'inductance'),parsed=selection.cells;
-  let pointer;
-  if(data.eddy){
-    const e=data.eddy,layers=e.layers??processTechnology?.eddy_layers??[];
-    if(!Array.isArray(layers) || layers.length>2 || layers.some(i=>!Number.isInteger(i) || i<0))throw Error('Select up to two substrate layers.');
-    pointer=kernel._simulate_eddy(data.winding??0,hz,...parsed,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000);
-  }else pointer=kernel._simulate(data.winding??0,hz,...parsed,data.filament_limit??256);
-  const result=JSON.parse(kernel.UTF8ToString(pointer));
-  return meshResult(result,selection);
+  const pointer=e?kernel._simulate_eddy(winding,hz,...parsed,limit,e.mode,e.layers.length,e.layers[0]??0,e.layers[1]??0,e.budget):kernel._simulate(winding,hz,...parsed,limit);
+  return meshResult(JSON.parse(kernel.UTF8ToString(pointer)),selection);
 }
 function solveTransformer(data,hz){
       if(!processTechnology || !hasLayout)throw Error('Generate two windings before running CALCTRANS.');
-      const domain=processTechnology.domain,e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[],termination=Number(data.termination_ohm??0);
-      if(!Array.isArray(layers) || layers.length>2 || layers.some(i=>!Number.isInteger(i) || i<0))throw Error('Select up to two substrate layers.');
+      const domain=processTechnology.domain,e=eddySettings(kernel,data.eddy,processTechnology),layers=e.layers,termination=Number(data.termination_ohm??0);
+      const primary=windingIndex(data.primary,0,currentLayout,'primary winding'),secondary=windingIndex(data.secondary,1,currentLayout,'secondary winding'),ground=windingIndex(data.ground,-1,currentLayout,'ground winding',true),limit=filamentBudget(kernel,data.filament_limit);
       if(!Number.isFinite(termination))throw Error('Use a finite transformer termination.');
-      if(termination!==0 && (data.ground??-1)<0)throw Error('Choose an explicit ground for a nonzero CALCTRANS termination.');
+      if(termination!==0 && ground<0)throw Error('Choose an explicit ground for a nonzero CALCTRANS termination.');
       const selection=solverCells(kernel,data,hz,'network'),parsed=selection.cells;
       const resistance=data.nativeInput?kernel._normalize_value(termination,4,.1,0):termination;
-      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_transformer(data.primary??0,data.secondary??1,data.ground??-1,hz,...parsed,domain.x,domain.y,...fftGrid(data),contactBudget(data),data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,resistance,e.evaluation_limit??250000)));
+      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_transformer(primary,secondary,ground,hz,...parsed,domain.x,domain.y,...fftGrid(data),contactBudget(data),limit,e.mode,layers.length,layers[0]??0,layers[1]??0,resistance,e.budget)));
       return meshResult(result,selection);
 }
 function solveNetwork(data,hz,context,portCommand=false){
       const target=context?.kernel??kernel,technology=context?.technology??processTechnology,layout=context?.layout??currentLayout;
       const requested=data.model??'PI2';if(!['PI2','PIX','PI4'].includes(requested))throw Error('Select PI2, PIX or PI4.');
       if(!technology || (context?!layout?.shapes.length:!hasLayout))throw Error('Generate a layout before running the combined network.');
-      const winding=data.winding??0,reference=data.ground??-1;
-      if(!Number.isInteger(winding)||winding<0||!layout.shapes[winding])throw Error('Select an existing integer winding for the port model.');
-      if(!Number.isInteger(reference)||reference< -1||(reference>=0&&!layout.shapes[reference]))throw Error('Select an existing integer ground or the device reference.');
+      const winding=windingIndex(data.winding,0,layout),reference=windingIndex(data.ground,-1,layout,'ground winding',true);
       let dispatch,model=requested;
       if(portCommand&&model!=='PI4'){
         dispatch=JSON.parse(target.UTF8ToString(target._port_analysis_plan(winding,model==='PIX'?1:0)));if(dispatch.error)throw Error(dispatch.error);model=dispatch.model;
@@ -61,24 +55,22 @@ function solveNetwork(data,hz,context,portCommand=false){
       // does not perform that acquisition/reset.
       const ground=portCommand&&requested==='PI2'&&reference===-1?winding:reference;
       const pads=model==='PI4'?(data.pads??[]):[];if(model==='PI4'&&(!Array.isArray(pads)||pads.length!==2||pads.some(i=>!Number.isInteger(i)||i<0||!layout.shapes[i])))throw Error('Select valid first and second PI4 pad records.');
-      const domain=technology.domain,e=data.eddy??{},layers=e.layers??technology.eddy_layers??[];
-      if(!Array.isArray(layers) || layers.length>2 || layers.some(i=>!Number.isInteger(i) || i<0))throw Error('Select up to two substrate layers.');
+      const domain=technology.domain,e=eddySettings(target,data.eddy,technology),layers=e.layers;
       if(model==='CAP'){
         const selection=solverCells(target,{...data,mesh:data.contact_mesh??{}},hz,'capacitance');
         const cap=meshResult(JSON.parse(target.UTF8ToString(target._simulate_capacitance(winding,ground,hz,...selection.cells,domain.x,domain.y,...fftGrid(data,technology,target),contactBudget(data,target),0))),selection);
         return {...cap,...capacitorPortResponse(target,cap),capacitance_matrix:cap.matrix,dispatch};
       }
-      const selection=solverCells(target,data,hz,'network'),parsed=selection.cells;
-      const result=JSON.parse(target.UTF8ToString(solver(winding,...pads,ground,hz,...parsed,domain.x,domain.y,...fftGrid(data,technology,target),contactBudget(data,target),data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000)));
+      const limit=filamentBudget(target,data.filament_limit),selection=solverCells(target,data,hz,'network'),parsed=selection.cells;
+      const result=JSON.parse(target.UTF8ToString(solver(winding,...pads,ground,hz,...parsed,domain.x,domain.y,...fftGrid(data,technology,target),contactBudget(data,target),limit,e.mode,layers.length,layers[0]??0,layers[1]??0,e.budget)));
       const solved=meshResult(result,selection);if(dispatch)solved.dispatch=dispatch;return solved;
 }
 async function solveThreePort(data,hz,task){
       if(!processTechnology || !hasLayout)throw Error('Generate three windings before running 3PORT.');
       const indices=data.windings??[0,1,2];if(!Array.isArray(indices)||indices.length!==3||new Set(indices).size!==3||indices.some(i=>!Number.isInteger(i)||i<0||!currentLayout.shapes[i]))throw Error('Select three distinct winding records.');
-      const domain=processTechnology.domain,e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[];
-      if(!Array.isArray(layers)||layers.length>2||layers.some(i=>!Number.isInteger(i)||i<0))throw Error('Select up to two substrate layers.');
-      const selection=solverCells(kernel,data,hz,'network'),parsed=selection.cells,ground=data.ground??-1;
-      const args=[...indices,ground,hz,...parsed,domain.x,domain.y,...fftGrid(data),contactBudget(data),data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000];let result;
+      const domain=processTechnology.domain,e=eddySettings(kernel,data.eddy,processTechnology),layers=e.layers,ground=windingIndex(data.ground,-1,currentLayout,'ground winding',true),limit=filamentBudget(kernel,data.filament_limit);
+      const selection=solverCells(kernel,data,hz,'network'),parsed=selection.cells;
+      const args=[...indices,ground,hz,...parsed,domain.x,domain.y,...fftGrid(data),contactBudget(data),limit,e.mode,layers.length,layers[0]??0,layers[1]??0,e.budget];let result;
       if(data.backing){
         const h=validateThreePortBacking(data.backing),names=indices.map(i=>currentLayout.shapes[i].name),reference=currentLayout.shapes[ground<0?indices[0]:ground]?.name;
         if(JSON.stringify(h.names)!==JSON.stringify(names)||h.ground!==reference||h.frequency_hz!==hz)throw Error('Captured backing winding order, reference or frequency differs from this request.');
@@ -147,7 +139,7 @@ self.onmessage=async({data})=>{
     if(action==='network'){const result=solveNetwork(data,frequency(data));postMessage({id:data.id,network:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
     if(action==='resonance'){
       if(!processTechnology||!hasLayout)throw Error('Generate a layout before searching for self resonance.');
-      const kind=kernel._shape_kind(data.winding??0);if(kind<0)throw Error('Select a valid winding for SELFRES.');
+      const winding=windingIndex(data.winding,0,currentLayout),ground=windingIndex(data.ground,-1,currentLayout,'ground winding',true),kind=kernel._shape_kind(winding);if(kind<0)throw Error('Select a valid winding for SELFRES.');
       const fast=Boolean(data.fast_quantization);if(fast&&kind!==4)throw Error('The original FAST model for this structure faults; use the numerical SLOW search.');
       if(data.mode!==undefined&&!['single','differential'].includes(data.mode))throw Error('Select single-ended or differential SELFRES mode.');
       const settings={};for(const [key,field]of [['first','start_ghz'],['second','end_ghz'],['step','step_ghz']]){if(typeof data[field]!=='number')throw Error('Enter SELFRES start, end and step frequencies in GHz.');settings[key]=frequency(data,data[field]);}
@@ -159,7 +151,7 @@ self.onmessage=async({data})=>{
         try{
           if(kind===4){
             const domain=processTechnology.domain,selection=solverCells(kernel,{...data,mesh:data.contact_mesh??{}},hz,'capacitance');
-            const cap=meshResult(JSON.parse(kernel.UTF8ToString(kernel._simulate_capacitance(data.winding??0,data.ground??-1,hz,...selection.cells,domain.x,domain.y,...fftGrid(data),contactBudget(data),0))),selection);
+            const cap=meshResult(JSON.parse(kernel.UTF8ToString(kernel._simulate_capacitance(winding,ground,hz,...selection.cells,domain.x,domain.y,...fftGrid(data),contactBudget(data),0))),selection);
             result={name:cap.name,ground:cap.ground,frequency_hz:hz,matrix:capacitorPortMatrix(kernel,cap),mesh:cap.mesh,contacts:cap.contacts,...(cap.automatic_cells?{automatic_cells:cap.automatic_cells}:{})};
           }else result=solveNetwork({...data,model:'PI2'},hz);
         }catch(error){throw Error(`SELFRES analysis ${history.length+1} at ${hz} Hz: ${error.message}`);}
@@ -174,7 +166,7 @@ self.onmessage=async({data})=>{
       const target=data.port_kind??'network';if(!['network','transformer','three-port'].includes(target))throw Error('Select a network, transformer or three-port sweep.');
       if(!processTechnology||!hasLayout)throw Error('Generate a layout before running a port sweep.');
       const range=['start_ghz','stop_ghz','step_ghz'].map(key=>{if(typeof data[key]!=='number')throw Error('Enter start, stop and step frequencies in GHz.');return frequency(data,data[key]);});
-      const limit=data.sample_limit??101;if(!Number.isInteger(limit))throw Error('Use an integer port sample limit.');
+      const limit=portSampleBudget(kernel,data.sample_limit);
       const plan=JSON.parse(kernel.UTF8ToString(kernel._port_frequency_schedule(...range,limit)));if(plan.error)throw Error(plan.error);
       if(target==='three-port'&&data.backing&&plan.frequencies_hz.length>1)throw Error('A native-state capture is valid at one frequency. Clear the capture to sweep the numerical three-port model.');
       const solvePort=target==='three-port'?solveThreePort:target==='transformer'?solveTransformer:solveNetwork,field=target==='three-port'?'three_port':target;
@@ -191,8 +183,8 @@ self.onmessage=async({data})=>{
     }
     if(action==='capacitance'){
       if(!processTechnology)throw Error('Generate a layout before running CAP.');
-      const domain=processTechnology.domain,hz=frequency(data),selection=solverCells(kernel,data,hz,'capacitance'),parsed=selection.cells;
-      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_capacitance(data.winding??0,data.ground??-1,hz,...parsed,domain.x,domain.y,...fftGrid(data),contactBudget(data),data.unfolded?1:0)));
+      const winding=windingIndex(data.winding,0,currentLayout),ground=windingIndex(data.ground,-1,currentLayout,'ground winding',true),domain=processTechnology.domain,hz=frequency(data),selection=solverCells(kernel,data,hz,'capacitance'),parsed=selection.cells;
+      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_capacitance(winding,ground,hz,...parsed,domain.x,domain.y,...fftGrid(data),contactBudget(data),data.unfolded?1:0)));
       meshResult(result,selection);postMessage({id:data.id,capacitance:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
     }
     if(action==='simulate'){

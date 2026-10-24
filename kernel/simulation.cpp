@@ -1,5 +1,6 @@
 #include "engine.hpp"
 #include "filament_policy.hpp"
+#include "solver_limits.hpp"
 #include "eddy_runtime.hpp"
 #include "json.hpp"
 #include "asitic/shape_construction.hpp"
@@ -72,8 +73,9 @@ static const char* simulate_impl(int winding,double frequency,double length_cell
     if(winding<0 || !__builtin_isfinite(frequency) || frequency<=0 ||
        !__builtin_isfinite(length_cell) || length_cell<=0 || !__builtin_isfinite(width_cell) || width_cell<=0 ||
        !__builtin_isfinite(thickness_cell) || thickness_cell<=0 || !__builtin_isfinite(subdivision_trigger) || subdivision_trigger<=0 ||
-       filament_limit<1 || filament_limit>1024)
-        return "{\"error\":\"Use a positive frequency and mesh cells, and a filament limit from 1 to 1024\"}";
+       !reasitic::dense_solver_count_fits(filament_limit)){
+        static char error[256];sprintf(error,"{\"error\":\"Use a positive frequency and mesh cells, and a filament limit from 1 to %d\"}",reasitic::maximum_solver_filaments);return error;
+    }
     auto* source=engine.shapes;for(int i=0;source && i<winding;++i)source=source->next;
     if(!source)return "{\"error\":\"Generate a layout and select a valid winding\"}";
     if(!bounded_clone(*source,length_cell,subdivision_trigger,filament_limit))
@@ -137,6 +139,9 @@ static const char* simulate_impl(int winding,double frequency,double length_cell
     sprintf(out,"]}");return simulation_result;
 }
 
+extern "C" const char* solver_limits(){
+    static char output[256];sprintf(output,"{\"filaments\":%d,\"matrix_bytes\":%u,\"green_evaluations\":%d,\"eddy_mode\":%d,\"eddy_layers\":%d,\"port_samples\":%d}",reasitic::maximum_solver_filaments,reasitic::dense_solver_matrix_bytes,reasitic::maximum_green_evaluations,reasitic::maximum_eddy_mode,reasitic::maximum_eddy_layers,reasitic::maximum_port_samples);return output;
+}
 extern "C" const char* simulate(int winding,double frequency,double length_cell,double width_cell,double thickness_cell,double subdivision_trigger,int filament_limit) {
     return simulate_impl(winding,frequency,length_cell,width_cell,thickness_cell,subdivision_trigger,filament_limit,nullptr);
 }

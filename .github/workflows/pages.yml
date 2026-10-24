@@ -37,6 +37,8 @@ jobs:
           node tests/optimizer-startup.mjs
           node --experimental-vm-modules tests/site-package.mjs
       - run: python tools/build_native.py
+      - name: Verify integer controls before WASM conversion
+        run: node tests/worker-integer-controls.mjs
       - run: python tools/build_portable_math.py
       - name: Verify portable numerical formulation
         run: |

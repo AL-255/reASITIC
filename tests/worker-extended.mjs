@@ -15,7 +15,7 @@ try{
  result=await send({id:4,...request,eddy:{mode:1,layers:[0,1],evaluation_limit:1}});assert.match(result.error,/budget/);result=await send({id:5,...request});assert.deepEqual(result.network,expected);
  result=await send({id:6,...request,eddy:{mode:1}});assert.equal(result.network.eddy.layer_count,1);assert.ok(result.network.eddy.quadrature_status[5]>0);assert.match(result.warnings,/did not converge/);
  result=await send({id:7,...request,ground:0});assert.equal(result.network.filaments,9);result=await send({id:8,...request});assert.deepEqual(result.network,expected);
- result=await send({id:9,...request,eddy:{mode:0,layers:[99]}});assert.match(result.error,/layers/);result=await send({id:11,...request,model:'bogus'});assert.match(result.error,/PI2.*PIX/);result=await send({id:10,...request});assert.deepEqual(result.network,expected);
+ result=await send({id:9,...request,eddy:{mode:0,layers:[99]}});assert.match(result.error,/substrate layer index/);result=await send({id:11,...request,model:'bogus'});assert.match(result.error,/PI2.*PIX/);result=await send({id:10,...request});assert.deepEqual(result.network,expected);
  result=await send({id:12,action:'simulate',frequency:1e9,mesh:{length:1000,width:1000,thickness:1000,subdivision_trigger:1000}});assert.ok(!result.error,result.error);assert.equal(result.simulation.resistance,.1625);
  console.log('PIX worker: complete original solve, native inputs/layers, visible nonconvergence, self-ground isolation, rejected-budget recovery and following LMAT solve pass');
 }finally{await worker.terminate();}

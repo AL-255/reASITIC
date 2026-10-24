@@ -1,5 +1,6 @@
 #include "engine.hpp"
 #include "filament_policy.hpp"
+#include "solver_limits.hpp"
 #include "potential_grid.hpp"
 #include "json.hpp"
 #include "eddy_runtime.hpp"
@@ -36,10 +37,8 @@ namespace {
 char* output=nullptr;double total_capacitance=0,total_resistance=0;
 // The solver stores dense n-by-n complex matrices. Bound their storage,
 // independently of processor arithmetic or the native contact-selection rules.
-constexpr unsigned contact_matrix_bytes=16u*1024u*1024u;
-constexpr int contact_count_limit(){int n=0;while(static_cast<unsigned long long>(n+1)*(n+1)<=contact_matrix_bytes/sizeof(ComplexValue))++n;return n;}
-constexpr int max_contacts=contact_count_limit();
-bool contact_budget(int n){return n>=1&&static_cast<unsigned long long>(n)*n<=contact_matrix_bytes/sizeof(ComplexValue);}
+constexpr int max_contacts=reasitic::dense_solver_count_limit();
+bool contact_budget(int n){return reasitic::dense_solver_count_fits(n);}
 struct Allocation { void* pointer;Allocation* next; };
 struct Workspace {
     Allocation* allocations=nullptr;int nx,ny;unsigned matrix_request=0,matrix_backing=0;
@@ -249,8 +248,9 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
     const GeometryCommandRuntime commands{{private_geometry,0,engine.warnings,sprintf,composition_message,nullptr,nullptr},nullptr,memory,private_name_random,nullptr};
     if(network) {
         if(!__builtin_isfinite(network->length) || network->length<=0 || !__builtin_isfinite(network->width) || network->width<=0 ||
-           !__builtin_isfinite(network->thickness) || network->thickness<=0 || network->filament_limit<1 || network->filament_limit>1024)
-            return "{\"error\":\"Use positive network cells and a filament limit from 1 to 1024\"}";
+           !__builtin_isfinite(network->thickness) || network->thickness<=0 || !reasitic::dense_solver_count_fits(network->filament_limit)){
+            static char error[256];sprintf(error,"{\"error\":\"Use positive network cells and a filament limit from 1 to %d\"}",reasitic::maximum_solver_filaments);return error;
+        }
         if(!source->filaments.first || !reasitic::bounded_solver_clone(*source,network->length,length_cell,network->filament_limit))
             return "{\"error\":\"Network longitudinal mesh exceeds the selected filament budget\"}";
         const GeometryRuntime geometry{memory,engine.warnings,network_terminate,nullptr};

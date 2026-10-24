@@ -308,6 +308,15 @@ nondefault value cannot leak into a subsequent request using the default. CAP
 is independent of this inductive subdivision limit. Nondefault limits appear in
 result metadata and the displayed mesh description.
 
+The worker validates integer solver controls before WASM can truncate fractions
+or wrap large values into another winding, eddy mode or budget. Winding and
+substrate indices must refer to the current layout and technology. The C++
+`solver_limits()` export supplies the storage and work limits to JavaScript;
+the native and WASM builds share the same dense-matrix storage policy.
+`tests/worker-integer-controls.mjs` rejects 523 malformed controls across twelve
+solver, resonance and sweep paths, checks exact results after rejection, and
+verifies that requests preserve the source geometry.
+
 `tests/maxnw.mjs` checks nine repeated original LMAT matrices, including grading
 thresholds, rotated geometry and thickness subdivision. `tests/maxnw-ports.mjs`
 checks eleven full original S/Y/Z files across PI2, PIX, PI4, CALCTRANS and 3PORT.
@@ -448,6 +457,7 @@ binary64 inputs at 200 decimal digits.
 python3 -m pip install gdstk==1.0.2 mpmath==1.3.0 CairoSVG==2.9.1
 python3 tools/build.py                    # or --emxx /path/to/em++
 python3 tools/build_native.py             # GCC i386 + libc.so.6 reference audit
+node tests/worker-integer-controls.mjs
 python3 tools/build_portable_math.py       # native/WASM software-math verification
 node tests/portable-gmd.mjs
 node tests/portable-error-power.mjs

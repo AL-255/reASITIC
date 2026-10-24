@@ -1,4 +1,5 @@
 #include "eddy_runtime.hpp"
+#include "solver_limits.hpp"
 #include "runtime_math.hpp"
 #ifdef __EMSCRIPTEN__
 #include "x87_port.hpp"
@@ -42,7 +43,7 @@ namespace reasitic {
 EddyScope::EddyScope(EddySession* s):session(s),previous(active){active=s;}
 EddyScope::~EddyScope(){active=previous;free(session);}
 bool configure_eddy(EddySession& s,const EngineView& engine,int mode,int count,int first,int second,int budget) {
-    if(mode<0 || mode>2 || count<0 || count>2 || budget<1 || budget>10000000)return false;
+    if(mode<0 || mode>maximum_eddy_mode || count<0 || count>maximum_eddy_layers || budget<1 || budget>maximum_green_evaluations)return false;
     const int indices[]={first,second};for(int i=0;i<count;++i)if(indices[i]<0 || indices[i]>=engine.substrate_count || !(engine.substrate[indices[i]].resistivity>0))return false;
     s.mode=mode;s.layer_count=count;s.indices[0]=first;s.indices[1]=second;s.limit=budget;s.warnings=engine.warnings;
     s.sample_hash=s.value_hash=14695981039346656037ULL;

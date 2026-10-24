@@ -16,6 +16,7 @@ extern "C" const char* optimization_create(const char*,const double*,int);
 extern "C" const char* probe_runtime_trig(int,double);
 extern "C" const char* probe_retained_math(int,unsigned,unsigned,int);
 extern "C" const char* probe_math(int,double,double,double);
+extern "C" const char* solver_limits();
 extern "C" const char* probe_potential_contact(int,int);
 extern "C" const char* probe_two_port_output(const double*,const double*,int,double);
 extern "C" double normalize_value(double,int,double,int);
@@ -47,6 +48,7 @@ extern "C" int set_max_width_cells(int);
 extern "C" const char* edit_geometry(const char*,double,double,double,int);
 extern "C" const char* self_resonance_plan(double,double,double,int,int,int,int,const double*,int);
 extern "C" int main(int argc,char** argv,char**) {
+    if(argc==2 && __builtin_strcmp(argv[1],"--solver-limits")==0){puts(solver_limits());return 0;}
     if(argc==4 && __builtin_strcmp(argv[1],"--potential-contact")==0){puts(probe_potential_contact(atoi(argv[2]),atoi(argv[3])));return 0;}
     if(argc==6 && __builtin_strcmp(argv[1],"--fft-budget")==0){printf("%d\n",reasitic::potential_grid_fits(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),atoi(argv[5])!=0)?1:0);return 0;}
     if(argc==10 && argv[1][2]=='s') { auto* values=static_cast<double*>(calloc(102,72));auto* file=fopen(argv[9],"rb");if(!file)return 2;const int count=fread(values,72,102,file);fclose(file);puts(self_resonance_plan(strtod(argv[2],nullptr),strtod(argv[3],nullptr),strtod(argv[4],nullptr),atoi(argv[5]),atoi(argv[6]),atoi(argv[7]),atoi(argv[8]),values,count));free(values);return 0; }
