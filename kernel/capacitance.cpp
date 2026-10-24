@@ -4,6 +4,8 @@
 #include "three_history.hpp"
 #include "asitic/combined_network.hpp"
 #include "asitic/extended_twoport.hpp"
+#include "asitic/extended_analysis.hpp"
+namespace asitic { GeometryShape* prepare_pad_geometry(const GeometryShape&,const GeometryShape&,const GeometryShape&,CombinedNetworkState&,const PadDeembeddingOptions&,GeometryShape*&); }
 #include "asitic/later_analysis.hpp"
 #include "asitic/three_port_analysis.hpp"
 #include "asitic/port_output.hpp"
@@ -120,15 +122,15 @@ char* matrix_json(char* out,const ComplexMatrix& matrix) {
     out+=sprintf(out,"]");return out;
 }
 bool finite_matrix(const ComplexMatrix& m) { for(int j=0;j<m.columns;++j)for(int i=0;i<m.rows;++i){auto z=m.view().at(i,j);if(!__builtin_isfinite(z.real) || !__builtin_isfinite(z.imag))return false;}return true; }
-struct NetworkRequest { double length,width,thickness;int filament_limit;reasitic::EddySession* eddy;int secondary=-1;double termination=0;int third=-1;const ComplexValue* cap_history=nullptr;const ComplexValue* ind_history=nullptr;int history_cells=0;const unsigned* history_addresses=nullptr;bool extended=false; };
+struct NetworkRequest { double length,width,thickness;int filament_limit;reasitic::EddySession* eddy;int secondary=-1;double termination=0;int third=-1;const ComplexValue* cap_history=nullptr;const ComplexValue* ind_history=nullptr;int history_cells=0;const unsigned* history_addresses=nullptr;bool extended=false;int first_pad=-1,second_pad=-1; };
 int private_name_random(void*) { return 65; }
 void network_terminate(int,void*) { abort(); }
 struct NetworkSnapshots {
-    SolverMemory memory;ComplexMatrix capacitance{},inductance{},node_capacitance{},system_before{},system_after{},currents{},voltages{};
+    SolverMemory memory;ComplexMatrix capacitance{},inductance{},node_capacitance{},system_before{},system_after{},currents{},voltages{},pads{},with_pads{};
     static void record(const char* name,const ComplexMatrix& matrix,void* user) {
         auto& s=*static_cast<NetworkSnapshots*>(user);
-        if(!((name[0]=='Z' && name[1]=='C') || (name[0]=='Y' && name[1]=='M') || name[0]=='c' || name[0]=='v'))return;
-        auto& copy=name[0]=='c'?s.currents:name[0]=='v'?s.voltages:name[0]=='Z'?s.capacitance:s.inductance;
+        if(!((name[0]=='Z' && name[1]=='C') || (name[0]=='Y' && name[1]=='M') || name[0]=='c' || name[0]=='v' || name[0]=='P' || name[0]=='W'))return;
+        auto& copy=name[0]=='P'?s.pads:name[0]=='W'?s.with_pads:name[0]=='c'?s.currents:name[0]=='v'?s.voltages:name[0]=='Z'?s.capacitance:s.inductance;
         copy=matrix;copy.stride=copy.rows;copy.vector_reference=copy.matrix_reference=0;
         copy.data=static_cast<ComplexValue*>(s.memory.arrays.get(matrix.rows*matrix.columns*16u));
         for(int j=0;j<matrix.columns;++j)for(int i=0;i<matrix.rows;++i)copy.view().at(i,j)=matrix.view().at(i,j);
@@ -190,6 +192,13 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         if(!third || third==source || third==secondary)return "{\"error\":\"Select three distinct winding records\"}";
         if(source && (!three_name_admissible(*source,engine.shapes) || !three_name_admissible(*secondary,engine.shapes) || !three_name_admissible(*third,engine.shapes)))return "{\"error\":\"Original three-port temporary names collide with the layout\"}";
     }
+    const bool padbed=network && network->first_pad>=0;GeometryShape* pad1=nullptr;GeometryShape* pad2=nullptr;
+    if(padbed){
+        pad1=engine.shapes;for(int i=0;pad1 && i<network->first_pad;++i)pad1=pad1->next;
+        pad2=engine.shapes;for(int i=0;pad2 && i<network->second_pad;++i)pad2=pad2->next;
+        if(!pad1 || !pad2)return "{\"error\":\"Select valid first and second pad records\"}";
+        GeometryShape* pad_shapes[]={pad1,pad2};for(auto* shape:pad_shapes){int n=0;while(reinterpret_cast<const char*>(shape)[n] && n<78)++n;if(n>=78)return "{\"error\":\"Native PI4 pad temporary names exceed their safe capacity\"}";}
+    }
     if(!source || !reference)return "{\"error\":\"Select a valid device and ground winding\"}";
     if(three && !same_name(*source,*reference) && (!network->cap_history || !network->ind_history || network->history_cells<1))return "{\"error\":\"Native separate-reference three-port results depend on out-of-bounds matrix backing; captured backing is required for exact comparison\"}";
     if(three && (network->history_cells<0 || network->history_cells>512*512))return "{\"error\":\"Invalid three-port backing size\"}";
@@ -207,7 +216,11 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
     // main mesh counts to -1/-1. Apply that exact acquisition step to a private
     // clone, so repeated solves leave the user's source geometry intact.
     if(ground>=0) { const bool identical=source==reference,second_identical=secondary==reference,third_identical=third==reference;reference=clone_for_ground(*reference,memory);if(identical)source=reference;if(second_identical)secondary=reference;if(third_identical)third=reference; }
-    const auto* original_source=source;const auto* original_secondary=secondary;const auto* original_third=third;const auto* original_reference=reference;GeometryShape* preview_head=nullptr;int network_filaments=0,boundary=0,second_boundary=0;unsigned node_count=0;
+    if(padbed){
+        GeometryShape* pads[]={pad1,pad2};
+        for(auto* pad:pads){auto* copy=clone_for_ground(*pad,memory);if(source==pad)source=copy;if(reference==pad)reference=copy;if(pad1==pad)pad1=copy;if(pad2==pad)pad2=copy;}
+    }
+    const auto* original_source=source;const auto* original_secondary=secondary;const auto* original_third=third;const auto* original_reference=reference;GeometryShape* preview_head=nullptr;int network_filaments=0,boundary=0,second_boundary=0;unsigned node_count=0;GeometryShape* pads_preview=nullptr;int pad_contacts=0,pad_groups=0;
     char composition_message[1024];const GeometryRuntime private_geometry{memory,engine.warnings,network_terminate,nullptr};
     const GeometryTechnology composition_technology{engine.metals,engine.vias,engine.metal_heights,engine.metal_count};
     const GeometryCommandRuntime commands{{private_geometry,0,engine.warnings,sprintf,composition_message,nullptr,nullptr},nullptr,memory,private_name_random,nullptr};
@@ -218,7 +231,13 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         if(!source->filaments.first || !reasitic::bounded_solver_clone(*source,network->length,length_cell,network->filament_limit))
             return "{\"error\":\"Network longitudinal mesh exceeds the selected filament budget\"}";
         const GeometryRuntime geometry{memory,engine.warnings,network_terminate,nullptr};
-        if(three) {
+        if(padbed){
+            const GeometryShape* pad_shapes[]={pad1,pad2};for(auto* pad:pad_shapes)if(!pad->filaments.first || !reasitic::bounded_solver_clone(*pad,network->length,length_cell,network->filament_limit))return "{\"error\":\"Pad longitudinal mesh exceeds the selected filament budget\"}";
+            CombinedNetworkState preview{};preview.shapes=engine.shapes;PadDeembeddingOptions preparation{};preparation.technology=composition_technology;preparation.commands=commands;preparation.combined.discretization={network->length,length_cell};
+            auto* joined=prepare_pad_geometry(*source,*pad1,*pad2,preview,preparation,pads_preview);
+            if(!reasitic::bounded_solver_clone(*joined,network->length,length_cell,network->filament_limit))return "{\"error\":\"Device with pads exceeds the longitudinal filament budget\"}";
+            source=clone_geometry_shape(preview.shapes,*joined,{network->length,length_cell},geometry);
+        }else if(three) {
             const GeometryShape* other_shapes[]={secondary,third};for(auto* shape:other_shapes)if(!shape->filaments.first || !reasitic::bounded_solver_clone(*shape,network->length,length_cell,network->filament_limit))return "{\"error\":\"Three-port longitudinal mesh exceeds the selected filament budget\"}";
             ThreePortAnalysisState preview{};ThreePortAnalysisOptions preparation{};preparation.discretization={network->length,length_cell};preparation.technology=composition_technology;preparation.commands=commands;
             source=prepare_three_port_geometry(*source,*secondary,*third,*reference,preview,preparation,boundary,second_boundary,node_count);
@@ -256,6 +275,15 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
     for(auto* g=state.groups;g;g=g->next)for(auto* c=g->first;c;c=reinterpret_cast<PotentialContact*>(c->next_address))
         if(c->x0<0 || c->x1>nx || c->y0<0 || c->y1>ny || c->x0>=c->x1 || c->y0>=c->y1)return "{\"error\":\"A contact collapses on the FFT grid or crosses its boundary; use a finer FFT grid or move/widen the conductor\"}";
     release_potential_contacts(state.groups,memory);
+    if(padbed){
+        if(!admissible(*pads_preview,contacts,contact_limit,pad_contacts,pad_groups,memory,engine.warnings) ||
+           (!same_name(*pads_preview,*reference) && !admissible(*reference,contacts,contact_limit,pad_contacts,pad_groups,memory,engine.warnings)))return "{\"error\":\"Pads-only contact mesh exceeds its budget or is degenerate\"}";
+        int reference_groups=0;if(!same_name(*pads_preview,*reference))for(auto* s=reference->filaments.first;s;s=next(s))++reference_groups;
+        if(pad_groups-reference_groups<2)return "{\"error\":\"Original PI4 pad subtraction requires at least two folded pad groups\"}";
+        if(!prepare_potential_contacts(pads_preview->filaments,reference->filaments,state.groups,contacts,memory,{},engine.warnings))return "{\"error\":\"Original pads-only contact builder rejected the geometry\"}";
+        for(auto* g=state.groups;g;g=g->next)for(auto* c=g->first;c;c=reinterpret_cast<PotentialContact*>(c->next_address))if(c->x0<0 || c->x1>nx || c->y0<0 || c->y1>ny || c->x0>=c->x1 || c->y0>=c->y1)return "{\"error\":\"A pads-only contact collapses on the FFT grid or crosses its boundary\"}";
+        release_potential_contacts(state.groups,memory);
+    }
     if(!allocate_potential_cache(state.cache,nx,ny,engine.metal_count,memory,engine.warnings))return "{\"error\":\"Could not allocate original Green tables\"}";
     Snapshots snapshots{memory};const PotentialCacheRuntime runtime{{no_open,no_read,no_write,no_close,sprintf,nullptr},"","",engine.warnings,engine.warnings};
     PotentialCapacitanceOptions options{contacts,{engine.substrate,engine.substrate_count,engine.metals,engine.metal_count},depths,runtime,true,true,Snapshots::record,&snapshots,{}};
@@ -269,7 +297,10 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
             {true,sprintf,engine.warnings,NetworkSnapshots::record_nodes,&intermediate},engine.warnings,false,false,NetworkSnapshots::record,&intermediate,{}};
         const GeometryRuntime geometry{memory,engine.warnings,network_terminate,nullptr};
         bool ok;
-        if(network->extended) {
+        if(padbed){
+            combined.shapes=engine.shapes;const PadDeembeddingOptions pad_options{composition_technology,commands,network_options,false,{}};
+            ok=solve_pad_deembedded_network(*original_source,*pad1,*pad2,*original_reference,frequency,combined,pad_options);
+        }else if(network->extended) {
             ExtendedTwoPortState extended{};extended.network.capacitance=state;
             const ExtendedTwoPortOptions extended_options{network_options,{frequency,true,sprintf,nullptr,engine.warnings,NetworkSnapshots::record,&intermediate,nullptr},geometry,nullptr,sprintf,nullptr,nullptr};
             ok=solve_extended_twoport_network(*original_source,*reference,frequency,extended,extended_options);combined=extended.network;
@@ -308,14 +339,16 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         }else ok=solve_combined_network(*original_source,*reference,frequency,combined,network_options,geometry);
         if(network->eddy->exceeded)return "{\"error\":\"Network eddy evaluation budget exceeded\"}";
         if(network->extended && (!finite_matrix(intermediate.currents) || !finite_matrix(intermediate.voltages)))return "{\"error\":\"Original extended node equations produced nonfinite vectors\"}";
+        if(padbed && (intermediate.pads.rows<2 || !finite_matrix(intermediate.pads) || !finite_matrix(intermediate.with_pads)))return "{\"error\":\"Original pad deembedding did not produce finite stage matrices\"}";
         const auto& y=transformer?coupled.ports:combined.ports;const ComplexValue ports[]={y.y11,y.y12,y.y21,y.y22};
         if(!ok || !finite_matrix(intermediate.capacitance) || !finite_matrix(intermediate.inductance))return "{\"error\":\"Original combined solver did not produce finite matrices\"}";
         for(const auto z:ports)if(!__builtin_isfinite(z.real) || !__builtin_isfinite(z.imag))return "{\"error\":\"Original node equations produced nonfinite admittance\"}";
-        const unsigned capacity=64u*(intermediate.capacitance.elements+intermediate.inductance.elements+intermediate.node_capacitance.elements+intermediate.currents.rows*intermediate.currents.columns+intermediate.voltages.rows*intermediate.voltages.columns)+16384u;
+        const unsigned capacity=64u*(intermediate.capacitance.elements+intermediate.inductance.elements+intermediate.node_capacitance.elements+intermediate.currents.rows*intermediate.currents.columns+intermediate.voltages.rows*intermediate.voltages.columns+intermediate.pads.elements+intermediate.with_pads.elements)+16384u;
         output=static_cast<char*>(calloc(1,capacity));if(!output)return "{\"error\":\"Unable to allocate network output\"}";char* out=output;
         out+=sprintf(out,"{\"name\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_source));out+=sprintf(out,",\"ground\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_reference));
+        if(padbed){out+=sprintf(out,",\"model\":\"PI4\",\"pads\":[");out=reasitic::json_string(out,reinterpret_cast<const char*>(pad1));out+=sprintf(out,",");out=reasitic::json_string(out,reinterpret_cast<const char*>(pad2));out+=sprintf(out,"],\"pad_contacts\":%d",pad_contacts);}
         if(transformer){out+=sprintf(out,",\"secondary\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_secondary));out+=sprintf(out,",\"termination_ohm\":%.17g,\"boundary\":%d",network->termination,boundary);}
-        out+=sprintf(out,",\"frequency_hz\":%.17g,\"contacts\":%d,\"groups\":%d,\"filaments\":%d,\"mesh\":{\"length\":%.17g,\"width\":%.17g,\"thickness\":%.17g,\"contact_length\":%.17g,\"contact_width\":%.17g,\"chip_x\":%.17g,\"chip_y\":%.17g,\"fft_x\":%d,\"fft_y\":%d},\"matrix\":[[",frequency,snapshots.contacts,expected_groups,network_filaments,network->length,network->width,network->thickness,length_cell,width_cell,chip_x,chip_y,nx,ny);
+        out+=sprintf(out,",\"frequency_hz\":%.17g,\"contacts\":%d,\"groups\":%d,\"filaments\":%d,\"mesh\":{\"length\":%.17g,\"width\":%.17g,\"thickness\":%.17g,\"contact_length\":%.17g,\"contact_width\":%.17g,\"chip_x\":%.17g,\"chip_y\":%.17g,\"fft_x\":%d,\"fft_y\":%d},\"matrix\":[[",frequency,padbed?count:snapshots.contacts,expected_groups,network_filaments,network->length,network->width,network->thickness,length_cell,width_cell,chip_x,chip_y,nx,ny);
         out=complex_json(out,y.y11);out+=sprintf(out,",");out=complex_json(out,y.y12);out+=sprintf(out,"],[");out=complex_json(out,y.y21);out+=sprintf(out,",");out=complex_json(out,y.y22);out+=sprintf(out,"]]");
         if(transformer){
             out+=sprintf(out,",\"transformer\":{");
@@ -333,6 +366,7 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         out+=sprintf(out,",\"input_impedance\":[");out=complex_json(out,two_port_impedance(y,false,1));out+=sprintf(out,",");out=complex_json(out,two_port_impedance(y,false,2));out+=sprintf(out,",");out=complex_json(out,two_port_impedance(y,true,1));out+=sprintf(out,"],\"eddy\":");out=reasitic::eddy_metadata(out,*network->eddy);
         out+=sprintf(out,",\"capacitance_matrix\":");out=matrix_json(out,intermediate.capacitance);out+=sprintf(out,network->extended?",\"inductance_impedance_matrix\":":",\"inductance_admittance_matrix\":");out=matrix_json(out,intermediate.inductance);
         if(network->extended){out+=sprintf(out,",\"model\":\"PIX\",\"currents\":");out=matrix_json(out,intermediate.currents);out+=sprintf(out,",\"voltages\":");out=matrix_json(out,intermediate.voltages);}else {out+=sprintf(out,",\"node_capacitance_matrix\":");out=matrix_json(out,intermediate.node_capacitance);}
+        if(padbed){out+=sprintf(out,",\"pad_capacitance_matrix\":");out=matrix_json(out,intermediate.pads);out+=sprintf(out,",\"with_pad_admittance_matrix\":");out=matrix_json(out,intermediate.with_pads);}
         sprintf(out,",\"green_table_hash\":\"%016llx\"}",table_hash(transformer?coupled.capacitance.cache:combined.capacitance.cache,nx,ny,pairs));return output;
     }
     ComplexMatrix matrix{};total_capacitance=total_resistance=__builtin_nan("");
@@ -364,6 +398,16 @@ extern "C" const char* simulate_extended_network(int winding,int ground,double f
     reasitic::EddyScope scope(session);reasitic::clear_diagnostics();
     if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid network eddy mode, layers or evaluation budget\"}";
     NetworkRequest request{length_cell,width_cell,thickness_cell,filament_limit,session};request.extended=true;
+    return simulate_capacitance_impl(winding,ground,frequency,contact_length,contact_width,chip_x,chip_y,nx,ny,contact_limit,0,&request);
+}
+
+extern "C" const char* simulate_pad_network(int winding,int first_pad,int second_pad,int ground,double frequency,double length_cell,double width_cell,double thickness_cell,double contact_length,double contact_width,
+    double chip_x,double chip_y,int nx,int ny,int contact_limit,int filament_limit,int mode,int count,int first,int second,int budget) {
+    if(first_pad<0 || second_pad<0)return "{\"error\":\"Select valid pad records\"}";
+    auto* session=static_cast<reasitic::EddySession*>(calloc(1,sizeof(reasitic::EddySession)));if(!session)return "{\"error\":\"Unable to allocate network eddy workspace\"}";
+    reasitic::EddyScope scope(session);reasitic::clear_diagnostics();
+    if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid network eddy mode, layers or evaluation budget\"}";
+    NetworkRequest request{length_cell,width_cell,thickness_cell,filament_limit,session};request.first_pad=first_pad;request.second_pad=second_pad;
     return simulate_capacitance_impl(winding,ground,frequency,contact_length,contact_width,chip_x,chip_y,nx,ny,contact_limit,0,&request);
 }
 

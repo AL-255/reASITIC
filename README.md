@@ -29,7 +29,8 @@ and permittivity. The original eddy Green kernels, QUADPACK integration and
 matrix stamping are integrated. PI2 combines the original capacitance, inductance
 and node-equation solvers into a two-port admittance matrix and pi model.
 CALCTRANS adds original coupled-winding narrowband simulation. PIX adds the
-original extended two-port node system. Pad deembedding and two-port S-parameter/sweep integration remain outstanding.
+original extended two-port node system. PI4 pad deembedding is available under validation, with measured WASM rounding
+differences. Two-port S-parameter/sweep integration remains outstanding.
 Original 3PORT provides three-winding models and S/Y/Z conversion. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
@@ -51,6 +52,10 @@ node tests/eddy.mjs
 node tests/eddy-runtime.mjs
 node tests/eddy-lifecycle.mjs
 node tests/worker-eddy.mjs
+node tests/pad.mjs
+node tests/pad-lifecycle.mjs
+node tests/worker-pad.mjs
+node tests/pad-rounding.mjs
 node tests/extended.mjs
 node tests/extended-lifecycle.mjs
 node tests/worker-extended.mjs
@@ -256,7 +261,35 @@ cover admittance, pi fields, reduced capacitance/impedance and both vectors.
 `tools/capture_extended.py` repeats native commands and read-only GDB captures
 in fresh processes; it does not change numerical memory or registers. Admission,
 eddy recovery, alternating PI2/CAP/PIX solves and bounded repeated allocations
-are regression gates. Pad deembedding remains to be exposed.
+are regression gates.
+
+The PI4 selector calls `simulate_pad_network(device, first_pad, second_pad,
+ground, ...)`, followed by the same frequency/mesh/technology/budget arguments
+as `simulate_network`. It executes the original pad copies, device subdivision,
+joins, combined solve, pads-only solve and binary64 pad subtraction. Each pad
+uses original type-8 -1/-1 main mesh acquisition. Both mesh stages are admitted
+before the original caller, which ignores inner failure returns and can otherwise
+dereference a missing matrix. Private source records remain immutable.
+The response includes final admittance/pi metrics, the combined capacitance and
+inductance/node matrices, pads-only capacitance and pre-subtraction admittance.
+Omitted ground retains the device reference; explicit self-ground additionally
+resets its mesh. Negative native metrics are retained.
+
+**PI4 is not yet verified identical in WASM.** Fourteen repeated original cases
+include seven exact raw WASM comparisons, four finite WASM rounding discrepancies
+and three native nonfinite outputs (reported as errors). The x87 recovered source
+matches all finite raw executable observations. The new discrepancies first appear
+in filament inductance; both offset-pad eddy sample/value traces match x87 exactly.
+One mutual-inductance pair was traced to FLDLN2/FYL2X input binary80 words
+`9061ddd199f3f5ef:3fee`: the software result ends in `c1a8dc2e`, hardware in
+`c1a8dc2f`. A direct binary64 log store agrees, but subsequent cancellation exposes
+the retained difference. `probe_retained_math` and `tests/pad-rounding.mjs`
+reproduce this instruction input without substituting captured outputs.
+`tools/capture_pad.py` captures both solve stages, inner/final admittances and
+pi fields through read-only GDB observations in two fresh processes per case.
+`node tests/pad.mjs --strict` and `node tests/pad-rounding.mjs --strict` deliberately
+fail while these differences remain. The normal audit records known differences
+and rejects any unclassified case; it is not a full-goal completion gate.
 
 The coupled-winding panel runs the original CALCTRANS backend and extracts its
 narrowband transformer model: primary/secondary L and R, mutual inductance,
@@ -371,8 +404,8 @@ unwritten parser/history and mesh words use explicit zero initial state, rather
 than claiming process-independent parity for uninitialized bytes.
 
 Next required work includes resolving the measured hardware rounding differences,
-broader original-executable creator/input coverage, extended/deembedded network
-solvers, native two-port S-parameter conversion and port sweeps, and original-executable end-to-end
+broader original-executable creator/input coverage, exact PI4 fidelity,
+native two-port S-parameter conversion and port sweeps, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.
 

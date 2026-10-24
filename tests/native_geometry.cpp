@@ -6,6 +6,7 @@ extern "C" const char* simulate_capacitance(int,int,double,double,double,double,
 extern "C" void finalize_technology();
 extern "C" const char* analyze(double);
 extern "C" const char* probe_runtime_trig(int,double);
+extern "C" const char* probe_retained_math(int,unsigned,unsigned,int);
 extern "C" const char* probe_math(int,double,double,double);
 extern "C" double normalize_value(double,int,double,int);
 extern "C" int printf(const char*,...);
@@ -13,6 +14,7 @@ extern "C" const char* probe_green(int,int,int,double,double,double,double,int);
 extern "C" const char* simulate_eddy(int,double,double,double,double,double,int,int,int,int,int,int);
 extern "C" const char* simulate_network(int,int,double,double,double,double,double,double,double,double,int,int,int,int,int,int,int,int,int);
 extern "C" const char* simulate_extended_network(int,int,double,double,double,double,double,double,double,double,int,int,int,int,int,int,int,int,int);
+extern "C" const char* simulate_pad_network(int,int,int,int,double,double,double,double,double,double,double,double,int,int,int,int,int,int,int,int,int);
 extern "C" const char* simulate_transformer(int,int,int,double,double,double,double,double,double,double,double,int,int,int,int,int,int,int,int,double,int);
 extern "C" const char* simulate_three_port(int,int,int,int,double,double,double,double,double,double,double,double,int,int,int,int,int,int,int,int,int);
 extern "C" const char* probe_three_port(int,int,int,int,double,double,double,double,double,double,double,double,int,int,int,int,int,int,int,int,int,const void*,const void*,int,const unsigned*);
@@ -31,6 +33,7 @@ extern "C" int puts(const char*);
 extern "C" int atoi(const char*);
 extern "C" int main(int argc,char** argv,char**) {
     if(argc==4 && argv[1][2]=='t'){puts(probe_runtime_trig(atoi(argv[2]),strtod(argv[3],nullptr)));return 0;}
+    if(argc==6 && argv[1][2]=='x'){puts(probe_retained_math(atoi(argv[2]),static_cast<unsigned>(strtod(argv[3],nullptr)),static_cast<unsigned>(strtod(argv[4],nullptr)),atoi(argv[5])));return 0;}
     if(argc==6 && argv[1][0]=='-' && argv[1][2]=='i') { printf("%.17g\n",normalize_value(strtod(argv[2],nullptr),atoi(argv[3]),strtod(argv[4],nullptr),atoi(argv[5])));return 0; }
     if(argc==6 && argv[1][0]=='-') { puts(probe_math(atoi(argv[2]),strtod(argv[3],nullptr),strtod(argv[4],nullptr),strtod(argv[5],nullptr)));return 0; }
     if(argc!=26 && argc!=22 && argc!=10 && argc!=12 && argc!=7 && argc!=14 && argc!=15 && argc!=19 && argc!=20 && argc!=21 && argc!=23)return 2;
@@ -45,6 +48,13 @@ extern "C" int main(int argc,char** argv,char**) {
         puts(simulate_capacitance(ground?1:0,ground?0:-1,strtod(argv[6],nullptr),strtod(argv[7],nullptr),strtod(argv[8],nullptr),512,512,atoi(argv[9]),atoi(argv[10]),512,atoi(argv[11])));return 0;
     }
     if(argc==10 && argv[1][2]=='g') { puts(probe_green(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),strtod(argv[5],nullptr),strtod(argv[6],nullptr),strtod(argv[7],nullptr),strtod(argv[8],nullptr),atoi(argv[9])));return 0; }
+    if(argc==22 && argv[1][2]=='p') {
+        create_geometry(atoi(argv[2]),argv[3],"",512,512,128,128,.1,1,0);create_geometry(atoi(argv[4]),argv[5],"",512,512,128,128,.1,1,1);create_geometry(atoi(argv[6]),argv[7],"",512,512,128,128,.1,1,1);
+        int device=2,pad1=1,pad2=0,ground=-1;
+        if(argv[8][0]=='@')ground=argv[8][1]=='1'?pad1:argv[8][1]=='2'?pad2:device;
+        else if(*argv[8]){create_geometry(2,argv[8],"",512,512,128,128,.1,1,1);++device;++pad1;++pad2;ground=0;}
+        puts(simulate_pad_network(device,pad1,pad2,ground,strtod(argv[9],nullptr),strtod(argv[10],nullptr),strtod(argv[11],nullptr),strtod(argv[12],nullptr),strtod(argv[13],nullptr),strtod(argv[14],nullptr),512,512,atoi(argv[15]),atoi(argv[16]),512,1024,atoi(argv[17]),atoi(argv[18]),atoi(argv[19]),atoi(argv[20]),atoi(argv[21])));return 0;
+    }
     if((argc==22 || argc==26) && argv[1][0]=='-') {
         create_geometry(atoi(argv[2]),argv[3],"",512,512,128,128,.1,1,0);create_geometry(atoi(argv[4]),argv[5],"",512,512,128,128,.1,1,1);create_geometry(atoi(argv[6]),argv[7],"",512,512,128,128,.1,1,1);
         int first=2,second=1,third=0,ground=-1;

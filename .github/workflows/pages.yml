@@ -48,6 +48,9 @@ jobs:
           node tests/eddy-runtime.mjs
           node tests/eddy-lifecycle.mjs
           node tests/worker-eddy.mjs
+          node tests/pad.mjs
+          node tests/pad-lifecycle.mjs
+          node tests/worker-pad.mjs
           node tests/extended.mjs
           node tests/extended-lifecycle.mjs
           node tests/worker-extended.mjs
@@ -73,8 +76,10 @@ jobs:
           node tests/simulation-data.mjs
           node tests/retained-math.mjs
           python tests/gds_reader.py
-      - name: Record unresolved hardware error-power rounding differences
-        run: node tests/eddy-math-diagnostics.mjs
+      - name: Record unresolved hardware rounding differences
+        run: |
+          node tests/eddy-math-diagnostics.mjs
+          node tests/pad-rounding.mjs
       - name: Retain fidelity evidence, including known x87 differences
         if: always()
         uses: actions/upload-artifact@v4

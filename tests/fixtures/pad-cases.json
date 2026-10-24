@@ -1,0 +1,520 @@
+{
+  "cases": [
+    {
+      "name": "wire-distinct-ground",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "wire-default",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+        }
+      ],
+      "ground": "",
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "wire-self-ground",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+        }
+      ],
+      "ground": "@self",
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "wire-low-frequency",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 0.1,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "wire-high-frequency",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 10,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "wire-subdivision",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        32,
+        32
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        40,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        40,
+        20
+      ],
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "wire-cross-section",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        10,
+        0.25
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "wire-two-layer",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 1,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "wire-reflection",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 1,
+      "layers": [
+        0
+      ]
+    },
+    {
+      "name": "square-device",
+      "device": {
+        "id": 0,
+        "keywords": "NAME=A:LEN=200:WID=220:W=32:S=16:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=320:YORG=100"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        32,
+        32
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "asymmetric-pads",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=80:WID=48:METAL=M3:XORG=250:YORG=180:ORIENT=15"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        32,
+        32
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "multisegment-pad",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 0,
+          "keywords": "NAME=P1:LEN=160:WID=160:W=32:S=16:N=1:METAL=M1:EXIT=M2:XORG=40:YORG=40"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        32,
+        32
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "offset-pads-two-layer",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=200"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=200"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 1,
+      "layers": [
+        0,
+        1
+      ]
+    },
+    {
+      "name": "offset-pads-reflection",
+      "device": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "pads": [
+        {
+          "id": 2,
+          "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=200"
+        },
+        {
+          "id": 2,
+          "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=200"
+        }
+      ],
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1,
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "eddy_mode": 1,
+      "layers": [
+        0
+      ]
+    }
+  ]
+}
