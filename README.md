@@ -159,6 +159,16 @@ then consume these stable branches. Returned `pi_shunts` records the values
 actually used: the rounded port matrix can lose conductances that the shunt
 calculation retains. Historical arithmetic mode keeps the original extraction.
 
+PIX also computes its shunts from a common-mode drive, using its midpoint
+voltage/current averaging model. Current conservation eliminates the chain
+currents before solving for internal voltage changes and one endpoint current:
+the common-mode system has `n` unknowns instead of the original `2n+2`.
+The same 128-bit software arithmetic is used. For a single segment, the midpoint
+capacitor splits equally between endpoints; cancelling the impedance
+symbolically preserves components even when their magnitudes differ by hundreds
+of bits. PIX port matrices and saved current/voltage snapshots retain their
+original solver path, and historical mode retains the original pi extraction.
+
 `tests/portable-pi-shunts.mjs` checks an exact rational RC circuit whose shunt
 conductance disappears entirely when rounded port entries are added, plus
 one-segment and zero-capacitance limits, invalid/singular inputs and recovery.
@@ -168,6 +178,13 @@ pi, impedance and resonance metrics. All 23 finite cases also compare the
 same C++ common-mode solve in native and WASM builds bit for bit; three original
 nonfinite cases retain their rejection. The largest circuit-metric relative
 error in these cases fell from about `3.7e-7` to below `5.2e-12`.
+`tests/portable-extended.mjs` checks another 13 PIX cases, including width
+subdivision, against an independent 80-digit current-elimination reference for
+the complete port matrix, saved currents/voltages, pi metrics, input impedance
+and resonance. Common-mode shunts match bit for bit in native and WASM builds.
+The worst metric error in these cases fell from `3.7e-7` to below `1.5e-11`.
+`tests/portable-extended-shunts.mjs` adds exact midpoint-circuit limits, a
+400-bit component magnitude range, impedance independence and error recovery.
 
 The primary numerical checks compare the same C++ implementation compiled for a
 native host and WASM against independent mpmath references: 203 geometric-mean
@@ -198,9 +215,11 @@ python3 tools/build_portable_math.py       # native/WASM software-math verificat
 node tests/portable-gmd.mjs
 node tests/portable-error-power.mjs
 node tests/portable-pi-shunts.mjs
+node tests/portable-extended-shunts.mjs
 node tests/portable-simulation.mjs
 node tests/portable-pad.mjs
 node tests/portable-two-port.mjs
+node tests/portable-extended.mjs
 node tests/two-port-output.mjs
 node tests/port-schedule.mjs
 node tests/self-resonance-plan.mjs

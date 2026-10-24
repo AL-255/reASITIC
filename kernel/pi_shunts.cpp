@@ -45,6 +45,28 @@ struct Values {
     Complex& operator[](int i){return data[i];}
 };
 bool finite(const double* values,int n,int stride){if(!values||stride<n)return false;for(int j=0;j<n;++j)for(int i=0;i<2*n;++i)if(!__builtin_isfinite(values[2*j*stride+i]))return false;return true;}
+bool store(Context& c,const Complex& far,const Complex& near,reasitic::PiShunts& out){
+    const reasitic::PiShunts result{far.real.rounded(),far.imag.rounded(),near.real.rounded(),near.imag.rounded()};
+    const double values[]={result.first_real,result.first_imag,result.second_real,result.second_imag};
+    if(c.status&(BF_ST_MEM_ERROR|BF_ST_INVALID_OP|BF_ST_DIVIDE_ZERO|BF_ST_OVERFLOW))return false;
+    for(double value:values)if(!__builtin_isfinite(value))return false;
+    out=result;return true;
+}
+
+bool solve(Values& a,Values& rhs,Complex* solution,int m){
+    // Partial-pivot elimination with 128 bits of software guard precision.
+    // No host transcendental or floating-point control mode is used.
+    for(int k=0;k<m;++k){
+        int pivot=k;auto largest=norm(a[k*m+k]);
+        for(int i=k+1;i<m;++i){auto candidate=norm(a[i*m+k]);if(bf_cmp_lt(&largest.value,&candidate.value)){largest=candidate;pivot=i;}}
+        if(bf_is_zero(&largest.value)||bf_is_nan(&largest.value))return false;
+        if(pivot!=k){for(int j=k;j<m;++j){const auto saved=a[k*m+j];a[k*m+j]=a[pivot*m+j];a[pivot*m+j]=saved;}const auto saved=rhs[k];rhs[k]=rhs[pivot];rhs[pivot]=saved;}
+        for(int i=k+1;i<m;++i){const auto factor=a[i*m+k]/a[k*m+k];for(int j=k+1;j<m;++j)a[i*m+j]=a[i*m+j]-factor*a[k*m+j];rhs[i]=rhs[i]-factor*rhs[k];}
+    }
+    for(int i=m-1;i>=0;--i){auto value=rhs[i];for(int j=i+1;j<m;++j)value=value-a[i*m+j]*solution[j];solution[i]=value/a[i*m+i];}
+    return true;
+}
+
 }
 namespace reasitic {
 bool common_mode_shunts(const double* cap,const double* ind,int n,int cap_stride,int ind_stride,
@@ -67,31 +89,64 @@ bool common_mode_shunts(const double* cap,const double* ind,int n,int cap_stride
             a[(i-1)*m+j-1]=capacitance+(Y(i,j)-Y(i-1,j))-(Y(i,j-1)-Y(i-1,j-1));
         }
     }
-    // Partial-pivot elimination with 128 bits of software guard precision.
-    // No host transcendental or floating-point control mode is used.
-    for(int k=0;k<m;++k){
-        int pivot=k;auto largest=norm(a[k*m+k]);
-        for(int i=k+1;i<m;++i){auto candidate=norm(a[i*m+k]);if(bf_cmp_lt(&largest.value,&candidate.value)){largest=candidate;pivot=i;}}
-        if(bf_is_zero(&largest.value)||bf_is_nan(&largest.value))return false;
-        if(pivot!=k){for(int j=k;j<m;++j){const auto saved=a[k*m+j];a[k*m+j]=a[pivot*m+j];a[pivot*m+j]=saved;}const auto saved=rhs[k];rhs[k]=rhs[pivot];rhs[pivot]=saved;}
-        for(int i=k+1;i<m;++i){const auto factor=a[i*m+k]/a[k*m+k];for(int j=k+1;j<m;++j)a[i*m+j]=a[i*m+j]-factor*a[k*m+j];rhs[i]=rhs[i]-factor*rhs[k];}
-    }
-    for(int i=m-1;i>=0;--i){auto value=rhs[i];for(int j=i+1;j<m;++j)value=value-a[i*m+j]*delta[j+1];delta[i+1]=value/a[i*m+i];}
+    if(!solve(a,rhs,delta.data+1,m))return false;
     auto near=C(0,0);Complex far(c);
     for(int j=1;j<n;++j)near=near-C(0,j)*delta[j];
     for(int j=0;j<n;++j){const auto drop=delta[j]-delta[j+1];near=near+Y(0,j)*drop;far=far-Y(n-1,j)*drop;}
     // Row sums of the two-pad admittance are its two raw self-capacitances;
     // the mutual term cancels analytically before numerical subtraction.
     if(pads){near=near-Complex(c,pads);far=far-Complex(c,pads+2*(1+pad_stride));}
-    const PiShunts result{far.real.rounded(),far.imag.rounded(),near.real.rounded(),near.imag.rounded()};
-    const double values[]={result.first_real,result.first_imag,result.second_real,result.second_imag};
-    if(c.status&(BF_ST_MEM_ERROR|BF_ST_INVALID_OP|BF_ST_DIVIDE_ZERO|BF_ST_OVERFLOW))return false;
-    for(double value:values)if(!__builtin_isfinite(value))return false;
-    out=result;return true;
+    return store(c,far,near,out);
+}
+bool extended_common_mode_shunts(const double* cap,const double* impedance,int n,
+                                int cap_stride,int ind_stride,PiShunts& out){
+    if(n<1||n>1024||!finite(cap,n,cap_stride)||!finite(impedance,n,ind_stride))return false;
+    Context c;
+    if(n==1){
+        // One midpoint capacitor splits equally between the endpoints. Cancel
+        // the branch impedance symbolically, preserving even a real component
+        // hundreds of bits smaller than the imaginary one.
+        const Complex z(c,impedance);if(bf_is_zero(&z.real.value)&&bf_is_zero(&z.imag.value))return false;
+        const double half_value[]={.5,0};const auto shunt=Complex(c,cap)*Complex(c,half_value);
+        return store(c,shunt,shunt,out);
+    }
+    Values a(c,n*n),rhs(c,n),solution(c,n),hc(c,n*n),zhc(c,n*n);
+    if(!a.data||!rhs.data||!solution.data||!hc.data||!zhc.data)return false;
+    const auto C=[&](int i,int j){return Complex(c,cap+2*(i+j*cap_stride));};
+    const auto Z=[&](int i,int j){return Complex(c,impedance+2*(i+j*ind_stride));};
+    const double half_value[]={.5,0},one_value[]={1,0};const Complex half(c,half_value),one(c,one_value),zero(c);
+    // I = 1*I0 - T*C*B*(1+delta), with B the adjacent-node average and T
+    // cumulative integration. H=B*T has ones below its diagonal and 1/2
+    // on it. Eliminate currents and the two zero endpoint deltas first:
+    // (D + Z*H*C*B)*delta - Z*1*I0 = -Z*H*C*1.
+    for(int j=0;j<n;++j){Complex prefix(c);for(int i=0;i<n;++i){const auto cell=C(i,j);hc[i*n+j]=prefix+half*cell;prefix=prefix+cell;}}
+    for(int i=0;i<n;++i){
+        Complex row_sum(c);
+        for(int j=0;j<n;++j){
+            auto& cell=zhc[i*n+j];for(int k=0;k<n;++k)cell=cell+Z(i,k)*hc[k*n+j];
+            rhs[i]=rhs[i]-cell;row_sum=row_sum+Z(i,j);
+        }
+        for(int j=1;j<n;++j){
+            auto cell=half*(zhc[i*n+j-1]+zhc[i*n+j]);
+            if(i==j)cell=cell+one;if(i+1==j)cell=cell-one;
+            a[i*n+j-1]=cell;
+        }
+        a[i*n+n-1]=zero-row_sum;
+    }
+    if(!solve(a,rhs,solution.data,n))return false;
+    const auto delta=[&](int vertex){return vertex>0&&vertex<n?solution[vertex-1]:zero;};
+    const auto near=solution[n-1];auto far=zero-near;
+    for(int j=0;j<n;++j){const auto midpoint=one+half*(delta(j)+delta(j+1));for(int i=0;i<n;++i)far=far+C(i,j)*midpoint;}
+    return store(c,far,near,out);
 }
 }
 extern "C" const char* probe_pi_shunts(const double* cap,const double* ind,int n,const double* pads,int pad_stride){
     static char output[256];reasitic::PiShunts result;
     if(!reasitic::common_mode_shunts(cap,ind,n,n,n,pads,pad_stride,result))return "{\"error\":\"Common-mode shunt solve failed\"}";
+    sprintf(output,"{\"first\":[%.17g,%.17g],\"second\":[%.17g,%.17g],\"precision_bits\":128}",result.first_real,result.first_imag,result.second_real,result.second_imag);return output;
+}
+extern "C" const char* probe_extended_pi_shunts(const double* cap,const double* impedance,int n){
+    static char output[256];reasitic::PiShunts result;
+    if(!reasitic::extended_common_mode_shunts(cap,impedance,n,n,n,result))return "{\"error\":\"Extended common-mode shunt solve failed\"}";
     sprintf(output,"{\"first\":[%.17g,%.17g],\"second\":[%.17g,%.17g],\"precision_bits\":128}",result.first_real,result.first_imag,result.second_real,result.second_imag);return output;
 }

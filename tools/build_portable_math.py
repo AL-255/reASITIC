@@ -25,7 +25,7 @@ def main():
     sources=[str(ROOT/'kernel/portable_gmd.cpp'),str(ROOT/'kernel/portable_gmd_big.cpp'),str(ROOT/'kernel/pi_shunts.cpp')];out=ROOT/'build/portable-math';out.mkdir(parents=True,exist_ok=True)
     common=['-std=c++17','-O2','-fno-fast-math','-ffp-contract=off','-DSOFTFLOAT_FAST_INT64','-DINLINE_LEVEL=5','-DSOFTFLOAT_ROUND_ODD']
     objects,inc=build_objects(args.emxx,'wasm')
-    subprocess.run([args.emxx,*common,*inc,*sources,*objects,'-sMODULARIZE=1','-sEXPORT_ES6=1','-sENVIRONMENT=node','-sALLOW_MEMORY_GROWTH=1','-sFILESYSTEM=0','-sEXPORTED_FUNCTIONS=["_probe_gmd","_probe_error_power","_probe_pi_shunts","_malloc","_free"]','-sEXPORTED_RUNTIME_METHODS=["UTF8ToString","HEAPF64"]','-o',str(out/'gmd.mjs')],check=True)
+    subprocess.run([args.emxx,*common,*inc,*sources,*objects,'-sMODULARIZE=1','-sEXPORT_ES6=1','-sENVIRONMENT=node','-sALLOW_MEMORY_GROWTH=1','-sFILESYSTEM=0','-sEXPORTED_FUNCTIONS=["_probe_gmd","_probe_error_power","_probe_pi_shunts","_probe_extended_pi_shunts","_malloc","_free"]','-sEXPORTED_RUNTIME_METHODS=["UTF8ToString","HEAPF64"]','-o',str(out/'gmd.mjs')],check=True)
     objects,inc=build_objects('gcc','native')
     subprocess.run(['g++',*common,*inc,*sources,str(ROOT/'tests/portable_math_native.cpp'),*objects,'-lm','-o',str(out/'gmd-native')],check=True)
     print('Built portable C++ geometry math for native host and WASM')

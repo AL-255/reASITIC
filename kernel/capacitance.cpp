@@ -359,9 +359,10 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         if(!ok || !finite_matrix(intermediate.capacitance) || !finite_matrix(intermediate.inductance))return "{\"error\":\"Original combined solver did not produce finite matrices\"}";
         for(const auto z:ports)if(!__builtin_isfinite(z.real) || !__builtin_isfinite(z.imag))return "{\"error\":\"Original node equations produced nonfinite admittance\"}";
 #ifdef __EMSCRIPTEN__
-        reasitic::PiShunts shunts{};const bool stable_shunts=!transformer&&!network->extended&&!reasitic::reference_numerics();
+        reasitic::PiShunts shunts{};const bool stable_shunts=!transformer&&!reasitic::reference_numerics();
         if(stable_shunts){
-            if(!reasitic::common_mode_shunts(reinterpret_cast<const double*>(intermediate.capacitance.data),reinterpret_cast<const double*>(intermediate.inductance.data),intermediate.capacitance.rows,intermediate.capacitance.stride,intermediate.inductance.stride,padbed?reinterpret_cast<const double*>(intermediate.pads.data):nullptr,intermediate.pads.stride,shunts))return "{\"error\":\"Common-mode shunt solve failed\"}";
+            const bool calculated=network->extended?reasitic::extended_common_mode_shunts(reinterpret_cast<const double*>(intermediate.capacitance.data),reinterpret_cast<const double*>(intermediate.inductance.data),intermediate.capacitance.rows,intermediate.capacitance.stride,intermediate.inductance.stride,shunts):reasitic::common_mode_shunts(reinterpret_cast<const double*>(intermediate.capacitance.data),reinterpret_cast<const double*>(intermediate.inductance.data),intermediate.capacitance.rows,intermediate.capacitance.stride,intermediate.inductance.stride,padbed?reinterpret_cast<const double*>(intermediate.pads.data):nullptr,intermediate.pads.stride,shunts);
+            if(!calculated)return "{\"error\":\"Common-mode shunt solve failed\"}";
             combined.pi=extract_pi_equivalent_with_shunts(y,frequency,{shunts.first_real,shunts.first_imag},{shunts.second_real,shunts.second_imag});
         }
 #endif

@@ -8,6 +8,7 @@ and its LU factorization while using the same physical C and Z inputs.
 """
 import json,sys
 import mpmath as mp
+from reference_two_port import metrics
 
 def reference(result):
     with mp.workdps(80):
@@ -28,6 +29,10 @@ def reference(result):
         voltages=solved[:n+1,:];currents=mp.ones(n+1,1)*solved[n+1:n+2,:]-t*c*b*voltages
         y=mp.matrix([[-currents[n,1],-currents[n,0]],[currents[0,1],currents[0,0]]])
         encode=lambda m:[[[float(mp.re(m[i,j])),float(mp.im(m[i,j]))] for j in range(m.cols)] for i in range(m.rows)]
-        return dict(mpmath_version=mp.__version__,decimal_digits=80,groups=n,matrix=encode(y),currents=encode(currents[:,0:1]),voltages=encode(voltages[:,0:1]))
+        scalar_pair=lambda z:[float(mp.re(z)),float(mp.im(z))]
+        return dict(mpmath_version=mp.__version__,decimal_digits=80,groups=n,matrix=encode(y),currents=encode(currents[:,0:1]),voltages=encode(voltages[:,0:1]),
+                    circuit_shunts=dict(first=scalar_pair(y[0,0]+y[0,1]),second=scalar_pair(y[1,0]+y[1,1])),
+                    circuit_metrics=metrics(y,mp.mpf(result['frequency_hz'])),
+                    reported_metrics=metrics(matrix(result['matrix']),mp.mpf(result['frequency_hz']),result.get('pi_shunts')))
 
 if __name__=='__main__':print(json.dumps(reference(json.load(sys.stdin)),allow_nan=False))
