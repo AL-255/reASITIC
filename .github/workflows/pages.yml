@@ -1,0 +1,62 @@
+name: Build, compare and deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: '6.0.6'
+          actions-cache-folder: emsdk-cache
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install independent GDS reader and i386 comparison runtime
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update -qq
+          sudo apt-get install -y g++-multilib libc6:i386
+          pip install gdstk==1.0.2
+      - run: python tools/build.py
+      - run: python tools/build_native.py
+      - name: Compare original geometry fixtures and unchanged i386 C++
+        run: |
+          node tests/original-geometry.mjs
+          node tests/parity.mjs
+          node tests/worker.mjs
+          python tests/gds_reader.py
+      - name: Retain fidelity evidence, including known x87 differences
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fidelity-evidence
+          path: build/evidence
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
