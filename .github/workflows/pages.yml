@@ -42,6 +42,8 @@ jobs:
           node tests/host-rounding-test.mjs
           node tests/two-port-output.mjs
           node tests/port-schedule.mjs
+          node tests/self-resonance-plan.mjs
+          node tests/worker-self-resonance.mjs
           node tests/automatic-cells.mjs
           node tests/maxnw.mjs
           node tests/maxnw-ports.mjs

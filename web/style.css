@@ -18,3 +18,5 @@ textarea{font:12px monospace;color:var(--ink);background:#101b1e;border:1px soli
 #trans-details{white-space:pre-line}
 
 #three-details{white-space:pre-line}
+
+.selfres-scroll{overflow:auto;max-height:220px}.selfres-scroll table{border-collapse:collapse;width:100%;font-size:11px}.selfres-scroll th,.selfres-scroll td{text-align:right;padding:7px 10px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}.selfres-scroll th{color:var(--muted);font-weight:500}

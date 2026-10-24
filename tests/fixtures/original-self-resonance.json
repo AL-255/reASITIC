@@ -1,0 +1,396 @@
+{
+  "reference": "Unmodified SELFRES twice per case; read-only GDB analysis entry/return and search return observations",
+  "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+  "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+  "case_definition_sha256": "a19c20a32170569a0a3f9e317b693a6aa20eea2f1780b25bed1cf0af13034214",
+  "cases": [
+    {
+      "name": "wire-unbracketed",
+      "samples": [
+        {
+          "frequency_hex": "000000c00b5ad641",
+          "admittance_hex": "69c0e883bb8de93fda5bff0c318b00c06cc0e883bb8de9bfdb5bff0c318b00406cc0e883bb8de9bfdb5bff0c318b0040eb5bedcbbc8de93fc4de974b138500c0"
+        },
+        {
+          "frequency_hex": "00000060b813da41",
+          "admittance_hex": "d49450b88871e33f47a878bf315ffdbfd49450b88871e3bf47a878bf315ffd3fd49450b88871e3bf47a878bf315ffd3ff512c4768a71e33fa3ff8a51ec50fdbf"
+        },
+        {
+          "frequency_hex": "000000b08ef0db41",
+          "admittance_hex": "707c075ce027e13fa496be4b60c4fbbf707c075ce027e1bfa496be4b60c4fb3f707c075ce027e1bfa496be4b60c4fb3f6196875ce227e13fc43b42e815b5fbbf"
+        },
+        {
+          "frequency_hex": "000000d8f9dedc41",
+          "admittance_hex": "fbf11fa7f827e03f8b3390785305fbbffaf11fa7f827e0bf8b3390785305fb3ffaf11fa7f827e0bf8b3390785305fb3f71a45bcafa27e03f52ac4c9a86f5fabf"
+        },
+        {
+          "frequency_hex": "0000006c2f56dd41",
+          "admittance_hex": "433bbbf02d60df3f1a8db29b29a9fabf433bbbf02d60dfbf1a8db29b29a9fa3f433bbbf02d60dfbf1a8db29b29a9fa3f08dec85a3260df3f567b0b801b99fabf"
+        },
+        {
+          "frequency_hex": "00000036ca91dd41",
+          "admittance_hex": "267b281d14ecde3fd9115fb7e47bfabf247b281d14ecdebfda115fb7e47bfa3f247b281d14ecdebfda115fb7e47bfa3f26e6379918ecde3fc63d06fdb56bfabf"
+        }
+      ],
+      "requests": [
+        "000000c00b5ad641",
+        "00000060b813da41",
+        "000000b08ef0db41",
+        "000000d8f9dedc41",
+        "0000006c2f56dd41",
+        "00000036ca91dd41"
+      ],
+      "return_frequency_hex": [
+        "0000009b97afdd41"
+      ],
+      "printed_result": [
+        "Self Resonant Frequency Occurs at  1.99 (GHz)."
+      ]
+    },
+    {
+      "name": "wire-single",
+      "samples": [
+        {
+          "frequency_hex": "000000aa11842742",
+          "admittance_hex": "1056737c2fb64e3f7b85d8442885b2bf0256737c2fb64ebf7b85d8442885b23f0256737c2fb64ebf7b85d8442885b23fb4db27511db35a3f88dd69fcefde9c3f"
+        },
+        {
+          "frequency_hex": "0000003e47fb1742",
+          "admittance_hex": "000919d646336d3f9bd6c761d825c2bf000919d646336dbf9bd6c761d825c23f000919d646336dbf9bd6c761d825c23ffa11d21fd0ac6e3f9bd70b3fe22bb7bf"
+        },
+        {
+          "frequency_hex": "000080a4dac02142",
+          "admittance_hex": "1056bbf156c95a3f66f98103e186b8bf0756bbf156c95abf69f98103e186b83f0756bbf156c95abf69f98103e186b83fc1c3bf3b43a0603fb08e6e9af06194bf"
+        },
+        {
+          "frequency_hex": "0000402776a22442",
+          "admittance_hex": "94ccd1773ee2533fe79f0737c21ab5bf07cdd1773ee253bfdd9f0737c21ab53f07cdd1773ee253bfdd9f0737c21ab53f04eacf8e429e5c3f1085fcea5aae773f"
+        },
+        {
+          "frequency_hex": "0000e065a8312342",
+          "admittance_hex": "292c871eadf2563f4ffcbc67f9afb6bf032c871eadf256bf4afcbc67f9afb63f032c871eadf256bf4afcbc67f9afb63fdefbb23761815e3f60faf2ff23df7abf"
+        },
+        {
+          "frequency_hex": "000090460fea2342",
+          "admittance_hex": "23ce527d3955553f90fa0b8c0bdeb5bffec8527d395555bf8cfa0b8c0bdeb53ffec8527d395555bf8cfa0b8c0bdeb53f2c53f42adc775d3f003828d9d13332bf"
+        },
+        {
+          "frequency_hex": "0000e8b642462442",
+          "admittance_hex": "5ed71edecc96543f61eb0941ab7ab5bffbd61edecc9654bf5aeb0941ab7ab53ffbd61edecc9654bf5aeb0941ab7ab53f930430e671055d3f00e3998093c2663f"
+        },
+        {
+          "frequency_hex": "0000bcfe28182442",
+          "admittance_hex": "34ce3413bcf4543f62bc1384e9abb5bf18cb3413bcf454bf67bc1384e9abb53f18cb3413bcf454bf67bc1384e9abb53fbb947257343d5d3f40d8ffb29298543f"
+        },
+        {
+          "frequency_hex": "0000a6221c012442",
+          "admittance_hex": "8e25ef88a724553f0dc727adddc4b5bf0b2aef88a72455bf0bc727adddc4b53f0b2aef88a72455bf0bc727adddc4b53f7675361c2a5a5d3f019027180c1a403f"
+        },
+        {
+          "frequency_hex": "00009bb495f52342",
+          "admittance_hex": "58ab4783db3c553f4cfe64596dd1b5bf06ad4783db3c55bf4efe64596dd1b53f06ad4783db3c55bf4efe64596dd1b53f16d1516aeb685d3f02c42f509a1d1c3f"
+        },
+        {
+          "frequency_hex": "0080957dd2ef2342",
+          "admittance_hex": "483d473a0549553f6dc158a0bad7b5bfff37473a054955bf6ec158a0bad7b53fff37473a054955bf6ec158a0bad7b53fe07742d65d705d3f0170c5d78c5116bf"
+        },
+        {
+          "frequency_hex": "00401819b4f22342",
+          "admittance_hex": "f595080eef42553fb065798893d4b5bfff97080eef4255bfaf65798893d4b53fff97080eef4255bfaf65798893d4b53fd1a4f423a36c5d3fff1f0cf8c23ee73e"
+        },
+        {
+          "frequency_hex": "00e0564b43f12342",
+          "admittance_hex": "afeadfcff945553fb96849f726d6b5bffee7dfcff94555bfba6849f726d6b53ffee7dfcff94555bfba6849f726d6b53f28e5ed1d806e5d3f0118fc74cb6803bf"
+        }
+      ],
+      "requests": [
+        "000000aa11842742",
+        "0000003e47fb1742",
+        "000080a4dac02142",
+        "0000402776a22442",
+        "0000e065a8312342",
+        "000090460fea2342",
+        "0000e8b642462442",
+        "0000bcfe28182442",
+        "0000a6221c012442",
+        "00009bb495f52342",
+        "0080957dd2ef2342",
+        "00401819b4f22342",
+        "00e0564b43f12342"
+      ],
+      "return_frequency_hex": [
+        "009037b2fbf12342"
+      ],
+      "printed_result": [
+        "Self Resonant Frequency Occurs at 42.83 (GHz)."
+      ]
+    },
+    {
+      "name": "square-single",
+      "samples": [
+        {
+          "frequency_hex": "000000b494171342",
+          "admittance_hex": "b2adc95bd3aa373f1526709b59fd0abf7f2a3c5c133e2cbf9d9b8176d3ba933f7f2a3c5c133e2cbf9d9b8176d3ba933f77122feb466f393f1212f35d6c34733f"
+        },
+        {
+          "frequency_hex": "000000dcff050442",
+          "admittance_hex": "a59972e1eec8503f8c97773f417c92bfe90e36fc077450bffdcaf829c1989b3fe90e36fc077450bffdcaf829c1989b3fd4dc7afd333c513fa3fe88feb9a68fbf"
+        },
+        {
+          "frequency_hex": "000000a2941a0d42",
+          "admittance_hex": "468002b027f9403f8682b7f98fea7ebf7786195315a23dbf5fe133f19ca8953f7786195315a23dbf5fe133f19ca8953fb4fdc0f863df413f9fe8c52630726fbf"
+        },
+        {
+          "frequency_hex": "000080826fd21042",
+          "admittance_hex": "1e5efca4904a3b3f27b5595f73a76dbf1e978b3e8ab934bf4b8b10f09e5c943f1e978b3e8ab934bf4b8b10f09e5c943fcb435be85c143d3f373f3070db39443f"
+        },
+        {
+          "frequency_hex": "000080d3b95f0f42",
+          "admittance_hex": "c27c90fc5c263e3f120d1b955d9e76bf1552e9c2b3c938bf32fad8981fea943f1552e9c2b3c938bf32fad8981fea943fde9a6032c5f13f3ff08669cee75459bf"
+        },
+        {
+          "frequency_hex": "0000203626411042",
+          "admittance_hex": "cb8c252f089e3c3ff85476c25aab72bf6143865e8aac36bf410845f2bc9d943f6143865e8aac36bf410845f2bc9d943fb05b76a9b5683e3f7bbb4bbd91883dbf"
+        },
+        {
+          "frequency_hex": "000050dcca891042",
+          "admittance_hex": "559b130d11ee3b3fdfda114466bc70bf2b6023fa31ae35bf0a9390cdd27b943f2b6023fa31ae35bf0a9390cdd27b943f085d81f852b83d3fbaf734c5eeab163f"
+        },
+        {
+          "frequency_hex": "0000388978651042",
+          "admittance_hex": "a433707572443c3ff0f946cc0eb371bf6f4a6d281b2c36bf68b0a07f6f8c943f6f4a6d281b2c36bf68b0a07f6f8c943fc54fa363eb0e3e3f32514c82cfc127bf"
+        },
+        {
+          "frequency_hex": "0000c4b2a1771042",
+          "admittance_hex": "b42226acdc183c3f97c54b36873771bf08963f78d7ec35bf09b6ce420b84943f08963f78d7ec35bf09b6ce420b84943fc726c3683ae33d3f109c670a75bc08bf"
+        },
+        {
+          "frequency_hex": "00008a47b6801042",
+          "admittance_hex": "84cffec45d033c3f2ffac70beaf970bf21d9052771cd35bf9a3fa795e97f943f21d9052771cd35bf9a3fa795e97f943f737b16adadcd3d3fdd7b93b0e3a8f43e"
+        },
+        {
+          "frequency_hex": "000027fd2b7c1042",
+          "admittance_hex": "bb1201ed160e3c3fd4ae5270b51871bfb4259f641fdd35bf8efccc0ef981943fb4259f641fdd35bf8efccc0ef981943f6ccd5bc46dd83d3f71cee43a40c9ecbe"
+        },
+        {
+          "frequency_hex": "00805822717e1042",
+          "admittance_hex": "e756d1c6b8083c3f63826bf24e0971bf4b51e10b47d535bfe530f8faf080943f4b51e10b47d535bfe530f8faf080943f6053cb270cd33d3fefa0fd2ad017c93e"
+        }
+      ],
+      "requests": [
+        "000000b494171342",
+        "000000dcff050442",
+        "000000a2941a0d42",
+        "000080826fd21042",
+        "000080d3b95f0f42",
+        "0000203626411042",
+        "000050dcca891042",
+        "0000388978651042",
+        "0000c4b2a1771042",
+        "00008a47b6801042",
+        "000027fd2b7c1042",
+        "00805822717e1042"
+      ],
+      "return_frequency_hex": [
+        "00c0bf8f4e7d1042"
+      ],
+      "printed_result": [
+        "Self Resonant Frequency Occurs at 17.71 (GHz)."
+      ]
+    },
+    {
+      "name": "square-differential-reversed",
+      "samples": [
+        {
+          "frequency_hex": "000000b494171342",
+          "admittance_hex": "b2adc95bd3aa373f1526709b59fd0abf7f2a3c5c133e2cbf9d9b8176d3ba933f7f2a3c5c133e2cbf9d9b8176d3ba933f77122feb466f393f1212f35d6c34733f"
+        },
+        {
+          "frequency_hex": "0000007a292c1c42",
+          "admittance_hex": "ecd4444d316e3c3f9e265ab48e9b8d3f9bf16c3ed6d4203fac28ca61644e963f9bf16c3ed6d4203fac28ca61644e963fe0f3d6cb59e53d3f904a00e75954953f"
+        },
+        {
+          "frequency_hex": "000080ee395b2042",
+          "admittance_hex": "8b8c51200274473ff90d40e9f525993fec0c0c48ff4e3d3fafdbe5384f849b3fec0c0c48ff4e3d3fafdbe5384f849b3f11fb799ce4fc473f1be3687a5711a03f"
+        },
+        {
+          "frequency_hex": "000080ab4e711e42",
+          "admittance_hex": "3fb8998f15b2413f353e12033680933fda1615efb8f1303f5ca4f3592f6e983fda1615efb8f1303f5ca4f3592f6e983fecf741a7c457423f731a09ddb84c9a3f"
+        },
+        {
+          "frequency_hex": "00004044e1931f42",
+          "admittance_hex": "f46f411e4036443fc5e24bda6b2d963f6e81547cab7c363f6c062c6d7dd4993f6e81547cab7c363f6c062c6d7dd4993fe52184c465ce443f9a3a288207159d3f"
+        },
+        {
+          "frequency_hex": "0000504895122042",
+          "admittance_hex": "24f79b5791ba453fba806769279f973feacbd0221cb6393f55d3e15340a29a3feacbd0221cb6393f55d3e15340a29a3f861eec514a4b463f12d1518f1a929e3f"
+        },
+        {
+          "frequency_hex": "000070ea85dc1f42",
+          "admittance_hex": "aec65a333df2443f822d362ecee3963ff6e0be21680e383f583ba513f7389a3ff6e0be21680e383f583ba513f7389a3f507d732eba86453f7c9dee9646d19d3f"
+        },
+        {
+          "frequency_hex": "0000c41e6c002042",
+          "admittance_hex": "6c06493cce54453f800c5e47d740973f567606a566df383f753c22bffd6c9a3f567606a566df383f753c22bffd6c9a3f094781966ce7453f401b027519319e3f"
+        },
+        {
+          "frequency_hex": "0000fc13afee1f42",
+          "admittance_hex": "7388ef472123453fb472cf712a12973f5bfcb0303476383ff6488d6fd3529a3f5bfcb0303476383ff6488d6fd3529a3fc2e308ccafb6453f77a4d1d10a019e3f"
+        },
+        {
+          "frequency_hex": "0000c2a8c3f71f42",
+          "admittance_hex": "ac06b56cde3b453fd63a88b77629973fe90f4f2aa0aa383f7879abc8de5f9a3fe90f4f2aa0aa383f7879abc8de5f9a3fdacb0a12f5ce453f8f2128c408199e3f"
+        },
+        {
+          "frequency_hex": "00005f5e39f31f42",
+          "admittance_hex": "85ff338c792f453fea6bc50dce1d973f39aff3eb5e90383f35537baa56599a3f39aff3eb5e90383f35537baa56599a3f80e17c2eccc2453f47ab7675070d9e3f"
+        },
+        {
+          "frequency_hex": "00802d39f4f01f42",
+          "admittance_hex": "e26d70d74b29453f4e325c9efb17973f1cbebfbf4683383f6c03dd7014569a3f1cbebfbf4683383f6c03dd7014569a3fef9f066ebcbc453fb5988b8e08079e3f"
+        }
+      ],
+      "requests": [
+        "000000b494171342",
+        "0000007a292c1c42",
+        "000080ee395b2042",
+        "000080ab4e711e42",
+        "00004044e1931f42",
+        "0000504895122042",
+        "000070ea85dc1f42",
+        "0000c41e6c002042",
+        "0000fc13afee1f42",
+        "0000c2a8c3f71f42",
+        "00005f5e39f31f42",
+        "00802d39f4f01f42"
+      ],
+      "return_frequency_hex": [
+        "0040c6cb16f21f42"
+      ],
+      "printed_result": [
+        "Self Resonant Frequency Occurs at 34.30 (GHz)."
+      ]
+    },
+    {
+      "name": "capacitor-slow",
+      "samples": [
+        {
+          "frequency_hex": "00000070357df441",
+          "admittance_hex": "a3ca98d0daa97e3f4ab0c45af0d9cbbfbf5e1b5d3eb07ebf27bf69d28a73cc3fbf5e1b5d3eb07ebf27bf69d28a73cc3fe98dfa9df3be7e3f2190c2b47403ccbf"
+        },
+        {
+          "frequency_hex": "000000d8f9defc41",
+          "admittance_hex": "2128ed9b46da6e3f79b3a5440a3bc3bfd656132c8bd86ebf2a4a5128b813c43fd656132c8bd86ebf2a4a5128b813c43f41394513e5f76e3f32644193d775c3bf"
+        },
+        {
+          "frequency_hex": "00000006ee870042",
+          "admittance_hex": "1f7874d41087673f8e37df2edf7ec0bf63a9a75c327c67bf95decde02b77c13f63a9a75c327c67bf95decde02b77c13f9a84a78cc09c673f59e1cec46ac2c0bf"
+        },
+        {
+          "frequency_hex": "0000009326940142",
+          "admittance_hex": "fad9a41b29d0643f92cfa37737b7bebf14bea5e03fc064bf6bccb616be63c03f14bea5e03fc064bf6bccb616be63c03f6b64665b77e1643f82a648451c47bfbf"
+        },
+        {
+          "frequency_hex": "000080d9421a0242",
+          "admittance_hex": "6fa6ad2f7fa1633f3145732969abbdbff8d71f23f28e63bf8010d9e786cbbf3ff8d71f23f28e63bf8010d9e786cbbf3f5ac12a0a82b0633ffe8a5fecb83fbebf"
+        },
+        {
+          "frequency_hex": "0000c0fc505d0242",
+          "admittance_hex": "ba461481e513633fc8a39979c92abdbfaf5868ebfeff62bfbdbd0f9cd452bf3faf5868ebfeff62bfbdbd0f9cd452bf3f36b8e2f9bb21633f8691f9c94fc1bdbf"
+        },
+        {
+          "frequency_hex": "0000600ed87e0242",
+          "admittance_hex": "02e8f3be5ecf623f53ed68c1baebbcbf9308137cc9ba62bf3b0cd3cebc17bf3f9308137cc9ba62bf3b0cd3cebc17bf3f4d56885a9ddc623f658a6d9e5c83bdbf"
+        }
+      ],
+      "requests": [
+        "00000070357df441",
+        "000000d8f9defc41",
+        "00000006ee870042",
+        "0000009326940142",
+        "000080d9421a0242",
+        "0000c0fc505d0242",
+        "0000600ed87e0242"
+      ],
+      "return_frequency_hex": [
+        "000030979b8f0242"
+      ],
+      "printed_result": [
+        "Self Resonant Frequency Occurs at  9.96 (GHz)."
+      ]
+    },
+    {
+      "name": "capacitor-fast",
+      "samples": [],
+      "requests": [
+        "00000070357df441"
+      ],
+      "return_frequency_hex": [],
+      "native_fault": "SIGSEGV",
+      "printed_result": []
+    },
+    {
+      "name": "square-automatic",
+      "samples": [
+        {
+          "frequency_hex": "00000048ca8e0342",
+          "admittance_hex": "e8026a5ecd90513f7def5a3d873793bfde8d4245004351bf5136907a28199c3fde8d4245004351bf5136907a28199c3faac206930d04523fed3a7f83ff9d90bf"
+        },
+        {
+          "frequency_hex": "00000044c4670c42",
+          "admittance_hex": "c26b2ec8a32b433fc7f0f3fcef2081bf1b0947c26aab40bf25eea066e510973f1b0947c26aab40bf25eea066e510973f924cdeac9fda433fad93dcb2538d78bf"
+        },
+        {
+          "frequency_hex": "000000a1206a1042",
+          "admittance_hex": "1d244f776721403f54022629956f71bf062b8fd370083abf5484911b85ed953f062b8fd370083abf5484911b85ed953f2b1d12ff3778413fa8f7af2c68db64bf"
+        },
+        {
+          "frequency_hex": "000080e03f851142",
+          "admittance_hex": "8743103dcf4b3d3f52655452bc9061bfb34be931c0ca35bfdb71b0b95f54953fb34be931c0ca35bfdb71b0b95f54953f9b87a1ed16ec3f3fd1c708782e0d40bf"
+        },
+        {
+          "frequency_hex": "00004080cf121242",
+          "admittance_hex": "7fe5724a892d3c3fdb8ec9ebb5d953bf9f35ffa4a9f333bff7294f600324953f9f35ffa4a9f333bff7294f600324953fb469592e6fd83e3fcaae68f4e351403f"
+        },
+        {
+          "frequency_hex": "000060b007cc1142",
+          "admittance_hex": "3ce5b3916bb73c3fe2a0e73203745bbf0791ee977adb34bf2b099440063b953f0791ee977adb34bf2b099440063b953f5a7ec452e55c3f3f1a6c90caa076da3e"
+        },
+        {
+          "frequency_hex": "000070c8a3a81142",
+          "admittance_hex": "ea81ec1d45003d3fcc73fb4f3e485fbf785ebaf6245235bf1e7f900f6747953f785ebaf6245235bf1e7f900f6747953fb76642c01ea33f3f68975087169d2fbf"
+        },
+        {
+          "frequency_hex": "000068bc55ba1142",
+          "admittance_hex": "12e7735083db3c3f81e17039845d5dbfcec981ed921635bfbab7edd02341953fcec981ed921635bfbab7edd02341953f15542637ab7f3f3f370fbca3e2bf1ebf"
+        },
+        {
+          "frequency_hex": "000064b62ec31142",
+          "admittance_hex": "c453f44f62c93c3fe8e2f4fe9c685cbff858e4b3f7f834bf0d536a57103e953ff858e4b3f7f834bf0d536a57103e953ff75267b0326e3f3fba580bccc6130dbf"
+        },
+        {
+          "frequency_hex": "000062339bc71142",
+          "admittance_hex": "67ba98ac61c03c3fca6f687846ee5bbfdd621f6735ea34bf758b36208a3c953fdd621f6735ea34bf758b36208a3c953f740969a086653f3fb323f5319dc2f9be"
+        }
+      ],
+      "requests": [
+        "00000048ca8e0342",
+        "00000044c4670c42",
+        "000000a1206a1042",
+        "000080e03f851142",
+        "00004080cf121242",
+        "000060b007cc1142",
+        "000070c8a3a81142",
+        "000068bc55ba1142",
+        "000064b62ec31142",
+        "000062339bc71142"
+      ],
+      "return_frequency_hex": [
+        "0000e171d1c91142"
+      ],
+      "printed_result": [
+        "Self Resonant Frequency Occurs at 19.10 (GHz)."
+      ]
+    }
+  ]
+}

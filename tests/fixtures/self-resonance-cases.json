@@ -1,0 +1,212 @@
+{
+  "cases": [
+    {
+      "name": "wire-unbracketed",
+      "creator": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "grid": [
+        8,
+        8
+      ],
+      "bounds_ghz": [
+        1,
+        2
+      ],
+      "step_ghz": 0.01,
+      "mode": "single",
+      "fast": false,
+      "native_iterations": 1,
+      "ground": "",
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "wire-single",
+      "creator": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "grid": [
+        8,
+        8
+      ],
+      "bounds_ghz": [
+        1,
+        100
+      ],
+      "step_ghz": 0.01,
+      "mode": "single",
+      "fast": false,
+      "native_iterations": 1,
+      "ground": "A",
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "square-single",
+      "creator": {
+        "id": 0,
+        "keywords": "NAME=A:LEN=200:WID=220:W=32:S=16:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100"
+      },
+      "grid": [
+        32,
+        32
+      ],
+      "bounds_ghz": [
+        1,
+        40
+      ],
+      "step_ghz": 0.005,
+      "mode": "single",
+      "fast": false,
+      "native_iterations": 10,
+      "ground": "",
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "square-differential-reversed",
+      "creator": {
+        "id": 0,
+        "keywords": "NAME=A:LEN=200:WID=220:W=32:S=16:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100"
+      },
+      "grid": [
+        32,
+        32
+      ],
+      "bounds_ghz": [
+        40,
+        1
+      ],
+      "step_ghz": 0.005,
+      "mode": "differential",
+      "fast": false,
+      "native_iterations": 0,
+      "ground": "",
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "capacitor-slow",
+      "creator": {
+        "id": 4,
+        "keywords": "NAME=A:LEN=100:WID=80:METAL1=M2:METAL2=M1:XORG=100:YORG=100"
+      },
+      "grid": [
+        32,
+        32
+      ],
+      "bounds_ghz": [
+        1,
+        10
+      ],
+      "step_ghz": 0.05,
+      "mode": "single",
+      "fast": false,
+      "native_iterations": 10,
+      "ground": "",
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "capacitor-fast",
+      "creator": {
+        "id": 4,
+        "keywords": "NAME=A:LEN=100:WID=80:METAL1=M2:METAL2=M1:XORG=100:YORG=100"
+      },
+      "grid": [
+        32,
+        32
+      ],
+      "bounds_ghz": [
+        1,
+        10
+      ],
+      "step_ghz": 0.05,
+      "mode": "differential",
+      "fast": true,
+      "native_iterations": 3,
+      "ground": "",
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "expect_native_fault": true
+    },
+    {
+      "name": "square-automatic",
+      "creator": {
+        "id": 0,
+        "keywords": "NAME=A:LEN=200:WID=220:W=32:S=16:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100"
+      },
+      "grid": [
+        32,
+        32
+      ],
+      "bounds_ghz": [
+        1,
+        20
+      ],
+      "step_ghz": 0.01,
+      "mode": "single",
+      "fast": false,
+      "native_iterations": 2,
+      "ground": "",
+      "automatic_cells": {
+        "alpha": 0.03,
+        "beta": 1000
+      },
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    }
+  ]
+}

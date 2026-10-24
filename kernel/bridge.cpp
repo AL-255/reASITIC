@@ -161,6 +161,7 @@ EngineView engine_view() { return {head,metals,vias,metal_count,{warn,nullptr},d
 void clear_diagnostics() { warning_length=0;warnings[0]=0; }
 }
 extern "C" {
+int shape_kind(int index) { if(index<0)return -1;auto* shape=head;while(shape && index--)shape=shape->next;return shape?integer(*shape,0x50):-1; }
 int set_max_width_cells(int value) { if(value<=0)return 0;max_width_cells=value;return 1; }
 void reset_technology() { clear();max_width_cells=500;metal_count=via_count=substrate_count=0;origin_x=origin_y=0;winding_phase=1; }
 void set_geometry_options(double x,double y,int phase) { origin_x=x;origin_y=y;winding_phase=phase?phase:1;has_parsed_gap=false; }

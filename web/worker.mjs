@@ -1,4 +1,5 @@
 import createKernel from './asitic.js';
+import {resonancePlan,capacitorPortMatrix} from './self-resonance.mjs';
 import {solverCells,meshResult} from './mesh-policy.mjs';
 import {portSampleSummary} from './port-sweep.mjs';
 import {validateThreePortBacking,allocateThreePortBacking} from './three-port.mjs';
@@ -72,6 +73,31 @@ self.onmessage=async({data})=>{
     if(action==='three-port'){const result=await solveThreePort(data,frequency(data),task);if(task!==epoch)return;postMessage({id:data.id,three_port:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
     if(action==='transformer'){const result=solveTransformer(data,frequency(data));postMessage({id:data.id,transformer:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
     if(action==='network'){const result=solveNetwork(data,frequency(data));postMessage({id:data.id,network:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
+    if(action==='resonance'){
+      if(!processTechnology||!hasLayout)throw Error('Generate a layout before searching for self resonance.');
+      const kind=kernel._shape_kind(data.winding??0);if(kind<0)throw Error('Select a valid winding for SELFRES.');
+      const fast=Boolean(data.fast_quantization);if(fast&&kind!==4)throw Error('The original FAST model for this structure faults; use the numerical SLOW search.');
+      if(data.mode!==undefined&&!['single','differential'].includes(data.mode))throw Error('Select single-ended or differential SELFRES mode.');
+      const settings={};for(const [key,field]of [['first','start_ghz'],['second','end_ghz'],['step','step_ghz']]){if(typeof data[field]!=='number')throw Error('Enter SELFRES start, end and step frequencies in GHz.');settings[key]=frequency(data,data[field]);}
+      settings.differential=data.mode==='differential';settings.fast=fast;settings.sample_budget=data.sample_budget??101;settings.native_iterations=data.native_iterations??10;
+      if(!Number.isInteger(settings.sample_budget)||settings.sample_budget<1||settings.sample_budget>101||!Number.isInteger(settings.native_iterations)||settings.native_iterations<0||settings.native_iterations>1000)throw Error('Use 1–101 SELFRES analyses and a native iteration argument from 0 to 1000.');
+      const history=[],source=kind===4?'CAP':'PI2';let plan=resonancePlan(kernel,settings,history);
+      while(plan.status==='need_sample'){
+        if(task!==epoch)return;const hz=plan.next_frequency_hz;let result;
+        try{
+          if(kind===4){
+            const domain=processTechnology.domain,selection=solverCells(kernel,{...data,mesh:data.contact_mesh??{}},hz,'capacitance');
+            const cap=meshResult(JSON.parse(kernel.UTF8ToString(kernel._simulate_capacitance(data.winding??0,data.ground??-1,hz,...selection.cells,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,0))),selection);
+            result={name:cap.name,ground:cap.ground,frequency_hz:hz,matrix:capacitorPortMatrix(kernel,cap),mesh:cap.mesh,contacts:cap.contacts,...(cap.automatic_cells?{automatic_cells:cap.automatic_cells}:{})};
+          }else result=solveNetwork({...data,model:'PI2'},hz);
+        }catch(error){throw Error(`SELFRES analysis ${history.length+1} at ${hz} Hz: ${error.message}`);}
+        history.push({frequency_hz:hz,matrix:result.matrix});plan=resonancePlan(kernel,settings,history);
+        const done=plan.status!=='need_sample',sample={...portSampleSummary(result),source_model:source};
+        postMessage({id:data.id,resonance:{...plan,source_model:source,sample,done},warnings:kernel.UTF8ToString(kernel._last_warnings())});
+        if(done)return;await new Promise(resolve=>setTimeout(resolve,0));
+      }
+      return;
+    }
     if(action==='port-sweep'){
       const target=data.port_kind??'network';if(!['network','transformer','three-port'].includes(target))throw Error('Select a network, transformer or three-port sweep.');
       if(!processTechnology||!hasLayout)throw Error('Generate a layout before running a port sweep.');

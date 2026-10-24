@@ -66,6 +66,34 @@ checks include partial edits, export-buffer exhaustion, lifetime recovery,
 selection, paired movements, parallel branches, empty layouts and subsequent
 simulation. Browser visual QA remains unverified.
 
+The original numerical `SELFRES` search is available separately from the
+pi-model resonance estimate. It repeatedly analyzes the selected device and
+ground with the original PI2 SLOW driver and searches single-ended or
+differential input reactance. The C++ routine retains its extended-precision
+midpoints, optional native fast-step quantization, stop tests and ignored native
+iteration argument. A replay boundary requests one missing admittance at a time;
+JavaScript coordinates the C++ solves and yields for cancellation without doing
+search arithmetic. Automatic mesh limits are recalculated at each saved query.
+
+The search reports the native returned frequency, the last frequency actually
+analyzed, its stopping criterion and whether sampled reactance changed sign.
+These are distinct: the original can return an untested frequency after interval
+convergence, including in an unbracketed range. Analysis budgets stop with an
+explicit incomplete result. The native hard limit executes up to 101 analyses
+but consumes only 100 of them; CSV marks whether each analysis was used and
+retains exact saved Hz and raw model admittances. The original capacitor creator
+becomes a generic joined structure, so its numerical SELFRES route also uses
+PI2. FAST requests for those structures fault in the pinned original and are
+rejected by the worker; the original kind-4 capacitive conversion and search
+quantization remain implemented for that model class.
+
+Seven repeated unmodified SELFRES captures include 60 complete finite model
+queries/returns and one reproducible FAST fault. `tests/self-resonance-plan.mjs`
+checks those saved frequencies and returns and 185 exact native/WASM replay
+plans, including the 101-analysis edge and budget recovery. Actual worker tests
+compare every saved model against the executable, preserve returned-versus-
+analyzed frequencies, and cover automatic cells, cancellation and recovery.
+
 Automatic cell sizing (AUTOCELL) applies to LMAT, CAP, PI2, PIX, PI4,
 CALCTRANS and 3PORT, including each saved sweep frequency. The recovered C++ rule
 uses the last technology metal: longitudinal size is `alpha * c / (4 f)`;
@@ -153,6 +181,8 @@ node tests/portable-simulation.mjs
 node tests/portable-pad.mjs
 node tests/two-port-output.mjs
 node tests/port-schedule.mjs
+node tests/self-resonance-plan.mjs
+node tests/worker-self-resonance.mjs
 node tests/automatic-cells.mjs
 node tests/maxnw.mjs
 node tests/maxnw-ports.mjs
@@ -462,6 +492,14 @@ the stable cross-section formulation verified by `portable-gmd.mjs` and
 `portable-simulation.mjs`; it is not tuned to reproduce a processor's final-bit
 approximation. Captured three-port backing replay explicitly scopes the retained
 reference arithmetic and restores the production policy afterwards.
+The three-port host audit also measures cancellation residuals relative to the
+matrix norm: near-zero entries of an inverted complex matrix need not retain
+component-relative accuracy. It records bounded host differences without CPU
+or case selection. CAP stages, schema, saved frequency and signed zero remain
+strict, and every original rectangular/polar S/Y/Z record is still compared
+exactly before the host audit. `tests/three-port.mjs --strict-native` additionally
+requires native instruction-bit identity. Production accuracy is checked
+separately against an independent 80-digit nodal reduction.
 
 The coupled-winding panel runs the original CALCTRANS backend and extracts its
 narrowband transformer model: primary/secondary L and R, mutual inductance,
@@ -582,6 +620,7 @@ Regenerate the independent original executable fixtures with:
 
 ```sh
 python3 tools/capture_lmat.py --reference ~/github/asitic-re
+python3 tools/capture_self_resonance.py --reference ~/github/asitic-re # requires GDB
 python3 tools/capture_maxnw.py --reference ~/github/asitic-re
 python3 tools/capture_maxnw_ports.py --reference ~/github/asitic-re
 python3 tools/capture_automatic_cells.py --reference ~/github/asitic-re # requires GDB
