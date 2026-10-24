@@ -8,3 +8,5 @@
 textarea{font:12px monospace;color:var(--ink);background:#101b1e;border:1px solid #3b4b50;border-radius:4px;padding:10px;resize:vertical;width:100%}.native-input{margin-top:22px;border-top:1px solid var(--line);padding-top:18px}.native-input summary{cursor:pointer;color:var(--accent);font-size:11px}.native-input label{margin-top:14px}.native-input button{font-size:10px}
 
 [hidden]{display:none!important}
+
+.append-layout{margin-top:20px}

@@ -10,7 +10,7 @@ let samples=[],selectedSimulation=null,sampleRequest=null,sampleKey='',capacitan
 const worker=new Worker(new URL('./worker.mjs',import.meta.url),{type:'module'});
 const simulationControls=['simulate','sweep','sim-winding','cell-length','cell-width','cell-thickness','cell-trigger','filament-limit','sweep-start','sweep-stop','sweep-count','frequency-scale','frequency','cap-solve','cap-winding','cap-ground','cap-frequency','cap-length','cap-width','cap-fftx','cap-ffty','contact-limit','cap-mode'];
 function setBusy(value,stoppable=false){
-  busy=value;for(const element of $('controls').elements)element.disabled=!ready||value||Boolean(element.closest('label')?.hidden)||Boolean(element.closest('.fields') && $('native-command').value.trim());
+  busy=value;for(const element of $('controls').elements)element.disabled=!ready||value||Boolean(element.closest('label')?.hidden)||Boolean(element.closest('.fields') && $('native-command').value.trim())||Boolean(element.id==='append-layout' && !layout);
   for(const id of simulationControls)$(id).disabled=!ready||!layout||value;
   $('analyze').disabled=!ready||!layout||value;$('stop').disabled=!value||!stoppable;
   $('cap-matrix-csv').disabled=value||!capacitanceResult;$('potential-matrix-csv').disabled=value||!capacitanceResult;
@@ -22,7 +22,7 @@ worker.onmessage=({data})=>{
   if(data.ready){ready=true;$('engine').textContent='● C++ / WASM ready';setBusy(false);if(technologyText)generate();return;}
   if(data.id!==request)return;
   if(data.cancelled){setBusy(false);$('status').textContent=`Sweep stopped. ${samples.length} completed samples retained.`;return;}
-  if(data.error){if(data.action==='generate'){layout=undefined;view=initialView=undefined;$('download').disabled=true;$('preview').replaceChildren();for(const id of ['footprint','segments','resistance'])$(id).textContent='—';clearSimulation();clearCapacitance();}failure(data.error);return;}
+  if(data.error){if(data.action==='generate' && !data.append){layout=undefined;view=initialView=undefined;$('download').disabled=true;$('preview').replaceChildren();for(const id of ['footprint','segments','resistance'])$(id).textContent='—';clearSimulation();clearCapacitance();}failure(data.error);return;}
   if(data.capacitance){
     capacitanceResult=data.capacitance;const c=capacitanceResult;setBusy(false);
     $('cap-total').textContent=c.capacitance_f===null?'—':(c.capacitance_f*1e15).toPrecision(7)+' fF';$('cap-resistance').textContent=c.resistance===null?'—':c.resistance.toPrecision(7)+' Ω';$('cap-contacts').textContent=String(c.contacts);
@@ -49,15 +49,15 @@ worker.onmessage=({data})=>{
   $('status').textContent=layout.warnings||'Layout generated. GDS export uses a 1 nm grid.';
 };
 function parameters(){return ['length','height','width','spacing','turns','radius','sides','metal','exit','angle','inner','secondary'].map(id=>Number($(id).value));}
-function options(){return {nativeInput:true,x:Number($('origin-x').value),y:Number($('origin-y').value),phase:Number($('phase').value),grid:Number($('snap-grid').value),snap:$('snap').checked,name:$('shape-name').value,secondaryName:$('secondary-name').value,secondaryWidth:Number($('secondary-width').value),nx:Number($('via-nx').value),ny:Number($('via-ny').value),via:Number($('via-layer').value)};}
+function options(){return {nativeInput:true,x:Number($('origin-x').value),y:Number($('origin-y').value),phase:Number($('phase').value),grid:Number($('snap-grid').value),snap:$('snap').checked,append:Boolean(layout && $('append-layout').checked),name:$('shape-name').value,secondaryName:$('secondary-name').value,secondaryWidth:Number($('secondary-width').value),nx:Number($('via-nx').value),ny:Number($('via-ny').value),via:Number($('via-layer').value)};}
 function frequency(){const value=Number($('frequency').value);if(!Number.isFinite(value)||value<=0)throw Error('Enter a positive frequency.');return value;}
 function send(data,stoppable=false){setBusy(true,stoppable);worker.postMessage({id:++request,...data});}
 $('analyze').onclick=()=>{try{if(layout){$('status').textContent='Calculating original conductor estimates…';send({action:'analyze',frequency_ghz:frequency()});}}catch(e){failure(e.message);}};
 function generate(){if(!ready||!technologyText)return;try{const o=options(),creator=$('native-command').value.trim()?parseCreatorCommand($('native-command').value,$('native-answers').value):creatorRecipe(Number($('kind').value),parameters(),o);$('download').disabled=true;$('loading').textContent='Generating geometry…';send({creator,options:o,technology:technologyText});}catch(e){failure(e.message);}}
 function updateMetals(text){const t=parseTechnology(text);for(const id of ['metal','exit']){$(id).replaceChildren();t.metals.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.name;$(id).append(o);});}const none=document.createElement('option');none.value=-1;none.textContent='None';$('exit').append(none);$('metal').value=Math.min(3,t.metals.length-1);$('exit').value=Math.min(2,t.metals.length-2);$('via-layer').replaceChildren();t.vias.forEach((v,i)=>{const option=document.createElement('option');option.value=i;option.textContent=v.name;$('via-layer').append(option);});}
-async function loadProcess(){try{if($('process').value==='custom'){updateMetals(importedText);technologyText=importedText;generate();return;}const response=await fetch(`technology/${$('process').value}.tek`);if(!response.ok)throw Error('Unable to load technology');const text=await response.text();updateMetals(text);technologyText=text;generate();}catch(e){failure(e.message);}}
+async function loadProcess(){try{$('append-layout').checked=false;if($('process').value==='custom'){updateMetals(importedText);technologyText=importedText;generate();return;}const response=await fetch(`technology/${$('process').value}.tek`);if(!response.ok)throw Error('Unable to load technology');const text=await response.text();updateMetals(text);technologyText=text;generate();}catch(e){failure(e.message);}}
 $('process').onchange=loadProcess;
-$('technology-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;const text=await file.text();updateMetals(text);technologyText=importedText=text;let option=$('process').querySelector('[value="custom"]');if(!option){option=document.createElement('option');option.value='custom';$('process').append(option);}option.textContent=file.name;$('process').value='custom';generate();}catch(e){failure(e.message);}};
+$('technology-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;const text=await file.text();$('append-layout').checked=false;updateMetals(text);technologyText=importedText=text;let option=$('process').querySelector('[value="custom"]');if(!option){option=document.createElement('option');option.value='custom';$('process').append(option);}option.textContent=file.name;$('process').value='custom';generate();}catch(e){failure(e.message);}};
 function updateCreatorFields(){
   const kind=Number($('kind').value),fields={0:['length','height','width','spacing','turns','metal','exit'],1:['radius','sides','width','spacing','turns','metal'],2:['length','width','metal'],3:['length','inner','width','spacing','turns','metal','exit'],4:['radius','sides','inner','width','spacing','turns','metal','exit'],5:['radius','sides','width','spacing','metal'],6:['length','height','width','spacing','turns','secondary','secondary-name','metal','exit'],7:['length','height','width','spacing','turns','secondary-name','metal','exit'],8:['length','height','width','spacing','turns','metal','exit'],9:['via-nx','via-ny','via-layer'],10:['length','height','metal','exit'],11:['length','width','secondary-width','spacing','turns','metal','exit']};
   const active=new Set(['shape-name','origin-x','origin-y','phase','snap-grid','snap',...fields[kind]]);
@@ -72,8 +72,8 @@ $('controls').onsubmit=e=>{e.preventDefault();generate();};
 function setView(){if(view)$('preview').setAttribute('viewBox',view.join(' '));}
 $('fit').onclick=()=>{if(initialView){view=[...initialView];setView();}};
 function render(){
-  const list=[...polygons(layout,technology)],points=list.flatMap(p=>p.points);
-  const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const list=[...polygons(layout,technology)];let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  for(const polygon of list)for(const [x,y] of polygon.points){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}
   const w=Math.max(1,x1-x0),h=Math.max(1,y1-y0),padding=Math.max(w,h)*.15;
   initialView=[x0-padding,-y1-padding,w+padding*2,h+padding*2];view=[...initialView];$('preview').replaceChildren();
   for(const polygon of list){const p=document.createElementNS(svgNS,'polygon');p.setAttribute('points',polygon.points.map(([x,y])=>`${x},${-y}`).join(' '));p.setAttribute('fill',colors[(polygon.layer-1)%colors.length]);p.setAttribute('fill-opacity','.77');p.setAttribute('stroke',colors[(polygon.layer-1)%colors.length]);p.setAttribute('stroke-width','.15');$('preview').append(p);}setView();

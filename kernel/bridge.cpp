@@ -114,6 +114,7 @@ const char* serialize_geometry() {
     char* out=result;out+=sprintf(out,"{\"shapes\":[");int index=0;
     for(auto* shape=head;shape;shape=shape->next,++index) {
         const double resistance=x87::binary64(shape_resistance_dc(shape->filaments,{metals,vias,metal_count}));
+        if(!__builtin_isfinite(resistance))return "{\"error\":\"Original geometry produced nonfinite resistance\"}";
         out+=sprintf(out,"%s{\"name\":",index?",":"");out=reasitic::json_string(out,reinterpret_cast<const char*>(shape->filaments.prefix));
         out+=sprintf(out,",\"resistance_dc\":%.17g,\"origin\":[%.17g,%.17g],\"segments\":[",resistance,number(*shape,0x54),number(*shape,0x5c));
         int count=0;
@@ -121,6 +122,7 @@ const char* serialize_geometry() {
             if(out-result>static_cast<int>(sizeof(result))-2048)return "{\"error\":\"Geometry exceeds export buffer\"}";
             out+=sprintf(out,"%s{\"metal\":%d,\"width\":%.17g,\"thickness\":%.17g,\"nx\":%d,\"ny\":%d,\"points\":[",count?",":"",s->metal,s->width,s->metal<metal_count?s->thickness:0.,s->width_count,s->thickness_count);
             const double* points[]={s->endpoints,s->endpoints+3,s->outer_start,s->outer_end,s->inner_start,s->inner_end};
+            for(int j=0;j<6;++j)for(int k=0;k<3;++k)if(!__builtin_isfinite(points[j][k]))return "{\"error\":\"Original geometry produced nonfinite coordinates\"}";
             for(int j=0;j<6;++j)out+=sprintf(out,"%s[%.17g,%.17g,%.17g]",j?",":"",points[j][0],points[j][1],points[j][2]);
             out+=sprintf(out,"]}");
         }
@@ -207,10 +209,12 @@ const char* create_geometry(int id,const char* keywords,const char* input,double
         char* out=result;out+=sprintf(out,"{\"error\":");out=reasitic::json_string(out,warnings);sprintf(out,"}");return result;
     }
     bool suppressed=false;create_native_geometry(id,creator_arguments,state,suppressed);
-    head=state.head;creator_active=false;
+    head=state.head;const char* serialized=serialize_geometry();
+    if(serialized!=result)fail_creator("Generated layout is nonfinite or exceeds the export size limit");
+    creator_active=false;
     while(pending) { pending->tracked=false;pending=pending->next; }
     if(head==original_head)return "{\"error\":\"Original creator did not produce geometry\"}";
-    return serialize_geometry();
+    return serialized;
 }
 const char* analyze(double frequency_hz) {
     warning_length=0;warnings[0]=0;

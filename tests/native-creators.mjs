@@ -47,9 +47,17 @@ const first=createGeometry(kernel,2,'NAME=A:LEN=20:WID=3:METAL=M1');
 assert.throws(()=>createGeometry(kernel,0,'NAME=B:LEN=20:W=3:S=2:N=64','',{append:true}),/./);
 assert.throws(()=>createGeometry(kernel,2,'NAME=A:LEN=20:WID=3:METAL=M1','',{append:true}),/already/);
 const both=createGeometry(kernel,2,'NAME=B:LEN=20:WID=3:METAL=M1','',{append:true});assert.equal(both.shapes.length,2);assert.deepEqual(both.shapes[1],first.shapes[0]);
+createGeometry(kernel,2,'NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100');
+const grounded=createGeometry(kernel,2,'NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100','',{append:true});
+writeFileSync(new URL('../build/evidence/composed-ground.gds',import.meta.url),writeGDS(grounded,technology));
 assert.throws(()=>createGeometry(kernel,10,'','P\nS\n80 80\n3\n8\n2\nM4\nM3\n100 100\n0\n'),/another line/);
 assert.throws(()=>createGeometry(kernel,0,':'),/arguments/);
 assert.throws(()=>createGeometry(kernel,1,'NAME=A:RAD=50:W=0:S=0:N=2:SIDES=1000000'),/arguments/);
+// A late export-limit failure occurs after native allocation/construction.
+// Appending it must roll back all new records and preserve the previous layout.
+const preserved=createGeometry(kernel,2,'NAME=KEEP:LEN=20:WID=3:METAL=M1');
+assert.throws(()=>createGeometry(kernel,1,'NAME=TOO_BIG:RAD=250:SIDES=256:W=.1:S=.1:N=64:METAL=M4','',{append:true}),/export size limit/);
+const recovered=createGeometry(kernel,2,'NAME=NEXT:LEN=20:WID=3:METAL=M1','',{append:true});assert.equal(recovered.shapes.length,2);assert.deepEqual(recovered.shapes[1],preserved.shapes[0]);
 const quoted=createGeometry(kernel,2,'NAME=A"B:LEN=20:WID=3:METAL=M1');assert.equal(quoted.shapes[0].name,'A"B');assert.equal(JSON.parse(kernel.UTF8ToString(kernel._analyze(1e9))).windings[0].name,'A"B');assert.equal(JSON.parse(kernel.UTF8ToString(kernel._simulate(0,1e9,1000,1000,1000,1000,8))).name,'A"B');
 for(let i=0;i<30;i++){assert.throws(()=>createGeometry(kernel,0,'NAME=X:LEN=20:W=3:S=2:N=64'),/./);createGeometry(kernel,2,'NAME=A:LEN=20:WID=3:METAL=M1');}
 mkdirSync(new URL('../build/evidence/',import.meta.url),{recursive:true});writeFileSync(new URL('../build/evidence/native-creators.json',import.meta.url),JSON.stringify({families:report,exact_fields:exact,original_printed_fields:printed},null,2)+'\n');

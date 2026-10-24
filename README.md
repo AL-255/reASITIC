@@ -17,7 +17,10 @@ The browser workbench includes square/polygon/symmetric/multi-metal
 windings, planar and 3D mirror transformers, baluns, stacked capacitor plates,
 rings, wires and configurable via arrays. The original keyword parsers and
 interactive creator dispatch run in C++. The advanced command editor supports
-all twelve creator commands and native dimensions such as ILEN / IWID. Parameters use micrometres. The original `RESIS` DC resistance, `INDUCTANCE` conductor estimate and `RESISHF`
+all twelve creator commands and native dimensions such as ILEN / IWID. Add devices
+to a shared layout to construct independent ground conductors and coil assemblies;
+new devices require unique names and the same technology. Rejected additions,
+including late export failures, preserve the previous layout and solver state. Parameters use micrometres. The original `RESIS` DC resistance, `INDUCTANCE` conductor estimate and `RESISHF`
 high-frequency resistance paths run inside the C++ kernel. These are the original
 conductor estimates; the original no-eddy LMAT filament solver is available in the workbench.
 The original layered CAP solver is also available, with substrate conductivity
@@ -82,7 +85,7 @@ Current measured evidence:
   including the original negative-angle normalization behavior.
 - Both transformer windings match the unchanged i386 solver. Rejected meshes
   recover, simulation does not mutate source geometry, and 100 repeated solves
-  retain a bounded heap. An independent gdstk reader validates 32 GDS exports.
+  retain a bounded heap. An independent gdstk reader validates 33 GDS exports.
 
 These are bounded tests, not universal parity claims. All listed exact
 comparisons are required CI gates. The source translator rejects unknown

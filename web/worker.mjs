@@ -1,6 +1,6 @@
 import createKernel from './asitic.js';
 import {parseTechnology,configureKernel,generateGeometry,createGeometry} from './technology.mjs';
-const kernel=await createKernel();let epoch=0,processTechnology=null;
+const kernel=await createKernel();let epoch=0,processTechnology=null,hasLayout=false;
 function frequency(data,value=data.frequency_ghz) {
   const result=value===undefined?data.frequency:kernel._normalize_value(Number(value),5,.1,0);
   if(!Number.isFinite(result) || result<=0)throw Error('Enter a positive native ASITIC frequency.');return result;
@@ -47,8 +47,11 @@ self.onmessage=async({data})=>{
       return;
     }
     if(action!=='generate')throw Error('Unknown workbench action.');
-    const technology=parseTechnology(data.technology);configureKernel(kernel,technology);processTechnology=technology;
-    const layout=data.creator?createGeometry(kernel,data.creator.id,data.creator.keywords,data.creator.answers,{...data.options,domain:technology.domain}):generateGeometry(kernel,data.kind,data.parameters,data.options);postMessage({id:data.id,layout,technology});
-  }catch(error){postMessage({id:data.id,error:error.message,action});}
+    const append=Boolean(data.options?.append);
+    if(append && (!hasLayout || !data.creator || data.technology!==processTechnology?.source))throw Error('Add to layout requires an existing layout, an original creator command, and the same technology.');
+    const technology=append?processTechnology:parseTechnology(data.technology);
+    if(!append){hasLayout=false;configureKernel(kernel,technology);processTechnology=technology;}
+    const layout=data.creator?createGeometry(kernel,data.creator.id,data.creator.keywords,data.creator.answers,{...data.options,domain:technology.domain}):generateGeometry(kernel,data.kind,data.parameters,data.options);hasLayout=true;postMessage({id:data.id,layout,technology});
+  }catch(error){postMessage({id:data.id,error:error.message,action,append:Boolean(data.options?.append)});}
 };
 postMessage({ready:true});
