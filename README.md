@@ -1042,3 +1042,23 @@ that work. Browser visual QA remains outstanding when a browser is available.
 
 GitHub Actions rebuilds the module, runs these checks, retains the numerical
 difference report and GDS artifacts, then deploys `dist/` to GitHub Pages.
+
+The public page loads a complete browser release from `releases/<sha256>/`.
+The identifier covers the JavaScript modules, WASM bytes, technology files,
+styles and bundled notices. Module imports, workers, the WASM loader and process
+loads stay within that release, so independently cached root files cannot mix
+kernel versions. `dist/build.json` records each input's SHA-256 and byte count;
+unversioned root artifacts remain available for Node verification.
+
+If a cached page refers to a release removed by a newer deployment, startup
+shows an explicit reload link that requests fresh root HTML. The same recovery
+is available after a worker load fails, including older pages without that link.
+An incompatible old kernel is rejected before the worker reports ready. The
+integration check models two cacheable deployments, verifies the module graph
+and stale-page recovery, then runs real packaged WASM/worker CAP and byte-identical
+GDS export. It verifies packaging and loading; rendered browser QA remains
+unverified when no browser surface is available.
+
+```sh
+node --experimental-vm-modules tests/site-package.mjs
+```

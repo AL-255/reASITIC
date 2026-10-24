@@ -1,3 +1,4 @@
+import {revealReload} from './startup.mjs';
 import {optimizationCSV} from './optimization.mjs';
 import {conductorEstimatesCSV} from './estimates.mjs';
 import {resonanceHistoryCSV} from './self-resonance.mjs';
@@ -45,7 +46,7 @@ function setBusy(value,stoppable=false){
   $('matrix-csv').disabled=value||!selectedSimulation?.matrix;$('results-csv').disabled=value||!samples.length;
 }
 function failure(message){if(activeOptimization){activeOptimization=false;$('opt-state').textContent=`Search stopped after ${optimizationSamples.length} completed candidates. ${message}`;}if(activeSelfResonance)$('selfres-state').textContent=`Search stopped after an error. ${selfResonanceSamples.length} analyses retained.`;activePortSweep=null;activeSelfResonance=false;$('status').textContent=message;$('loading').textContent='';setBusy(false);}
-worker.onerror=event=>{ready=false;$('engine').textContent='Kernel unavailable';failure(event.message||'Unable to load the WebAssembly kernel.');};
+worker.onerror=event=>{revealReload(document,location.href);ready=false;$('engine').textContent='Kernel unavailable';failure(event.message||'Unable to load the WebAssembly kernel.');};
 worker.onmessage=({data})=>{
   if(data.ready){ready=true;$('engine').textContent='● C++ / WASM ready';setBusy(false);if(technologyText)generate();return;}
   if(data.id!==request)return;
@@ -164,7 +165,7 @@ $('estimates-csv').onclick=()=>{try{download(conductorEstimatesCSV(conductorAnal
 $('apply-edit').onclick=()=>{try{const o=options();$('status').textContent='Applying original geometry edits…';send({action:'edit',commands:$('edit-commands').value,options:{grid:o.grid,snap:o.snap}});}catch(e){failure(e.message);}};
 function generate(){if(!ready||!technologyText)return;try{const o=options(),creator=$('native-command').value.trim()?parseCreatorCommand($('native-command').value,$('native-answers').value):creatorRecipe(Number($('kind').value),parameters(),o);$('download').disabled=true;$('loading').textContent='Generating geometry…';send({creator,options:o,technology:technologyText});}catch(e){failure(e.message);}}
 function updateMetals(text){const t=parseTechnology(text);for(const id of ['metal','exit']){$(id).replaceChildren();t.metals.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.name;$(id).append(o);});}const none=document.createElement('option');none.value=-1;none.textContent='None';$('exit').append(none);$('metal').value=Math.min(3,t.metals.length-1);$('exit').value=Math.min(2,t.metals.length-2);$('via-layer').replaceChildren();t.vias.forEach((v,i)=>{const option=document.createElement('option');option.value=i;option.textContent=v.name;$('via-layer').append(option);});for(const id of ['eddy-layer-1','eddy-layer-2']){$(id).replaceChildren();t.dielectric.forEach((layer,i)=>{const option=document.createElement('option');option.value=i;option.textContent=`Layer ${i} · ρ ${layer.resistivity} Ω·cm`;$(id).append(option);});}$('eddy-layer-count').value=t.eddy_layers.length;$('eddy-layer-1').value=t.eddy_layers[0]??0;$('eddy-layer-2').value=t.eddy_layers[1]??Math.min(1,t.dielectric.length-1);}
-async function loadProcess(){try{$('append-layout').checked=false;if($('process').value==='custom'){updateMetals(importedText);technologyText=importedText;generate();return;}const response=await fetch(`technology/${$('process').value}.tek`);if(!response.ok)throw Error('Unable to load technology');const text=await response.text();updateMetals(text);technologyText=text;generate();}catch(e){failure(e.message);}}
+async function loadProcess(){try{$('append-layout').checked=false;if($('process').value==='custom'){updateMetals(importedText);technologyText=importedText;generate();return;}const response=await fetch(new URL(`./technology/${$('process').value}.tek`,import.meta.url));if(!response.ok)throw Error('Unable to load technology');const text=await response.text();updateMetals(text);technologyText=text;generate();}catch(e){failure(e.message);}}
 $('process').onchange=loadProcess;
 $('technology-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;const text=await file.text();$('append-layout').checked=false;updateMetals(text);technologyText=importedText=text;let option=$('process').querySelector('[value="custom"]');if(!option){option=document.createElement('option');option.value='custom';$('process').append(option);}option.textContent=file.name;$('process').value='custom';generate();}catch(e){failure(e.message);}};
 function updateCreatorFields(){

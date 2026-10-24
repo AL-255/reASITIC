@@ -4,6 +4,7 @@ from pathlib import Path
 from port_geometry import generate,SOURCES
 from port_libm import build as build_libm
 from port_libbf import build as build_libbf
+from package_site import package
 ROOT=Path(__file__).resolve().parents[1]
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--emxx',default=os.environ.get('EMXX',shutil.which('em++') or str(Path.home()/'emsdk/upstream/emscripten/em++')));args=parser.parse_args()
@@ -13,7 +14,9 @@ def main():
         for name,digest in manifest['files'].items():
             if hashlib.sha256((ROOT/'vendor'/vendor/name).read_bytes()).hexdigest()!=digest:raise RuntimeError('Reference snapshot changed: '+vendor+'/'+name)
     clang=Path(shutil.which(args.emxx) or args.emxx).resolve().parent.parent/'bin/clang++'
-    port=generate(clang=clang);dist=ROOT/'dist';shutil.copytree(ROOT/'web',dist,dirs_exist_ok=True)
+    port=generate(clang=clang);dist=ROOT/'dist'
+    if dist.exists():shutil.rmtree(dist)
+    shutil.copytree(ROOT/'web',dist)
     inc=['-I'+str(port),'-I'+str(ROOT/'kernel'),'-I'+str(ROOT/'vendor/softfloat/include'),'-I'+str(ROOT/'vendor/softfloat/8086'),'-I'+str(ROOT/'vendor/libbf')]
     flags=['-O2','-fno-fast-math','-ffp-contract=off','-DSOFTFLOAT_FAST_INT64','-DINLINE_LEVEL=5','-DSOFTFLOAT_ROUND_ODD']
     version=subprocess.check_output([args.emxx,'--version'],text=True)
@@ -32,5 +35,6 @@ def main():
          '-sEXPORTED_FUNCTIONS=["_malloc","_free","_generate","_create_geometry","_set_layer_name","_set_geometry_options","_set_ring_gap_radians","_normalize_value","_reset_technology","_set_substrate","_set_substrate_material","_finalize_technology","_set_metal","_set_metal_rules","_set_via","_last_warnings","_analyze","_coupling","_optimization_plan","_optimization_multimetal_plan","_optimization_create","_optimization_accept","_set_potential_memo","_potential_memo_stats","_simulate","_simulate_capacitance","_max_contact_count","_potential_grid_fits","_probe_math","_probe_potential_contact","_probe_gmd","_probe_error_power","_set_reference_numerics","_probe_retained_math","_probe_runtime_trig","_probe_green","_simulate_eddy","_simulate_network","_simulate_extended_network","_simulate_pad_network","_simulate_transformer","_simulate_three_port","_probe_three_port","_probe_two_port_output","_port_frequency_schedule","_automatic_cell_limits","_set_max_width_cells","_edit_geometry","_self_resonance_plan","_shape_kind","_port_analysis_plan","_capacitor_port_matrix","_capacitor_port_response"]',
          '-sEXPORTED_RUNTIME_METHODS=["UTF8ToString","HEAPF64"]','-o',str(dist/'asitic.js')]
     subprocess.run(cmd,check=True)
-    print('Built',dist/'asitic.wasm')
+    site=package(dist)
+    print('Built',dist/'asitic.wasm','in browser release',site['release'])
 if __name__=='__main__':main()
