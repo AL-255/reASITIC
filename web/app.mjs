@@ -6,6 +6,7 @@ import {resonanceHistoryCSV} from './self-resonance.mjs';
 import {writeGDS,segmentRecords} from './gds.mjs';
 import {renderGeometryPreview} from './geometry-preview.mjs';
 import {parseTechnology} from './technology.mjs';
+import {createTechnologyLoader} from './technology-loader.mjs';
 import {creatorRecipe,parseCreatorCommand} from './creators.mjs';
 import {capacitanceMatrixCSV,capacitanceDiagnostics} from './capacitance.mjs';
 import {validateThreePortBacking,threePortMetricsCSV} from './three-port.mjs';
@@ -16,6 +17,7 @@ import {frequencySweep,matrixCSV,sweepCSV,plotSeries} from './simulation.mjs';
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
 const colors=['#d8ba69','#8ab9df','#b89bde','#b4e887','#e1b486','#cf83a6','#80c9c3','#ece7bb'];
 let importedText='',technologyText='',layout,technology,ready=false,busy=false,request=0,view,initialView,drag;
+let processLoading=false,appliedProcess=null;
 let conductorAnalysis=null,loadedPortResult=null;
 let samples=[],selectedSimulation=null,sampleRequest=null,sampleKey='',capacitanceResult=null,networkResult=null,transformerResult=null,threeResult=null,threeBacking=null;
 const portSamples={network:[],transformer:[],'three-port':[]};let activePortSweep=null,activeSelfResonance=false,selfResonanceResult=null,selfResonanceSamples=[];
@@ -23,7 +25,9 @@ let activeOptimization=false,optimizationSamples=[];
 const worker=new Worker(new URL('./worker.mjs',import.meta.url),{type:'module'});
 const simulationControls=['loaded-source','loaded-port','loaded-real','loaded-imag','loaded-cap1','loaded-cap2','coupling-first','coupling-second','selfres-search','selfres-start','selfres-end','selfres-step','selfres-mode','selfres-budget','max-width-cells','cell-policy','cell-alpha','cell-beta','simulate','sweep','sim-winding','cell-length','cell-width','cell-thickness','cell-trigger','filament-limit','sweep-start','sweep-stop','sweep-count','frequency-scale','frequency','cap-solve','cap-winding','cap-ground','cap-frequency','cap-length','cap-width','cap-fftx','cap-ffty','contact-limit','cap-mode','eddy-mode','eddy-layer-count','eddy-layer-1','eddy-layer-2','green-budget','network-model','network-pad1','network-pad2','network-solve','network-sweep','network-start','network-end','network-step','trans-sweep','trans-start','trans-end','trans-step','network-parameter','network-format','trans-parameter','trans-format','trans-primary','trans-secondary','trans-termination','trans-solve','three-first','three-second','three-third','three-parameter','three-format','three-backing-file','three-solve','three-sweep','three-start','three-end','three-step'];
 function setBusy(value,stoppable=false){
-  busy=value;for(const element of $('controls').elements)element.disabled=!ready||value||Boolean(element.closest('label')?.hidden)||Boolean(element.closest('.fields') && $('native-command').value.trim())||Boolean(element.id==='append-layout' && !layout);
+  busy=value;value||=processLoading;for(const element of $('controls').elements)element.disabled=!ready||value||Boolean(element.closest('label')?.hidden)||Boolean(element.closest('.fields') && $('native-command').value.trim())||Boolean(element.id==='append-layout' && !layout);
+  for(const id of ['process','technology-file'])$(id).disabled=!ready||busy;
+  $('generate').disabled=!ready||value||!technologyText;
   for(const id of ['opt-search','opt-search-kind','opt-keywords','opt-limit'])$(id).disabled=!ready||value;
   $('opt-choice').disabled=value||!optimizationSamples.length;$('opt-stop').disabled=!value||!activeOptimization;$('opt-csv').disabled=value||!optimizationSamples.length;
   const selected=optimizationSamples.find(s=>s.index===Number($('opt-choice').value));$('opt-apply').disabled=value||!selected||!selected.geometry_valid;
@@ -169,15 +173,33 @@ $('opt-apply').onclick=()=>{try{send({action:'optimization-apply',index:Number($
 $('analyze').onclick=()=>{try{if(layout){$('status').textContent='Calculating original conductor estimates…';send({action:'analyze',frequency_ghz:frequency()});}}catch(e){failure(e.message);}};
 $('estimates-csv').onclick=()=>{try{download(conductorEstimatesCSV(conductorAnalysis),'reASITIC-conductor-estimates.csv','text/csv');}catch(e){failure(e.message);}};
 $('apply-edit').onclick=()=>{try{const o=options();$('status').textContent='Applying original geometry edits…';send({action:'edit',commands:$('edit-commands').value,options:{grid:o.grid,snap:o.snap}});}catch(e){failure(e.message);}};
-function generate(){if(!ready||!technologyText)return;try{const o=options(),creator=$('native-command').value.trim()?parseCreatorCommand($('native-command').value,$('native-answers').value):creatorRecipe(Number($('kind').value),parameters(),o);$('download').disabled=true;$('loading').textContent='Generating geometry…';send({creator,options:o,technology:technologyText});}catch(e){failure(e.message);}}
-function updateMetals(text){const t=parseTechnology(text);for(const id of ['metal','exit']){$(id).replaceChildren();t.metals.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.name;$(id).append(o);});}const none=document.createElement('option');none.value=-1;none.textContent='None';$('exit').append(none);$('metal').value=Math.min(3,t.metals.length-1);$('exit').value=Math.min(2,t.metals.length-2);$('via-layer').replaceChildren();t.vias.forEach((v,i)=>{const option=document.createElement('option');option.value=i;option.textContent=v.name;$('via-layer').append(option);});for(const id of ['eddy-layer-1','eddy-layer-2']){$(id).replaceChildren();t.dielectric.forEach((layer,i)=>{const option=document.createElement('option');option.value=i;option.textContent=`Layer ${i} · ρ ${layer.resistivity} Ω·cm`;$(id).append(option);});}$('eddy-layer-count').value=t.eddy_layers.length;$('eddy-layer-1').value=t.eddy_layers[0]??0;$('eddy-layer-2').value=t.eddy_layers[1]??Math.min(1,t.dielectric.length-1);}
-async function loadProcess(){try{$('append-layout').checked=false;if($('process').value==='custom'){updateMetals(importedText);technologyText=importedText;generate();return;}const response=await fetch(new URL(`./technology/${$('process').value}.tek`,import.meta.url));if(!response.ok)throw Error('Unable to load technology');const text=await response.text();updateMetals(text);technologyText=text;generate();}catch(e){failure(e.message);}}
+function generate(){if(!ready||processLoading||!technologyText)return;try{const o=options(),creator=$('native-command').value.trim()?parseCreatorCommand($('native-command').value,$('native-answers').value):creatorRecipe(Number($('kind').value),parameters(),o);$('download').disabled=true;$('loading').textContent='Generating geometry…';send({creator,options:o,technology:technologyText});}catch(e){failure(e.message);}}
+function updateMetals(text,t=parseTechnology(text)){for(const id of ['metal','exit']){$(id).replaceChildren();t.metals.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.name;$(id).append(o);});}const none=document.createElement('option');none.value=-1;none.textContent='None';$('exit').append(none);$('metal').value=Math.min(3,t.metals.length-1);$('exit').value=Math.min(2,t.metals.length-2);$('via-layer').replaceChildren();t.vias.forEach((v,i)=>{const option=document.createElement('option');option.value=i;option.textContent=v.name;$('via-layer').append(option);});for(const id of ['eddy-layer-1','eddy-layer-2']){$(id).replaceChildren();t.dielectric.forEach((layer,i)=>{const option=document.createElement('option');option.value=i;option.textContent=`Layer ${i} · ρ ${layer.resistivity} Ω·cm`;$(id).append(option);});}$('eddy-layer-count').value=t.eddy_layers.length;$('eddy-layer-1').value=t.eddy_layers[0]??0;$('eddy-layer-2').value=t.eddy_layers[1]??Math.min(1,t.dielectric.length-1);}
+const loadTechnology=createTechnologyLoader({
+  loading:value=>{processLoading=value;setBusy(busy);if(value)$('status').textContent='Loading technology…';},
+  apply:({text,technology,selection})=>{
+    updateMetals(text,technology);technologyText=text;$('append-layout').checked=false;
+    if(selection.value==='custom'){
+      importedText=text;let option=$('process').querySelector('[value="custom"]');
+      if(!option){option=document.createElement('option');option.value='custom';$('process').append(option);}
+      if(selection.name)option.textContent=selection.name;
+    }
+    $('process').value=appliedProcess=selection.value;generate();
+  },
+  error:reason=>{if(appliedProcess!==null)$('process').value=appliedProcess;failure(reason.message);}
+});
+function loadProcess(){const value=$('process').value;return loadTechnology(async()=>{
+  if(value==='custom')return importedText;
+  const response=await fetch(new URL(`./technology/${value}.tek`,import.meta.url));
+  if(!response.ok)throw Error('Unable to load technology');return response.text();
+},{value});}
 $('process').onchange=loadProcess;
-$('technology-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;const text=await file.text();$('append-layout').checked=false;updateMetals(text);technologyText=importedText=text;let option=$('process').querySelector('[value="custom"]');if(!option){option=document.createElement('option');option.value='custom';$('process').append(option);}option.textContent=file.name;$('process').value='custom';generate();}catch(e){failure(e.message);}};
+$('technology-file').onchange=event=>{const file=event.target.files[0];if(file)return loadTechnology(()=>file.text(),{value:'custom',name:file.name});};
 function updateCreatorFields(){
   const kind=Number($('kind').value),fields={0:['length','height','width','spacing','turns','metal','exit'],1:['radius','sides','width','spacing','turns','metal'],2:['length','width','metal'],3:['length','inner','width','spacing','turns','metal','exit'],4:['radius','sides','inner','width','spacing','turns','metal','exit'],5:['radius','sides','width','spacing','metal'],6:['length','height','width','spacing','turns','secondary','secondary-name','metal','exit'],7:['length','height','width','spacing','turns','secondary-name','metal','exit'],8:['length','height','width','spacing','turns','metal','exit'],9:['via-nx','via-ny','via-layer'],10:['length','height','metal','exit'],11:['length','width','secondary-width','spacing','turns','metal','exit']};
   const active=new Set(['shape-name','origin-x','origin-y','phase','snap-grid','snap',...fields[kind]]);
-  for(const element of document.querySelectorAll('.fields input,.fields select')){element.closest('label').hidden=!active.has(element.id);element.disabled=!active.has(element.id)||!ready||busy||Boolean($('native-command').value.trim());}
+  if(kind!==9)active.add('angle');
+  for(const element of document.querySelectorAll('.fields input,.fields select')){element.closest('label').hidden=!active.has(element.id);element.disabled=!active.has(element.id)||!ready||busy||processLoading||Boolean($('native-command').value.trim());}
   $('spacing-label').firstChild.textContent=kind===5?'Gap · degrees':'Spacing';
 }
 $('kind').onchange=()=>{$('spacing').value=$('kind').value==='5'?20:$('kind').value==='7'?8:2;updateCreatorFields();};

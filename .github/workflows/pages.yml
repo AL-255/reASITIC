@@ -36,6 +36,7 @@ jobs:
           node tests/kernel-factory.mjs
           node tests/optimizer-startup.mjs
           node --experimental-vm-modules tests/site-package.mjs
+          node --experimental-vm-modules tests/app-process-loading.mjs
       - run: python tools/build_native.py
       - name: Verify integer controls before WASM conversion
         run: node tests/worker-integer-controls.mjs

@@ -138,6 +138,18 @@ retain that status and verify completed geometry and DC outputs twice. Separate
 original processes reload those unmodified records, verify the geometry survives
 the round trip, and produce repeatable LMAT references.
 
+Process downloads and imported technology files validate before changing the
+workbench. Only the most recent selection can publish its process and generate
+geometry; older downloads and errors are ignored. A rejected file or failed
+download retains the previous process selection and downloadable layout. The
+creator form exposes native orientation for all eleven constructors that accept
+it; VIA orientation uses the original ROTATE geometry edit.
+`tests/app-process-loading.mjs` executes the actual application handlers with
+controlled overlapping reads and real WASM worker responses. It checks both
+sample stacks, startup ordering, process rollback, form orientation and a rotated
+wire's exact original geometry/GDS. This verifies DOM logic; rendered browser
+QA remains outstanding.
+
 Imported metal `SMIN` and `WMIN` values reach the original C++ symmetric-creator
 prompts. They select its transition-clearance loop and width warnings; they do
 not impose a new blanket clamp on creator dimensions. The C++ boundary keeps
@@ -1169,4 +1181,5 @@ unverified when no browser surface is available.
 node tests/kernel-factory.mjs
 node tests/optimizer-startup.mjs
 node --experimental-vm-modules tests/site-package.mjs
+node --experimental-vm-modules tests/app-process-loading.mjs
 ```
