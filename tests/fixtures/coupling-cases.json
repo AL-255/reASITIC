@@ -1,0 +1,401 @@
+{
+  "cases": [
+    {
+      "name": "parallel-wire",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=M1:XORG=100:YORG=100:ORIENT=0",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=M1:XORG=100:YORG=130:ORIENT=0",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "antiparallel-wire",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=M1:XORG=100:YORG=100:ORIENT=0",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=M1:XORG=100:YORG=130:ORIENT=180",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "orthogonal-wire",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=M1:XORG=100:YORG=100:ORIENT=0",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=M1:XORG=100:YORG=130:ORIENT=90",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "stacked-wire",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=M1:XORG=100:YORG=100:ORIENT=0",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=M2:XORG=100:YORG=100:ORIENT=0",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "rotated-wire",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=M1:XORG=123.46:YORG=125.24:ORIENT=37",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=M1:XORG=180.26:YORG=159.24:ORIENT=37",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "large-origin-wire",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=M1:XORG=500000.1:YORG=500000.3:ORIENT=37",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=M1:XORG=500100.1:YORG=500080.3:ORIENT=37",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "short-wire",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=1:WID=5:METAL=M1:XORG=100:YORG=100:ORIENT=0",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=1:WID=5:METAL=M1:XORG=100:YORG=110:ORIENT=0",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "square-pair",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=1.5:METAL=M4:EXIT=M3:XORG=150:YORG=200",
+          "answers": ""
+        },
+        {
+          "command": "SQUARE NAME=B:LEN=100:WID=90:W=3:S=2:N=1.5:METAL=M4:EXIT=M3:XORG=300:YORG=200",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "polygon-pair",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "SPIRAL NAME=A:RAD=50:SIDES=7:W=3:S=2:N=1.5:METAL=M4:XORG=150:YORG=200:ORIENT=37",
+          "answers": ""
+        },
+        {
+          "command": "SPIRAL NAME=B:RAD=50:SIDES=7:W=3:S=2:N=1.5:METAL=M4:XORG=300:YORG=200:ORIENT=37",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "symmetric-pair",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "SYMSQ NAME=A:LEN=100:ILEN=15:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=150:YORG=200",
+          "answers": ""
+        },
+        {
+          "command": "SYMSQ NAME=B:LEN=100:ILEN=15:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=300:YORG=200",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "transformer-pair",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "TRANS PNAME=P:SNAME=S:LEN=100:WID=90:WP=3:WS=4:S=2:NP=1.5:NS=1.25:METAL=M4:EXIT=M3:XORG=200:YORG=200",
+          "answers": ""
+        }
+      ],
+      "first": "P",
+      "second": "S"
+    },
+    {
+      "name": "balun-pair",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "BALUN NAME=T:LEN=120:W1=3:W2=4:S=2:N=3:METAL=M4:METAL2=M3:XORG=200:YORG=200",
+          "answers": ""
+        }
+      ],
+      "first": "T-P",
+      "second": "T-S"
+    },
+    {
+      "name": "mirror-pair",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "3DMIRRORTRANS",
+          "answers": "P\nS\n80 80\n3\n8\n2\nM4\nM3\n200 200\n0\n1\n"
+        }
+      ],
+      "first": "P",
+      "second": "S"
+    },
+    {
+      "name": "via-pair",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "VIA",
+          "answers": "A\nVIA1\n2\n3\n1\n100 100\n"
+        },
+        {
+          "command": "VIA",
+          "answers": "B\nVIA1\n2\n3\n1\n110 100\n"
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "bicmos-parallel-wire",
+      "technology": "BiCMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=MSUB:XORG=100:YORG=100:ORIENT=0",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=MSUB:XORG=100:YORG=130:ORIENT=0",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "bicmos-antiparallel-wire",
+      "technology": "BiCMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=MSUB:XORG=100:YORG=100:ORIENT=0",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=MSUB:XORG=100:YORG=130:ORIENT=180",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "bicmos-orthogonal-wire",
+      "technology": "BiCMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=MSUB:XORG=100:YORG=100:ORIENT=0",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=MSUB:XORG=100:YORG=130:ORIENT=90",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "bicmos-stacked-wire",
+      "technology": "BiCMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=MSUB:XORG=100:YORG=100:ORIENT=0",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=M2:XORG=100:YORG=100:ORIENT=0",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "bicmos-rotated-wire",
+      "technology": "BiCMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=MSUB:XORG=123.46:YORG=125.24:ORIENT=37",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=MSUB:XORG=180.26:YORG=159.24:ORIENT=37",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "bicmos-square-pair",
+      "technology": "BiCMOS",
+      "creators": [
+        {
+          "command": "SQUARE NAME=A:LEN=100:WID=90:W=3:S=2:N=1.5:METAL=M3:EXIT=M2:XORG=150:YORG=200",
+          "answers": ""
+        },
+        {
+          "command": "SQUARE NAME=B:LEN=100:WID=90:W=3:S=2:N=1.5:METAL=M3:EXIT=M2:XORG=300:YORG=200",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "bicmos-polygon-pair",
+      "technology": "BiCMOS",
+      "creators": [
+        {
+          "command": "SPIRAL NAME=A:RAD=50:SIDES=7:W=3:S=2:N=1.5:METAL=M3:XORG=150:YORG=200:ORIENT=37",
+          "answers": ""
+        },
+        {
+          "command": "SPIRAL NAME=B:RAD=50:SIDES=7:W=3:S=2:N=1.5:METAL=M3:XORG=300:YORG=200:ORIENT=37",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "bicmos-symmetric-pair",
+      "technology": "BiCMOS",
+      "creators": [
+        {
+          "command": "SYMSQ NAME=A:LEN=100:ILEN=15:W=3:S=2:N=2:METAL=M3:METAL2=M2:XORG=150:YORG=200",
+          "answers": ""
+        },
+        {
+          "command": "SYMSQ NAME=B:LEN=100:ILEN=15:W=3:S=2:N=2:METAL=M3:METAL2=M2:XORG=300:YORG=200",
+          "answers": ""
+        }
+      ],
+      "first": "A",
+      "second": "B"
+    },
+    {
+      "name": "bicmos-transformer-pair",
+      "technology": "BiCMOS",
+      "creators": [
+        {
+          "command": "TRANS PNAME=P:SNAME=S:LEN=100:WID=90:WP=3:WS=4:S=2:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=200:YORG=200",
+          "answers": ""
+        }
+      ],
+      "first": "P",
+      "second": "S"
+    },
+    {
+      "name": "bicmos-balun-pair",
+      "technology": "BiCMOS",
+      "creators": [
+        {
+          "command": "BALUN NAME=T:LEN=120:W1=3:W2=4:S=2:N=3:METAL=M3:METAL2=M2:XORG=200:YORG=200",
+          "answers": ""
+        }
+      ],
+      "first": "T-P",
+      "second": "T-S"
+    },
+    {
+      "name": "bicmos-mirror-pair",
+      "technology": "BiCMOS",
+      "creators": [
+        {
+          "command": "3DMIRRORTRANS",
+          "answers": "P\nS\n80 80\n3\n8\n2\nM3\nM2\n200 200\n0\n1\n"
+        }
+      ],
+      "first": "P",
+      "second": "S"
+    },
+    {
+      "name": "parallel-branch-assembly",
+      "technology": "CMOS",
+      "creators": [
+        {
+          "command": "WIRE NAME=A:LEN=40:WID=5:METAL=M1:XORG=100:YORG=100",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=B:LEN=40:WID=5:METAL=M1:XORG=100:YORG=101",
+          "answers": ""
+        },
+        {
+          "command": "WIRE NAME=C:LEN=40:WID=5:METAL=M1:XORG=100:YORG=130",
+          "answers": ""
+        }
+      ],
+      "edits": "JOINSHUNT A B\nPHASE A 1",
+      "first": "A",
+      "second": "C"
+    }
+  ]
+}

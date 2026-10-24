@@ -74,6 +74,7 @@ jobs:
           node tests/parity.mjs
           node tests/estimates.mjs
           node tests/connected-analysis.mjs
+          node tests/coupling.mjs
           node tests/capacitance.mjs
           node tests/capacitance-data.mjs
           node tests/capacitance-grids.mjs

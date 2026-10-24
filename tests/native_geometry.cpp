@@ -7,6 +7,7 @@ extern "C" void set_substrate_material(int,double,double);
 extern "C" const char* simulate_capacitance(int,int,double,double,double,double,double,int,int,int,int);
 extern "C" void finalize_technology();
 extern "C" const char* analyze(double);
+extern "C" const char* coupling(int,int,int);
 extern "C" const char* probe_runtime_trig(int,double);
 extern "C" const char* probe_retained_math(int,unsigned,unsigned,int);
 extern "C" const char* probe_math(int,double,double,double);
@@ -58,6 +59,9 @@ extern "C" int main(int argc,char** argv,char**) {
     if(const char* metal=getenv("REASITIC_RULE_METAL")){
         const auto* spacing=getenv("REASITIC_SMIN");const auto* width=getenv("REASITIC_WMIN");if(!spacing||!width)return 2;
         const auto* rules=set_metal_rules(atoi(metal),strtod(spacing,nullptr),strtod(width,nullptr));if(__builtin_strncmp(rules,"{\"error\":",9)==0){puts(rules);return 2;}
+    }
+    if(argc==7 && __builtin_strcmp(argv[1],"--coupling")==0) {
+        create_geometry(atoi(argv[2]),argv[3],"",512,512,128,128,.1,1,0);create_geometry(atoi(argv[4]),argv[5],"",512,512,128,128,.1,1,1);puts(coupling(1,0,atoi(argv[6])));return 0;
     }
     if(argc==7 && argv[1][2]=='e') { create_geometry(atoi(argv[2]),argv[3],"",512,512,128,128,.1,1,0);puts(edit_geometry(argv[4],512,512,strtod(argv[5],nullptr),atoi(argv[6])));return 0; }
     if(argc==8 && argv[1][2]=='m') { create_geometry(2,argv[2],"",512,512,128,128,.1,1,0);if(!set_max_width_cells(atoi(argv[7])))return 2;puts(simulate(0,strtod(argv[3],nullptr),strtod(argv[4],nullptr),strtod(argv[5],nullptr),strtod(argv[6],nullptr),strtod(argv[4],nullptr),1024));return 0; }

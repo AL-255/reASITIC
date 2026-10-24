@@ -65,6 +65,14 @@ self.onmessage=async({data})=>{
       if(!processTechnology||!hasLayout)throw Error('Generate a layout before editing geometry.');
       const layout=editGeometry(kernel,data.commands,{...data.options,domain:processTechnology.domain});currentLayout=layout;hasLayout=true;postMessage({id:data.id,layout,technology:processTechnology,edited:true});return;
     }
+    if(action==='coupling'){
+      const first=data.first,second=data.second,limit=data.pair_limit??250000;
+      if(!Number.isInteger(first)||!Number.isInteger(second)||!Number.isInteger(limit))throw Error('Select two winding indices and an integer coupling budget.');
+      if(!hasLayout||first<0||second<0||first>=currentLayout.shapes.length||second>=currentLayout.shapes.length)throw Error('Select existing windings for COUPLING.');
+      if(limit<1||limit>1000000)throw Error('Use a coupling evaluation budget from 1 to 1000000.');
+      const result=JSON.parse(kernel.UTF8ToString(kernel._coupling(first,second,limit)));if(result.error)throw Error(result.error);
+      postMessage({id:data.id,coupling:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
+    }
     if(action==='analyze'){
       const analysis=JSON.parse(kernel.UTF8ToString(kernel._analyze(frequency(data))));
       if(analysis.error)throw Error(analysis.error);

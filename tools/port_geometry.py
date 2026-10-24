@@ -22,6 +22,8 @@ def translate(name,s):
     s=s.replace('asm volatile("faddl %2" : "=t"(result) : "0"(first),"m"(second));','result=first+second;')
     for op, instruction in [('-', 'fsubl'),('+','faddl')]:
         s=s.replace(f'asm volatile("fldl %1; {instruction} %2" : "=t"(result) : "m"(segment.endpoints[index]),"m"(origin[index%3]));',f'result=static_cast<long double>(segment.endpoints[index]){op}origin[index%3];')
+    s=s.replace('asm volatile("fldl %1; fstpl %0" : "=m"(mutual) : "m"(sum) : "st","memory");','mutual=sum;')
+    s=s.replace('asm volatile("fdivrl %2" : "=t"(result) : "0"(denominator),"m"(sum));','result=static_cast<long double>(sum)/denominator;')
     s=s.replace('asm volatile("fstpl %0" : "=m"(destination) : "t"(value) : "st");','destination=x87::binary64(value);')
     s=s.replace('asm volatile("fldl %1; fstpt %0":"=m"(out):"m"(n):"st");','out=n;')
     # Creator load/compare helpers preserve x87 width and status-word tests.
@@ -153,10 +155,10 @@ def source(name):
         assert s.count(needle)==1
         return '#include "portable_gmd.hpp"\n#include "numerical_policy.hpp"\n'+s.replace(needle,'    if(!reasitic::reference_numerics())return reasitic::geometric_mean_distance(w1,w2,t1,t2,dx,dy).distance;\n'+needle)
     if name=='estimate':
-        # A verbatim extraction of the original INDUCTANCE command and helpers.
+        # Original INDUCTANCE/COUPLING commands and their shared helpers.
         # Exclude unrelated command dispatch to avoid pulling in the whole host.
         s=(ROOT/'vendor/asitic/src/analysis_commands.cpp').read_text()
-        return s[:s.index('long double shape_coupling_estimate(')]+'}\n'
+        return s[:s.index('\nnamespace {\nlong double ac_res_load') ]+'}\n'
     if name=='eddy':
         s=(ROOT/'vendor/asitic/src/eddy.cpp').read_text()
         s=s.replace('namespace asitic {','namespace asitic {\nbool eddy_aborted();',1)

@@ -113,6 +113,26 @@ An independent GDS reader checks all resulting ribbons, via cuts and landing
 pads. Non-grid minima, negative/default/signed-zero rules, keyword behavior and
 request/reset recovery are covered separately.
 
+The original `COUPLING` conductor estimate is available alongside L and R(f).
+Select two windings to report the mutual inductance in nH and coupling coefficient.
+It uses the original segment-pair estimate and self-inductance normalization;
+the full transformer/network solvers remain available for distributed substrate
+effects. The C++ boundary copies both main segment chains before calling the
+original estimator, whose temporary endpoint translations can change geometry
+even after a successful call. Live geometry, GDS and following solves remain
+unchanged. Its default budget of 250,000 pair evaluations includes each winding's
+self pairs; the worker accepts an explicit budget up to 1,000,000.
+
+Twenty-six repeated original cases cover CMOS/BiCMOS wires, rotations, large
+origins, symmetric coils, planar/3D transformers, baluns, via-only lists and parallel
+branch assemblies.
+Read-only original entry/return observations check 52 binary64 values exactly
+in historical mode. Production reports match the original and differ by at most
+`5.4e-14` relatively on these cases. Checks also cover an independent 60-digit
+Neumann integral, reciprocity, original zero limits, request/budget recovery,
+source immutability and bounded heap use. Host x87 rounding is recorded separately
+with a `1e-12` bound; `--strict-native` requests exact host instruction identity.
+
 The original numerical `SELFRES` search is available separately from the
 pi-model resonance estimate. It repeatedly analyzes the selected device and
 ground with the original PI2 SLOW driver and searches single-ended or
@@ -295,6 +315,7 @@ node tests/parity.mjs
 node tests/original-geometry.mjs
 node tests/estimates.mjs
 node tests/connected-analysis.mjs
+node tests/coupling.mjs
 node tests/capacitance.mjs
 node tests/capacitance-data.mjs
 node tests/capacitance-grids.mjs
