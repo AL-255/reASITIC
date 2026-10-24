@@ -1,9 +1,10 @@
 """Independently verify creator GDS on both process stacks against original geometry."""
-import collections,json,math,re
+import collections,json,math,re,sys
 from pathlib import Path
 import gdstk
 
-original=json.loads(Path('tests/fixtures/original-creator-coverage.json').read_text())
+proof_name='creator-ranges' if '--ranges' in sys.argv else 'creator-coverage'
+original=json.loads(Path('tests/fixtures/original-'+proof_name+'.json').read_text())
 def vertices(points):return frozenset((math.floor(x*1000+.5),math.floor(y*1000+.5)) for x,y in points)
 files=polygons=0
 for case in original['cases']:
@@ -11,7 +12,7 @@ for case in original['cases']:
     for block in re.split(r'<via>\s*\d*',technology,flags=re.I)[1:]:
         vias.append({k.lower():float(v) for k,v in re.findall(r'^\s*(\w+)\s*=\s*([-+\d.eE]+)',block,re.M)})
     metals=case['metal_count']
-    library=gdstk.read_gds(Path('build/gds-creator-coverage')/(case['name']+'.gds'))
+    library=gdstk.read_gds(Path('build/gds-'+proof_name)/(case['name']+'.gds'))
     assert library.unit==1e-6 and library.precision==1e-9
     assert len(library.cells)==1 and not library.cells[0].references
     actual=library.cells[0].polygons;expected=collections.Counter()

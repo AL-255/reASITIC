@@ -1,0 +1,169 @@
+{
+  "cases": [
+    {
+      "name": "cmos-square-fraction",
+      "technology": "CMOS",
+      "command": "SQUARE NAME=A:LEN=400:WID=400:W=1:S=1:N=65.25:METAL=M4:EXIT=M3:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ],
+      "matrix_names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-polygon-fraction",
+      "technology": "CMOS",
+      "command": "SPIRAL NAME=A:RAD=200:SIDES=6:W=1:S=1:N=65.5:METAL=M4:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-symmetric-square",
+      "technology": "CMOS",
+      "command": "SYMSQ NAME=A:LEN=400:ILEN=15:W=1:S=1:N=65:METAL=M4:METAL2=M3:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-symmetric-polygon",
+      "technology": "CMOS",
+      "command": "SYMPOLY NAME=A:RAD=200:ILEN=15:SIDES=6:W=1:S=1:N=65:METAL=M4:METAL2=M3:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-transformer",
+      "technology": "CMOS",
+      "command": "TRANS PNAME=P:SNAME=S:LEN=400:WID=400:W=.5:S=.5:NP=65.25:NS=66:METAL=M4:EXIT=M3:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "P",
+        "S"
+      ]
+    },
+    {
+      "name": "cmos-balun",
+      "technology": "CMOS",
+      "command": "BALUN NAME=A:LEN=400:W1=.5:W2=.5:S=.5:N=131:METAL=M4:METAL2=M3:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A-P",
+        "A-S"
+      ]
+    },
+    {
+      "name": "cmos-multimetal",
+      "technology": "CMOS",
+      "command": "MMSQUARE NAME=A:LEN=400:WID=400:W=1:S=1:N=65.25:METAL=M5:EXIT=M3:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-mirror-3d",
+      "technology": "CMOS",
+      "command": "3DMIRRORTRANS",
+      "answers": "P\nS\n500 500\n.5\n3.25\n65\nM4\nM3\n256 256\n0\n1\n",
+      "names": [
+        "P",
+        "S"
+      ]
+    },
+    {
+      "name": "bicmos-square-fraction",
+      "technology": "BiCMOS",
+      "command": "SQUARE NAME=A:LEN=400:WID=400:W=1:S=1:N=65.25:METAL=M3:EXIT=M2:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ],
+      "matrix_names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-polygon-fraction",
+      "technology": "BiCMOS",
+      "command": "SPIRAL NAME=A:RAD=200:SIDES=6:W=1:S=1:N=65.5:METAL=M3:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-symmetric-square",
+      "technology": "BiCMOS",
+      "command": "SYMSQ NAME=A:LEN=400:ILEN=15:W=1:S=1:N=65:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-symmetric-polygon",
+      "technology": "BiCMOS",
+      "command": "SYMPOLY NAME=A:RAD=200:ILEN=15:SIDES=6:W=1:S=1:N=65:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-transformer",
+      "technology": "BiCMOS",
+      "command": "TRANS PNAME=P:SNAME=S:LEN=400:WID=400:W=.5:S=.5:NP=65.25:NS=66:METAL=M3:EXIT=M2:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "P",
+        "S"
+      ]
+    },
+    {
+      "name": "bicmos-balun",
+      "technology": "BiCMOS",
+      "command": "BALUN NAME=A:LEN=400:W1=.5:W2=.5:S=.5:N=131:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A-P",
+        "A-S"
+      ]
+    },
+    {
+      "name": "bicmos-multimetal",
+      "technology": "BiCMOS",
+      "command": "MMSQUARE NAME=A:LEN=400:WID=400:W=1:S=1:N=65.25:METAL=M3:EXIT=M2:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-mirror-3d",
+      "technology": "BiCMOS",
+      "command": "3DMIRRORTRANS",
+      "answers": "P\nS\n500 500\n.5\n3.25\n65\nM3\nM2\n256 256\n0\n1\n",
+      "names": [
+        "P",
+        "S"
+      ]
+    },
+    {
+      "name": "cmos-square-interactive",
+      "technology": "CMOS",
+      "command": "SQUARE",
+      "answers": "A\n400 400\n1\n1\n65.25\nM4\ny\nM3\n256 256\n",
+      "names": [
+        "A"
+      ]
+    }
+  ]
+}

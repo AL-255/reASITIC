@@ -8,7 +8,8 @@ import {parseCreatorCommand} from '../web/creators.mjs';
 import {parseTechnology,configureKernel,createGeometry} from '../web/technology.mjs';
 import {writeGDS} from '../web/gds.mjs';
 
-const definitions=readFileSync('tests/fixtures/creator-coverage-cases.json','utf8'),cases=JSON.parse(definitions).cases,fixture=JSON.parse(readFileSync('tests/fixtures/original-creator-coverage.json','utf8'));
+const ranges=process.argv.includes('--ranges'),definitionName=ranges?'creator-range':'creator-coverage',proofName=ranges?'creator-ranges':'creator-coverage';
+const definitions=readFileSync(`tests/fixtures/${definitionName}-cases.json`,'utf8'),cases=JSON.parse(definitions).cases,fixture=JSON.parse(readFileSync(`tests/fixtures/original-${proofName}.json`,'utf8'));
 const hash=x=>createHash('sha256').update(x).digest('hex');
 assert.equal(hash(definitions),fixture.case_definition_sha256);
 const technologies=Object.fromEntries(Object.keys(fixture.technology_sha256).map(name=>{
@@ -26,7 +27,7 @@ function next(){if(inbox.length)return Promise.resolve(inbox.shift());return new
 let id=0;async function send(data){worker.postMessage({id:++id,...data});const result=await next();assert.equal(result.id,id);assert.ok(!result.error,result.error);return result;}
 const kernel=await make(),mesh={length:1000,width:1000,thickness:1000,subdivision_trigger:1000},reports=[];
 let fields=0,matrices=0,worstMatrixError=0;
-mkdirSync('build/gds-creator-coverage',{recursive:true});
+mkdirSync(`build/gds-${proofName}`,{recursive:true});
 try{
   assert.equal((await next()).ready,true);
   for(const c of cases){
@@ -41,18 +42,18 @@ try{
     for(const shape of actual.shapes)assert.ok(Math.abs(shape.resistance_dc-Number(original.resistance_dc_printed[shape.name]))<=5.1e-7,c.name+' original printed DC resistance');
     const generated=await send({technology:technology.text,creator});
     assert.deepEqual(physical(generated.layout,original.metal_count),original.shapes,c.name+' worker original physical geometry');
-    const gds=writeGDS(actual,technology.parsed);assert.deepEqual(writeGDS(generated.layout,generated.technology),gds,c.name+' worker GDS');writeFileSync(`build/gds-creator-coverage/${c.name}.gds`,gds);
-    for(const [name,expected]of Object.entries(original.matrices)){
+    const gds=writeGDS(actual,technology.parsed);assert.deepEqual(writeGDS(generated.layout,generated.technology),gds,c.name+' worker GDS');writeFileSync(`build/gds-${proofName}/${c.name}.gds`,gds);
+    for(const [name,expected]of Object.entries(original.matrices??{})){
       const winding=actual.shapes.findIndex(s=>s.name===name),solved=JSON.parse(kernel.UTF8ToString(kernel._simulate(winding,1e9,1000,1000,1000,1000,1024)));
       assert.ok(!solved.error,solved.error);assert.equal(solved.matrix.length,expected.length,c.name+' matrix size');assert.equal(solved.filaments,expected.length,c.name+' original filament count');
-      const reference=expected.flat(2),values=solved.matrix.flat(2),scale=Math.max(...reference.map(Math.abs));assert.equal(values.length,reference.length);
-      const relativeError=Math.max(...values.map((v,i)=>{assert.ok(Number.isFinite(v));return Math.abs(v-reference[i])/scale;}));
+      const reference=expected.flat(2),values=solved.matrix.flat(2),scale=reference.reduce((m,v)=>Math.max(m,Math.abs(v)),0);assert.equal(values.length,reference.length);
+      const relativeError=values.reduce((error,v,i)=>{assert.ok(Number.isFinite(v));return Math.max(error,Math.abs(v-reference[i])/scale);},0);
       // LMAT prints ten significant digits; compare the whole matrix at that precision.
       assert.ok(relativeError<=1e-10,`${c.name}/${name} original LMAT relative error ${relativeError}`);worstMatrixError=Math.max(worstMatrixError,relativeError);
       const result=await send({action:'simulate',winding,frequency_ghz:1,mesh,filament_limit:1024});assert.deepEqual(result.simulation.matrix,solved.matrix,c.name+' worker matrix');matrices++;
     }
     reports.push({name:c.name,technology:c.technology,shapes:actual.shapes.length,original_creator_exit_status:original.creator_exit_status});
   }
-  mkdirSync('build/evidence',{recursive:true});writeFileSync('build/evidence/creator-coverage.json',JSON.stringify({cases:cases.length,physicalFields:fields,matrices,worstMatrixError,directAndWorker:true,reports},null,2)+'\n');
+  mkdirSync('build/evidence',{recursive:true});writeFileSync(`build/evidence/${proofName}.json`,JSON.stringify({cases:cases.length,physicalFields:fields,matrices,worstMatrixError,directAndWorker:true,reports},null,2)+'\n');
   console.log(`Creator coverage: ${cases.length} original cases on both process stacks, ${fields} exact physical fields, ${matrices} original LMAT matrices, DC resistance, worker and GDS equivalence pass`);
 }finally{await worker.terminate();}

@@ -69,6 +69,9 @@ jobs:
           node tests/creator-aliases.mjs
           node tests/creator-coverage.mjs
           python tests/gds_creator_coverage_reader.py
+          node tests/creator-coverage.mjs --ranges
+          python tests/gds_creator_coverage_reader.py --ranges
+          node tests/creator-ranges.mjs
           node tests/metal-rules.mjs
           python tests/gds_metal_rules_reader.py
           node tests/geometry-edits.mjs

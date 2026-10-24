@@ -87,6 +87,19 @@ DC resistance and 43 original LMAT matrices. Direct WASM and worker results agre
 native C++ also checks the CMOS cases. An independent reader verifies all 646 GDS
 ribbons, via cuts and landing pads.
 
+The creator form and C++ bridge also accept windings above 64 turns. Seventeen
+additional original-executable cases cover fractional square/polygon turns,
+symmetric windings, planar transformers, a 131-turn balun, multi-metal windings,
+3D mirror transformers and prompted square creation on both process stacks.
+Two fresh creators and two fresh reloads per case verify physical records and
+DC resistance; selected high-turn LMAT matrices are checked in WASM and the
+worker. GDS boundaries are independently checked against the original records.
+The original turn-fit calculations remain authoritative. A winding's minimum
+record requirement is checked against the 32 MiB creation allocation budget,
+and actual construction/export limits still recover transactionally. The older
+low-level generator now uses the same allocation recovery. SWEEP's native and
+WASM enumerators also retain candidates beyond 64 turns.
+
 The multi-metal creator allocates one pointer per layer, including both endpoints:
 `delta + 1` entries. The original allocates `delta` but writes through `delta`,
 which corrupts the heap for a three-layer difference. The port fixes the count
@@ -443,6 +456,9 @@ node tests/native-creators.mjs
 node tests/creator-aliases.mjs
 node tests/creator-coverage.mjs
 python3 tests/gds_creator_coverage_reader.py
+node tests/creator-coverage.mjs --ranges
+python3 tests/gds_creator_coverage_reader.py --ranges
+node tests/creator-ranges.mjs
 node tests/metal-rules.mjs
 python tests/gds_metal_rules_reader.py
 node tests/geometry-edits.mjs
@@ -933,8 +949,9 @@ CALCTRANS reports, 2PORTTRANS files and raw caches are under
 captures are under `build/original-three-port`; the variability audit is under
 `build/original-three-port-variability`.
 
-Creator input is bounded to native fixed buffers, 64 turns, 256 sides/via rows
-or columns, and a 32 MiB creation allocation budget. Invalid commands recover
+Creator input is bounded to native fixed buffers, 256 sides/via rows or columns,
+and a 32 MiB creation allocation budget with an output-size limit. Turn counts
+follow the original geometric fit rules and these resource budgets. Invalid commands recover
 without terminating the worker. Admission guards reject native fault cases;
 valid descriptor values are passed unchanged to the original builders. Native
 unwritten parser/history and mesh words use explicit zero initial state, rather
