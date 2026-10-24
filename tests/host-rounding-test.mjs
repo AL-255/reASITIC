@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {compareTransformerHost} from './host-rounding.mjs';
+const compare=(a,b)=>{const report={fields:0,rounding:[]};compareTransformerHost(a,b,'case',report);return report;};
+assert.equal(compare({matrix:[1.2932120971496668]},{matrix:[1.2932120971496666]}).rounding.length,1);
+assert.equal(compare({transformer:{ground_resistance_ohm:-4.532652235288123e-6}},{transformer:{ground_resistance_ohm:-4.532652235277346e-6}}).rounding.length,1);
+for(const field of ['groups','frequency_hz','capacitance_matrix','node_capacitance_matrix','green_table_hash'])assert.throws(()=>compare({[field]:1},{[field]:1+Number.EPSILON}));
+for(const [a,b]of [[1,1.000001],[-0,0],[0,1e-300],[1,Infinity],[1,null]])assert.throws(()=>compare({matrix:[a]},{matrix:[b]}));
+assert.throws(()=>compare({matrix:[1]},{matrix:[1,2]}));
+const row='\n1 2 3 4 5 6 7 8 9',changed='\n1 2.000000000000001 3 4 5 6 7 8 9';
+assert.ok(compare({two_port:{records:{s:row}}},{two_port:{records:{s:changed}}}).rounding.length);
+assert.throws(()=>compare({two_port:{records:{s:row}}},{two_port:{records:{s:row+' '}}}));
+assert.throws(()=>compare({two_port:{headers:{s:row}}},{two_port:{headers:{s:changed}}}));
+console.log('Host audit: bounded inductive rounding is recorded; CAP, metadata, structure, classification, signed zero, headers and format-only changes remain strict');
