@@ -80,6 +80,22 @@ worker paths reproduce all 164 accepted variants and byte-identical GDS files.
 `tests/creator-aliases.mjs` also checks the adapter against the pinned native
 catalog and rejects non-ASCII case folding that the original does not perform.
 
+Creator parameter coverage includes all twelve families on CMOS and BiCMOS,
+plus rotated, asymmetric, fractional-turn and inner-dimension variants. Thirty-seven
+cases compare 11,600 physical fields exactly with repeated original BSAVE records,
+DC resistance and 43 original LMAT matrices. Direct WASM and worker results agree;
+native C++ also checks the CMOS cases. An independent reader verifies all 646 GDS
+ribbons, via cuts and landing pads.
+
+The multi-metal creator allocates one pointer per layer, including both endpoints:
+`delta + 1` entries. The original allocates `delta` but writes through `delta`,
+which corrupts the heap for a three-layer difference. The port fixes the count
+directly and removes the bridge's blanket allocation padding. Tests span every
+supported layer difference. For the original case that faults on exit, captures
+retain that status and verify completed geometry and DC outputs twice. Separate
+original processes reload those unmodified records, verify the geometry survives
+the round trip, and produce repeatable LMAT references.
+
 Imported metal `SMIN` and `WMIN` values reach the original C++ symmetric-creator
 prompts. They select its transition-clearance loop and width warnings; they do
 not impose a new blanket clamp on creator dimensions. The C++ boundary keeps
@@ -267,6 +283,8 @@ node tests/three-port-sweep.mjs
 node tests/worker-three-port-sweep.mjs
 node tests/native-creators.mjs
 node tests/creator-aliases.mjs
+node tests/creator-coverage.mjs
+python3 tests/gds_creator_coverage_reader.py
 node tests/metal-rules.mjs
 python tests/gds_metal_rules_reader.py
 node tests/geometry-edits.mjs

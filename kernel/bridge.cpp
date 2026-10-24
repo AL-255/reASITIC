@@ -44,7 +44,7 @@ Allocation* pending=nullptr;unsigned pending_bytes=0,pending_count=0;
 void fail_creator(const char*);
 void* allocate(unsigned n,void*) {
     if(creator_active && (n>32*1024*1024 || pending_bytes>32*1024*1024-n || pending_count>=65536))fail_creator("Geometry exceeds the creation memory budget");
-    auto* a=static_cast<Allocation*>(calloc(1,sizeof(Allocation)+n+16)); // native MMSQUARE workspace padding
+    auto* a=static_cast<Allocation*>(calloc(1,sizeof(Allocation)+n));
     if(!a) { if(creator_active)fail_creator("Unable to allocate geometry");abort(); }
     if(creator_active) { a->tracked=true;a->next=pending;if(pending)pending->previous=a;pending=a;pending_bytes+=n;++pending_count; }
     return a+1;

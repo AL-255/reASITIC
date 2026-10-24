@@ -1,0 +1,346 @@
+{
+  "cases": [
+    {
+      "name": "cmos-square",
+      "technology": "CMOS",
+      "command": "SQUARE NAME=A:LEN=80:WID=70:W=3:S=2:N=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-polygon",
+      "technology": "CMOS",
+      "command": "SPIRAL NAME=A:RAD=50:SIDES=6:W=3:S=2:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-symmetric_square",
+      "technology": "CMOS",
+      "command": "SYMSQ NAME=A:LEN=100:ILEN=15:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-symmetric_polygon",
+      "technology": "CMOS",
+      "command": "SYMPOLY NAME=A:RAD=50:ILEN=15:SIDES=6:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-wire",
+      "technology": "CMOS",
+      "command": "WIRE NAME=A:LEN=40:WID=5:METAL=M1:XORG=10:YORG=20:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-ring",
+      "technology": "CMOS",
+      "command": "RING NAME=A:RAD=40:W=3:GAP=20:SIDES=16:METAL=M4:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-via",
+      "technology": "CMOS",
+      "command": "VIA",
+      "answers": "A\nVIA1\n2\n3\n1\n100 100\n",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-capacitor",
+      "technology": "CMOS",
+      "command": "CAPACITOR NAME=A:LEN=40:WID=5:METAL1=M2:METAL2=M1:XORG=100:YORG=100:ORIENT=0",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-multimetal_square",
+      "technology": "CMOS",
+      "command": "MMSQUARE NAME=A:LEN=80:WID=70:W=3:S=2:N=1:METAL=M5:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-transformer",
+      "technology": "CMOS",
+      "command": "TRANS PNAME=P:SNAME=S:LEN=100:WID=90:W=3:S=2:NP=1.5:NS=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "S",
+        "P"
+      ]
+    },
+    {
+      "name": "cmos-balun",
+      "technology": "CMOS",
+      "command": "BALUN NAME=B:LEN=120:W1=3:W2=4:S=2:N=3:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0",
+      "answers": "",
+      "names": [
+        "B-S",
+        "B-P"
+      ]
+    },
+    {
+      "name": "cmos-mirror_3d_transformer",
+      "technology": "CMOS",
+      "command": "3DMIRRORTRANS",
+      "answers": "P\nS\n80 80\n3\n8\n2\nM4\nM3\n100 100\n0\n1\n",
+      "names": [
+        "S",
+        "P"
+      ]
+    },
+    {
+      "name": "bicmos-square",
+      "technology": "BiCMOS",
+      "command": "SQUARE NAME=A:LEN=80:WID=70:W=3:S=2:N=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-polygon",
+      "technology": "BiCMOS",
+      "command": "SPIRAL NAME=A:RAD=50:SIDES=6:W=3:S=2:N=1.5:METAL=M3:EXIT=M2:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-symmetric_square",
+      "technology": "BiCMOS",
+      "command": "SYMSQ NAME=A:LEN=100:ILEN=15:W=3:S=2:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-symmetric_polygon",
+      "technology": "BiCMOS",
+      "command": "SYMPOLY NAME=A:RAD=50:ILEN=15:SIDES=6:W=3:S=2:N=2:METAL=M3:METAL2=M2:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-wire",
+      "technology": "BiCMOS",
+      "command": "WIRE NAME=A:LEN=40:WID=5:METAL=MSUB:XORG=10:YORG=20:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-ring",
+      "technology": "BiCMOS",
+      "command": "RING NAME=A:RAD=40:W=3:GAP=20:SIDES=16:METAL=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-via",
+      "technology": "BiCMOS",
+      "command": "VIA",
+      "answers": "A\nVIA3\n2\n3\n1\n100 100\n",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-capacitor",
+      "technology": "BiCMOS",
+      "command": "CAPACITOR NAME=A:LEN=40:WID=5:METAL1=M2:METAL2=MSUB:XORG=100:YORG=100:ORIENT=0",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-multimetal_square",
+      "technology": "BiCMOS",
+      "command": "MMSQUARE NAME=A:LEN=80:WID=70:W=3:S=2:N=1:METAL=M3:EXIT=M2:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-transformer",
+      "technology": "BiCMOS",
+      "command": "TRANS PNAME=P:SNAME=S:LEN=100:WID=90:W=3:S=2:NP=1.5:NS=1.25:METAL=M3:EXIT=M2:XORG=100:YORG=100:ORIENT=0:PHASE=1",
+      "answers": "",
+      "names": [
+        "S",
+        "P"
+      ]
+    },
+    {
+      "name": "bicmos-balun",
+      "technology": "BiCMOS",
+      "command": "BALUN NAME=B:LEN=120:W1=3:W2=4:S=2:N=3:METAL=M3:METAL2=M2:XORG=100:YORG=100:ORIENT=0",
+      "answers": "",
+      "names": [
+        "B-S",
+        "B-P"
+      ]
+    },
+    {
+      "name": "bicmos-mirror_3d_transformer",
+      "technology": "BiCMOS",
+      "command": "3DMIRRORTRANS",
+      "answers": "P\nS\n80 80\n3\n8\n2\nM3\nM2\n100 100\n0\n1\n",
+      "names": [
+        "S",
+        "P"
+      ]
+    },
+    {
+      "name": "cmos-square-inner",
+      "technology": "CMOS",
+      "command": "SQUARE NAME=A:ILEN=80:IWID=100:W=6:S=4:N=2.13:METAL=M5:EXIT=M3:XORG=256:YORG=256:ORIENT=37:PHASE=-1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-polygon-odd",
+      "technology": "CMOS",
+      "command": "SPIRAL NAME=A:RADIUS=70:SIDES=5:W=4:S=3:N=1.73:METAL=M5:XORG=256.26:YORG=256.24:ORIENT=37:PHASE=-1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-wire-short-negative-angle",
+      "technology": "CMOS",
+      "command": "WIRE NAME=A:LEN=1:WID=5:METAL=M1:XORG=128.26:YORG=130.24:ORIENT=-37:PHASE=-1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-transformer-unequal",
+      "technology": "CMOS",
+      "command": "TRANS PNAME=P:SNAME=S:LEN=220:WID=240:WP=8:WS=4:S=5:NP=1.75:NS=2.5:METAL=M5:EXIT=M3:XORG=256:YORG=256:ORIENT=37:PHASE=-1",
+      "answers": "",
+      "names": [
+        "P",
+        "S"
+      ]
+    },
+    {
+      "name": "cmos-symsq-inner",
+      "technology": "CMOS",
+      "command": "SYMSQ NAME=A:LEN=180:ILEN=28:W=5:S=3:N=2.8:METAL=M5:METAL2=M3:XORG=256:YORG=256:ORIENT=37:PHASE=-1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-sympoly-odd",
+      "technology": "CMOS",
+      "command": "SYMPOLY NAME=A:RAD=70:ILEN=28:SIDES=7:W=4:S=3:N=2.4:METAL=M5:METAL2=M3:XORG=256:YORG=256:ORIENT=37:PHASE=-1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-ring-clockwise",
+      "technology": "CMOS",
+      "command": "RING NAME=A:RAD=80:W=6:GAP=20:SIDES=16:METAL=M4:XORG=256:YORG=256:ORIENT=-37:PHASE=-1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-via-rectangular",
+      "technology": "CMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n7\n3\n-1\n123.46 125.24\n",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-capacitor-rotated",
+      "technology": "CMOS",
+      "command": "CAPACITOR NAME=A:LEN=80:WID=30:METAL1=M5:METAL2=M2:XORG=256:YORG=256:ORIENT=37",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-balun-widths",
+      "technology": "CMOS",
+      "command": "BALUN NAME=A:LEN=180:W1=6:W2=10:S=4:N=3.7:METAL=M5:METAL2=M3:XORG=256:YORG=256:ORIENT=37",
+      "answers": "",
+      "names": [
+        "A-P",
+        "A-S"
+      ]
+    },
+    {
+      "name": "cmos-mirror-unequal",
+      "technology": "CMOS",
+      "command": "3DMIRRORTRANS",
+      "answers": "P\nS\n120 160\n6\n10\n2\nM5\nM3\n256 256\n37\n-1\n",
+      "names": [
+        "P",
+        "S"
+      ]
+    },
+    {
+      "name": "cmos-multimetal-inner",
+      "technology": "CMOS",
+      "command": "MMSQUARE NAME=A:ILEN=80:IWID=100:W=6:S=4:N=2.75:METAL=M5:EXIT=M2:XORG=256:YORG=256:ORIENT=37:PHASE=-1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-multimetal-full-stack",
+      "technology": "CMOS",
+      "command": "MMSQUARE NAME=A:LEN=180:WID=160:W=6:S=4:N=1.25:METAL=M5:EXIT=M1:XORG=256:YORG=256:ORIENT=-37:PHASE=1",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    }
+  ]
+}

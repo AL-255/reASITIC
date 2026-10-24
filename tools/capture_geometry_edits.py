@@ -4,7 +4,7 @@ from pathlib import Path
 from capture_lmat import ROOT,ORIGINAL_SHA256,matrix
 from capture_eddy import COMMANDS
 
-def physical_layout(data):
+def physical_layout(data,metal_count=5):
     offset=20;shapes=[]
     while offset+4<=len(data):
         marker=struct.unpack_from('<I',data,offset)[0];offset+=4
@@ -18,7 +18,7 @@ def physical_layout(data):
             if marker not in (0x89,0x8a):break
             offset+=4;raw=data[offset:offset+0xf0];offset+=0xf0;metal,nx,ny=struct.unpack_from('<3i',raw,0xdc)
             segment=dict(metal=metal,width=struct.unpack_from('<d',raw,0xcc)[0],points=[list(struct.unpack_from('<3d',raw,i)) for i in (0,24,0x44,0x5c,0x88,0xa0)])
-            if metal<5:segment['thickness']=struct.unpack_from('<d',raw,0xd4)[0]
+            if metal<metal_count:segment['thickness']=struct.unpack_from('<d',raw,0xd4)[0]
             else:segment.update(nx=nx,ny=ny)
             if marker==0x89:shape['segments'].append(segment)
             else:shape['segments'][-1].setdefault('branches',[]).append(segment)
