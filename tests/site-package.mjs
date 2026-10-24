@@ -63,6 +63,7 @@ try{
   const loaded=(await send({action:'loaded-port',nativeInput:true})).loaded_port,observed=JSON.parse(readFileSync('tests/fixtures/original-loaded-port.json','utf8')).cases.find(c=>c.name==='wire-default').printed[1].match(/([-+\d.e]+)\s*\+ j\s*([-+\d.e]+)/i).slice(1).map(Number);
   assert.equal(loaded.status,'finite');assert.equal(Number(loaded.impedance_ohm[0].toFixed(3)),observed[0]);assert.equal(Number(loaded.impedance_ohm[1].toFixed(2)),observed[1]);
   const loadedExport=await import(pathToFileURL(join(folder,'loaded-port.mjs')).href);assert.ok(loadedExport.loadedPortCSV(loaded).includes('input_real_ohm'));
+  const pi3=(await send({action:'network',model:'PI3',ground:0,frequency_ghz:1,mesh:{length:1000,width:1000,thickness:1000},contact_mesh:{length:1000,width:1000},fft_x:8,fft_y:8,eddy:{mode:0,layers:[]},nativeInput:true})).network;assert.equal(pi3.model,'PI3');assert.equal(pi3.filaments,1);
   const exported=await import(pathToFileURL(join(folder,'gds.mjs')).href),gds=exported.writeGDS(layout,parseTechnology(technology));assert.deepEqual(gds,writeGDS(layout,parseTechnology(technology)));
   // Deploying a newer site may remove this release after the main kernel is
   // already running. Its first optimizer must still create a private instance.

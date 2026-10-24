@@ -19,7 +19,7 @@ try{
     ['LMAT',{...base,action:'simulate',eddy:undefined},['winding'],true,false],
     ['LMAT eddy',{...base,action:'simulate'},['winding'],true,true],
     ['CAP',{...base,action:'capacitance',mesh:base.contact_mesh},['winding','ground'],false,false],
-    ...['PI2','PIX','PI4'].map(model=>[model,{...base,action:'network',model},['winding','ground'],true,true]),
+    ...['PI2','PI3','PIX','PI4'].map(model=>[model,{...base,action:'network',model},['winding','ground'],true,true]),
     ['CALCTRANS',{...base,action:'transformer'},['primary','secondary','ground'],true,true],
     ['3PORT',{...base,action:'three-port'},['ground'],true,true],
     ['SELFRES',{...base,action:'resonance',start_ghz:1,end_ghz:2,step_ghz:.1,mode:'single',sample_budget:1},['winding','ground'],true,true],

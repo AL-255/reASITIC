@@ -1,0 +1,228 @@
+{
+  "cases": [
+    {
+      "name": "cmos-wire-self",
+      "technology": "CMOS",
+      "creator": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1
+    },
+    {
+      "name": "cmos-wire-distinct",
+      "technology": "CMOS",
+      "creator": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1
+    },
+    {
+      "name": "bicmos-wire-self",
+      "technology": "BiCMOS",
+      "creator": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M3:XORG=100:YORG=100"
+      },
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1
+    },
+    {
+      "name": "bicmos-wire-distinct",
+      "technology": "BiCMOS",
+      "creator": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M3:XORG=100:YORG=100"
+      },
+      "ground": "NAME=G:LEN=100:WID=40:METAL=MSUB:XORG=100:YORG=100",
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1
+    },
+    {
+      "name": "cmos-wire-subdivision",
+      "technology": "CMOS",
+      "creator": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "cells": [
+        40,
+        5,
+        0.5
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1
+    },
+    {
+      "name": "cmos-wire-rotated",
+      "technology": "CMOS",
+      "creator": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=200:YORG=100:ORIENT=30:PHASE=-1"
+      },
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 0.1
+    },
+    {
+      "name": "cmos-square-self",
+      "technology": "CMOS",
+      "creator": {
+        "id": 0,
+        "keywords": "NAME=A:LEN=200:WID=160:W=20:S=10:N=1:METAL=M1:EXIT=M2:XORG=250:YORG=250"
+      },
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1,
+      "original_nonfinite": true
+    },
+    {
+      "name": "cmos-symmetric-self",
+      "technology": "CMOS",
+      "creator": {
+        "id": 16,
+        "keywords": "NAME=A:LEN=200:W=16:S=8:N=1:METAL=M4:METAL2=M3:XORG=250:YORG=250"
+      },
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "grid": [
+        16,
+        16
+      ],
+      "frequency_ghz": 1,
+      "original_nonfinite": true
+    },
+    {
+      "name": "cmos-square-fine-grid",
+      "technology": "CMOS",
+      "creator": {
+        "id": 0,
+        "keywords": "NAME=A:LEN=200:WID=160:W=20:S=10:N=1:METAL=M1:EXIT=M2:XORG=250:YORG=250"
+      },
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "grid": [
+        64,
+        64
+      ],
+      "frequency_ghz": 1
+    },
+    {
+      "name": "cmos-symmetric-fine-grid",
+      "technology": "CMOS",
+      "creator": {
+        "id": 16,
+        "keywords": "NAME=A:LEN=200:W=16:S=8:N=1:METAL=M4:METAL2=M3:XORG=250:YORG=250"
+      },
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "grid": [
+        64,
+        64
+      ],
+      "frequency_ghz": 1
+    }
+  ]
+}

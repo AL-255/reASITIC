@@ -21,7 +21,7 @@ function direct(data,hz=1e9){
   if(data.action==='transformer')return call(kernel._simulate_transformer,data.primary,data.secondary,data.ground,hz,...suffix,0,250000);
   if(data.action==='three-port')return call(kernel._simulate_three_port,...data.windings,data.ground,hz,...suffix,250000);
   if(data.model==='PI4')return call(kernel._simulate_pad_network,data.winding,...data.pads,data.ground,hz,...suffix,250000);
-  return call(data.model==='PIX'?kernel._simulate_extended_network:kernel._simulate_network,data.winding,data.ground,hz,...suffix,250000);
+  return call(data.model==='PIX'?kernel._simulate_extended_network:data.model==='PI3'?kernel._simulate_pi3:kernel._simulate_network,data.winding,data.ground,hz,...suffix,250000);
 }
 try{
   assert.equal((await next()).ready,true);let layout;
@@ -29,7 +29,7 @@ try{
   for(const [name,length,width,metal,x,y]of creators){const creator={id:2,keywords:`NAME=${name}:LEN=${length}:WID=${width}:METAL=${metal}:XORG=${x}:YORG=${y}`};layout=(await checked({technology,creator,options:{append:Boolean(layout)}})).layout;createGeometry(kernel,2,creator.keywords,'',{append:layout.shapes.length>1});}
   const index=name=>layout.shapes.findIndex(s=>s.name===name),base={winding:index('A'),ground:index('G'),primary:index('A'),secondary:index('B'),windings:['A','B','C'].map(index),pads:['P1','P2'].map(index),frequency_ghz:1,nativeInput:true,mesh:{length:1000,width:1,thickness:1,subdivision_trigger:1000},contact_mesh:{length:1000,width:1000},fft_x:16,fft_y:16,filament_limit:256,contact_limit:128,eddy:{mode:0,layers:[]}};
   let comparisons=0;
-  for(const [action,field,model]of [['simulate','simulation'],['network','network','PI2'],['network','network','PIX'],['network','network','PI4'],['transformer','transformer'],['three-port','three_port']]){
+  for(const [action,field,model]of [['simulate','simulation'],['network','network','PI2'],['network','network','PI3'],['network','network','PIX'],['network','network','PI4'],['transformer','transformer'],['three-port','three_port']]){
     const request={...base,action,model};
     for(const maximum of [3,8,undefined]){const data={...request,max_width_cells:maximum},actual=(await checked(data))[field];assert.deepEqual(actual,direct(data),action+' '+(model??'')+' MAXNW '+maximum);assert.equal(actual.max_width_cells,maximum);comparisons++;}
   }

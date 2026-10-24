@@ -37,6 +37,7 @@ function setBusy(value,stoppable=false){
   $('analyze').disabled=!ready||!layout?.shapes.length||value;$('stop').disabled=!value||!stoppable||activePortSweep!==null||activeSelfResonance||activeOptimization;
   $('estimates-csv').disabled=value||!conductorAnalysis;
   $('selfres-stop').disabled=!value||!stoppable||!activeSelfResonance;$('selfres-csv').disabled=value||!selfResonanceSamples.length;
+  $('network-sweep').disabled=!ready||!layout?.shapes.length||value||$('network-model').value==='PI3';
   $('network-stop').disabled=!value||!stoppable||activePortSweep!=='network';$('trans-stop').disabled=!value||!stoppable||activePortSweep!=='transformer';$('three-stop').disabled=!value||!stoppable||activePortSweep!=='three-port';
   $('network-sweep-csv').disabled=value||!portSamples.network.length;$('trans-sweep-csv').disabled=value||!portSamples.transformer.length;$('three-sweep-csv').disabled=value||!portSamples['three-port'].length;
   $('cap-matrix-csv').disabled=value||!capacitanceResult;$('potential-matrix-csv').disabled=value||!capacitanceResult;
@@ -267,6 +268,7 @@ $('three-metrics-csv').onclick=()=>{try{download(threePortMetricsCSV(threeResult
 $('trans-y-csv').onclick=()=>{try{download(networkMatrixCSV(transformerResult),'reASITIC-transformer-admittance.csv','text/csv');}catch(e){failure(e.message);}};
 $('trans-z-csv').onclick=()=>{try{download(transformerImpedanceCSV(transformerResult),'reASITIC-transformer-impedance.csv','text/csv');}catch(e){failure(e.message);}};
 $('trans-metrics-csv').onclick=()=>{try{download(transformerMetricsCSV(transformerResult),'reASITIC-transformer-metrics.csv','text/csv');}catch(e){failure(e.message);}};
+$('network-model').onchange=()=>setBusy(busy);
 $('network-record').onclick=()=>{try{download(portSweepRecord(portResults('network'),$('network-parameter').value,$('network-format').value==='polar'),'reASITIC-two-port-native.txt','text/plain');}catch(e){failure(e.message);}};
 $('network-s-csv').onclick=()=>{try{download(portSweepScatteringCSV(portResults('network')),'reASITIC-two-port-scattering.csv','text/csv');}catch(e){failure(e.message);}};
 $('trans-record').onclick=()=>{try{download(portSweepRecord(portResults('transformer'),$('trans-parameter').value,$('trans-format').value==='polar'),'reASITIC-transformer-native.txt','text/plain');}catch(e){failure(e.message);}};

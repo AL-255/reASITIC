@@ -41,7 +41,7 @@ try{
   let layout;
   for(const [name,length,width,metal,x,y]of creators)layout=(await checked({technology,creator:{id:2,keywords:`NAME=${name}:LEN=${length}:WID=${width}:METAL=${metal}:XORG=${x}:YORG=${y}`},options:{append:Boolean(layout)}})).layout;
   const index=name=>layout.shapes.findIndex(s=>s.name===name),base={winding:index('A'),ground:index('G'),primary:index('A'),secondary:index('B'),windings:['A','B','C'].map(index),pads:['P1','P2'].map(index),automatic_cells:{alpha:.0001,beta:2.5},frequency_ghz:1,nativeInput:true,fft_x:64,fft_y:64,filament_limit:256,contact_limit:128,eddy:{mode:0},mesh:{length:NaN,width:NaN,thickness:NaN},contact_mesh:{length:NaN,width:NaN}};
-  for(const [action,field,model]of [['simulate','simulation'],['capacitance','capacitance'],['network','network','PI2'],['network','network','PIX'],['network','network','PI4'],['transformer','transformer'],['three-port','three_port']]){
+  for(const [action,field,model]of [['simulate','simulation'],['capacitance','capacitance'],['network','network','PI2'],['network','network','PI3'],['network','network','PIX'],['network','network','PI4'],['transformer','transformer'],['three-port','three_port']]){
     const request={...base,action,model},automatic=(await checked(request))[field],plain=(await checked(manual(request,automatic)))[field];
     assert.deepEqual(withoutPolicy(automatic),plain,action+' '+(model??'')+' direct-double mesh');
   }
@@ -65,6 +65,6 @@ try{
   const coarse=technology.replace(/^\s*fftx\s*=.*$/mi,'fftx = 1').replace(/^\s*ffty\s*=.*$/mi,'ffty = 1');
   await checked({technology:coarse,creator:{id:2,keywords:'NAME=A:LEN=20:WID=2:METAL=M5:XORG=4:YORG=8'}});
   assert.match((await send({...base,action:'network',winding:0,ground:0,fft_x:1,fft_y:1})).error,/collapses|degenerate/,'Automatic cells must not silently change FFT or coarsen cell sizes');
-  mkdirSync('build/evidence',{recursive:true});writeFileSync('build/evidence/worker-automatic-cells.json',JSON.stringify({solver_paths:7,sweep_families:4,original_sweep_comparisons:2,independent_three_port:independentThreePort,invalid_mesh_recovery:true},null,2)+'\n');
-  console.log('Automatic mesh worker: two complete original S sweeps, all seven solver paths, four sweep families, direct-double equivalence and invalid mesh recovery pass');
+  mkdirSync('build/evidence',{recursive:true});writeFileSync('build/evidence/worker-automatic-cells.json',JSON.stringify({solver_paths:8,sweep_families:4,original_sweep_comparisons:2,independent_three_port:independentThreePort,invalid_mesh_recovery:true},null,2)+'\n');
+  console.log('Automatic mesh worker: two complete original S sweeps, all eight solver paths, four sweep families, direct-double equivalence and invalid mesh recovery pass');
 }finally{await worker.terminate();}

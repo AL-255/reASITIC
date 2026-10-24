@@ -71,12 +71,12 @@ Real segment_length(const ConductorSegment& s) {
     return x87::sqrt((x*x+y*y)+z*z);
 }
 bool same_name(const GeometryShape& a,const GeometryShape& b) { const char* p=reinterpret_cast<const char*>(&a);const char* q=reinterpret_cast<const char*>(&b);while(*p && *p==*q){++p;++q;}return *p==*q; }
-GeometryShape* clone_for_ground(const GeometryShape& source,SolverMemory memory) {
+GeometryShape* clone_for_ground(const GeometryShape& source,SolverMemory memory,bool reset=true) {
     auto* shape=static_cast<GeometryShape*>(memory.arrays.get(sizeof(GeometryShape)));*shape=source;shape->next=nullptr;
     shape->filaments.first=nullptr;ConductorSegment* tail=nullptr;
     for(auto* s=source.filaments.first;s;s=next(s)) {
         auto* copy=static_cast<ConductorSegment*>(memory.arrays.get(sizeof(ConductorSegment)));*copy=*s;if(tail)tail->next_address=reinterpret_cast<unsigned>(copy);else shape->filaments.first=copy;
-        copy->width_count=copy->thickness_count=-1;copy->group_next_address=0;
+        if(reset)copy->width_count=copy->thickness_count=-1;copy->group_next_address=0;
         auto* parent=copy;
         for(auto* child=reinterpret_cast<const ConductorSegment*>(s->group_next_address);child;child=reinterpret_cast<const ConductorSegment*>(child->group_next_address)) {
             auto* duplicate=static_cast<ConductorSegment*>(memory.arrays.get(sizeof(ConductorSegment)));*duplicate=*child;duplicate->group_next_address=0;parent->group_next_address=reinterpret_cast<unsigned>(duplicate);parent=duplicate;
@@ -136,7 +136,7 @@ char* matrix_json(char* out,const ComplexMatrix& matrix) {
     out+=sprintf(out,"]");return out;
 }
 bool finite_matrix(const ComplexMatrix& m) { for(int j=0;j<m.columns;++j)for(int i=0;i<m.rows;++i){auto z=m.view().at(i,j);if(!__builtin_isfinite(z.real) || !__builtin_isfinite(z.imag))return false;}return true; }
-struct NetworkRequest { double length,width,thickness;int filament_limit;reasitic::EddySession* eddy;int secondary=-1;double termination=0;int third=-1;const ComplexValue* cap_history=nullptr;const ComplexValue* ind_history=nullptr;int history_cells=0;const unsigned* history_addresses=nullptr;bool extended=false;int first_pad=-1,second_pad=-1; };
+struct NetworkRequest { double length,width,thickness;int filament_limit;reasitic::EddySession* eddy;int secondary=-1;double termination=0;int third=-1;const ComplexValue* cap_history=nullptr;const ComplexValue* ind_history=nullptr;int history_cells=0;const unsigned* history_addresses=nullptr;bool extended=false;int first_pad=-1,second_pad=-1;bool pi3=false; };
 int private_name_random(void*) { return 65; }
 void network_terminate(int,void*) { abort(); }
 struct NetworkSnapshots {
@@ -234,10 +234,10 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
     if(length_cell<x_pitch || length_cell<y_pitch) { length_cell=x87::binary64(y_pitch<x_pitch?x_pitch:y_pitch);engine.warnings.emit("CCELL length raised to the native chip/FFT pitch"); }
     if(width_cell<x_pitch || width_cell<y_pitch) { width_cell=x87::binary64(y_pitch<x_pitch?x_pitch:y_pitch);engine.warnings.emit("CCELL width raised to the native chip/FFT pitch"); }
     Workspace work(nx,ny);const auto memory=work.memory();
-    // CAP's third argument uses native parser type 8, which resets the ground's
-    // main mesh counts to -1/-1. Apply that exact acquisition step to a private
-    // clone, so repeated solves leave the user's source geometry intact.
-    if(ground>=0) { const bool identical=source==reference,second_identical=secondary==reference,third_identical=third==reference;reference=clone_for_ground(*reference,memory);if(identical)source=reference;if(second_identical)secondary=reference;if(third_identical)third=reference; }
+    // CAP/PI2 use parser type 8 and reset the reference's main mesh words.
+    // PI3's required type-0 reference retains them. Isolate either acquisition
+    // in a private clone so repeated solves preserve the source geometry.
+    if(ground>=0) { const bool identical=source==reference,second_identical=secondary==reference,third_identical=third==reference;reference=clone_for_ground(*reference,memory,!(network&&network->pi3));if(identical)source=reference;if(second_identical)secondary=reference;if(third_identical)third=reference; }
     if(padbed){
         GeometryShape* pads[]={pad1,pad2};
         for(auto* pad:pads){auto* copy=clone_for_ground(*pad,memory);if(source==pad)source=copy;if(reference==pad)reference=copy;if(pad1==pad)pad1=copy;if(pad2==pad)pad2=copy;}
@@ -390,6 +390,7 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         const unsigned capacity=64u*(intermediate.capacitance.elements+intermediate.inductance.elements+intermediate.node_capacitance.elements+intermediate.currents.rows*intermediate.currents.columns+intermediate.voltages.rows*intermediate.voltages.columns+intermediate.pads.elements+intermediate.with_pads.elements)+16384u;
         output=static_cast<char*>(calloc(1,capacity));if(!output)return "{\"error\":\"Unable to allocate network output\"}";char* out=output;
         out+=sprintf(out,"{\"name\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_source));out+=sprintf(out,",\"ground\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_reference));
+        if(network->pi3)out+=sprintf(out,",\"model\":\"PI3\"");
         if(padbed){out+=sprintf(out,",\"model\":\"PI4\",\"pads\":[");out=reasitic::json_string(out,reinterpret_cast<const char*>(pad1));out+=sprintf(out,",");out=reasitic::json_string(out,reinterpret_cast<const char*>(pad2));out+=sprintf(out,"],\"pad_contacts\":%d",pad_contacts);}
         if(transformer){out+=sprintf(out,",\"secondary\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_secondary));out+=sprintf(out,",\"termination_ohm\":%.17g,\"boundary\":%d",network->termination,boundary);}
         if(engine.max_width_cells!=500)out+=sprintf(out,",\"max_width_cells\":%d",engine.max_width_cells);
@@ -450,6 +451,18 @@ extern "C" const char* simulate_network(int winding,int ground,double frequency,
     reasitic::EddyScope scope(session);reasitic::clear_diagnostics();
     if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid network eddy mode, layers or evaluation budget\"}";
     const NetworkRequest request{length_cell,width_cell,thickness_cell,filament_limit,session};
+    return simulate_capacitance_impl(winding,ground,frequency,contact_length,contact_width,chip_x,chip_y,nx,ny,contact_limit,0,&request);
+}
+
+extern "C" const char* simulate_pi3(int winding,int ground,double frequency,double length_cell,double width_cell,double thickness_cell,double contact_length,double contact_width,
+    double chip_x,double chip_y,int nx,int ny,int contact_limit,int filament_limit,int mode,int count,int first,int second,int budget) {
+    if(ground<0)return "{\"error\":\"PI3 requires an explicit ground winding\"}";
+    auto* session=static_cast<reasitic::EddySession*>(calloc(1,sizeof(reasitic::EddySession)));if(!session)return "{\"error\":\"Unable to allocate network eddy workspace\"}";
+    reasitic::EddyScope scope(session);reasitic::clear_diagnostics();
+    if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid network eddy mode, layers or evaluation budget\"}";
+    // Native PI3 parses its required reference as argument type 0. PI2's
+    // optional type-8 reference resets the incoming filament mesh words.
+    NetworkRequest request{length_cell,width_cell,thickness_cell,filament_limit,session};request.pi3=true;
     return simulate_capacitance_impl(winding,ground,frequency,contact_length,contact_width,chip_x,chip_y,nx,ny,contact_limit,0,&request);
 }
 

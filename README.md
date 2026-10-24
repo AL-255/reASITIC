@@ -37,6 +37,10 @@ and node-equation solvers into a two-port admittance matrix and pi model.
 CALCTRANS adds original coupled-winding narrowband simulation. PIX adds the
 original extended two-port node system. PI4 pad deembedding retains original
 reported model precision with the stable formulation; broader validation continues.
+PI3 provides the original single-frequency analysis with a required ground
+winding. Its reference acquisition preserves the incoming filament mesh counts;
+PI2's optional ground acquisition resets them. The distinction changes the
+original self-grounded coil models and is retained in the C++ kernel.
 PI2, PIX, PI4 and CALCTRANS export the recovered C++ two-port S conversion,
 native rectangular/polar S/Y/model records, and raw scattering CSVs.
 The loaded-input panel adds the original `2PZIN` metric after PI2, PIX, PI4 or
@@ -316,7 +320,7 @@ or wrap large values into another winding, eddy mode or budget. Winding and
 substrate indices must refer to the current layout and technology. The C++
 `solver_limits()` export supplies the storage and work limits to JavaScript;
 the native and WASM builds share the same dense-matrix storage policy.
-`tests/worker-integer-controls.mjs` rejects 523 malformed controls across twelve
+`tests/worker-integer-controls.mjs` rejects 569 malformed controls across thirteen
 solver, resonance and sweep paths, checks exact results after rejection, and
 verifies that requests preserve the source geometry.
 
@@ -522,6 +526,7 @@ node tests/portable-scattering.mjs
 node tests/portable-three-conversion.mjs
 node tests/loaded-port.mjs
 node tests/worker-loaded-port.mjs
+node tests/pi3.mjs
 node tests/portable-extended-shunts.mjs
 node tests/portable-extended-ports.mjs
 node tests/portable-folded-ports.mjs
@@ -891,7 +896,24 @@ allocations. Ground type-8 acquisition preserves its native -1/-1 mesh behavior,
 including explicit self-ground. Stage matrices are copied at original snapshot
 boundaries for comparison; all private state is released after every solve.
 Worker and lifecycle checks cover budget recovery, alternating CAP/LMAT/network
-requests, immutable source geometry and bounded repeated allocations. The model selector also exposes original PIX via
+requests, immutable source geometry and bounded repeated allocations.
+
+`simulate_pi3` has the same arguments as `simulate_network` and requires an
+explicit ground index. It calls the same combined solver while retaining the
+reference's incoming mesh words, matching PI3's required type-0 argument.
+PI2's optional type-8 argument resets those words, including the fields used
+for via counts. Ten cases from forty fresh original processes cover both
+technology stacks, same/distinct references, subdivision, rotation, square and
+symmetric coils, and original nonfinite coarse-grid results. The eight finite
+PI3 models agree with independent 80-digit reductions; 1,086 original stage
+fields and all finite original reports match in diagnostic mode. One square
+coil has a finite PI3 model and a nonfinite explicit-ground PI2 control.
+Worker checks preserve geometry and verify exports, loaded input impedance,
+MAXNW, automatic cells, integer validation and rejected-request recovery.
+The UI exposes PI3's direct single-frequency command; stepped port commands
+retain their original PI2/PIX/PI4 choices.
+
+The model selector also exposes original PIX via
 `simulate_extended_network` with the same arguments as `simulate_network`.
 PIX uses unfolded capacitance, impedance-form inductance and the original
 extended node equations. Its raw current/voltage CSV gives the first unit-voltage
@@ -1079,6 +1101,7 @@ python3 tools/capture_geometry_edits.py --reference ~/github/asitic-re
 python3 tools/capture_capacitance.py --reference ~/github/asitic-re
 python3 tools/capture_eddy.py --reference ~/github/asitic-re
 python3 tools/capture_network.py --reference ~/github/asitic-re
+python3 tools/capture_pi3.py --reference ~/github/asitic-re
 python3 tools/capture_loaded_port.py --reference ~/github/asitic-re # requires GDB
 python3 tools/capture_transformer.py --reference ~/github/asitic-re
 python3 tools/capture_three_port.py --reference ~/github/asitic-re # also requires GDB

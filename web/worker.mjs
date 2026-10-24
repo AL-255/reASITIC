@@ -8,7 +8,7 @@ import {portSampleSummary} from './port-sweep.mjs';
 import {validateThreePortBacking,allocateThreePortBacking} from './three-port.mjs';
 import {parseTechnology,configureKernel,generateGeometry,createGeometry,editGeometry} from './technology.mjs';
 const kernel=await createKernel();
-if(typeof kernel._max_contact_count!=='function'||typeof kernel._potential_grid_fits!=='function'||typeof kernel._solver_limits!=='function'||typeof kernel._loaded_port_impedance!=='function')throw Error('Part of the workbench is out of date. Reload to update it.');
+if(typeof kernel._max_contact_count!=='function'||typeof kernel._potential_grid_fits!=='function'||typeof kernel._solver_limits!=='function'||typeof kernel._loaded_port_impedance!=='function'||typeof kernel._simulate_pi3!=='function')throw Error('Part of the workbench is out of date. Reload to update it.');
 let epoch=0,processTechnology=null,hasLayout=false,currentLayout=null,optimizationKernel=null,optimizationState=null;
 let savedTwoPorts={};
 function rememberTwoPort(source,result){savedTwoPorts[source]={matrix:result.matrix,frequency_hz:result.frequency_hz};}
@@ -45,14 +45,16 @@ function solveTransformer(data,hz){
 }
 function solveNetwork(data,hz,context,portCommand=false){
       const target=context?.kernel??kernel,technology=context?.technology??processTechnology,layout=context?.layout??currentLayout;
-      const requested=data.model??'PI2';if(!['PI2','PIX','PI4'].includes(requested))throw Error('Select PI2, PIX or PI4.');
+      const requested=data.model??'PI2';if(!['PI2','PI3','PIX','PI4'].includes(requested))throw Error('Select PI2, PI3, PIX or PI4.');
       if(!technology || (context?!layout?.shapes.length:!hasLayout))throw Error('Generate a layout before running the combined network.');
       const winding=windingIndex(data.winding,0,layout),reference=windingIndex(data.ground,-1,layout,'ground winding',true);
+      if(requested==='PI3'&&reference<0)throw Error('Select an explicit ground winding for PI3.');
+      if(portCommand&&requested==='PI3')throw Error('PI3 is a single-frequency command. Select PI2, PIX or PI4 for a port sweep.');
       let dispatch,model=requested;
       if(portCommand&&model!=='PI4'){
         dispatch=JSON.parse(target.UTF8ToString(target._port_analysis_plan(winding,model==='PIX'?1:0)));if(dispatch.error)throw Error(dispatch.error);model=dispatch.model;
       }
-      const solver=model==='PI4'?target._simulate_pad_network:model==='PIX'?target._simulate_extended_network:target._simulate_network;
+      const solver=model==='PI4'?target._simulate_pad_network:model==='PIX'?target._simulate_extended_network:model==='PI3'?target._simulate_pi3:target._simulate_network;
       // 2PORTGND acquires its required reference through native argument type
       // 8 even when it is the device itself. 2PORTX's omitted optional ground
       // does not perform that acquisition/reset.
