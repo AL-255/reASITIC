@@ -42,6 +42,10 @@ jobs:
           node tests/original-lmat.mjs
           node tests/lmat-lifecycle.mjs
           node tests/worker.mjs
+          node tests/worker-simulation.mjs
+          node tests/command-input.mjs
+          node tests/simulation-data.mjs
+          node tests/retained-math.mjs
           python tests/gds_reader.py
       - name: Retain fidelity evidence, including known x87 differences
         if: always()

@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {frequencySweep,matrixCSV,sweepCSV,plotSeries} from '../web/simulation.mjs';
+assert.deepEqual(frequencySweep(1,100,3,true),[1,10,100]);assert.deepEqual(frequencySweep(1,3,3,false),[1,2,3]);
+assert.throws(()=>frequencySweep(2,1,3));assert.throws(()=>frequencySweep(0,10,3));assert.throws(()=>frequencySweep(1,10,102));
+const a={frequency_hz:1e9,inductance_h:1e-9,resistance:2,reactance:6,series_q:3,filaments:2,conductors:2,matrix:[[[1,2],[-0,1]],[[0,1],[1,2]]]},b={...a,frequency_hz:1e10,inductance_h:-1e-9,resistance:-2,series_q:null};
+assert.equal(matrixCSV(a),'frequency_hz,row,column,real_ohm,imag_ohm\n1000000000,0,0,1,2\n1000000000,0,1,-0,1\n1000000000,1,0,0,1\n1000000000,1,1,1,2\n');
+assert.ok(sweepCSV([a,b]).includes('10000000000,-1e-9,-2,6,,2,2'));
+const plot=plotSeries([b,a],'inductance_h');assert.equal(plot.points[0].sample,a);assert.equal(plot.points[1].sample,b);assert.equal(plot.points[0].x,0);assert.equal(plot.points[1].x,1);assert.ok(plot.yRange[0]<0 && plot.yRange[1]>0,'Signed native results were clipped');
+assert.equal(plotSeries([a],'resistance').points[0].x,.5);assert.equal(plotSeries([b],'series_q'),null);
+console.log('Simulation data: frequency grids, SI-unit CSVs, signed zero, null Q, sample ordering and unclipped signed plots pass');

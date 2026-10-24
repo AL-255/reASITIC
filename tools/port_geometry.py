@@ -6,7 +6,7 @@ hard error. Each long double arithmetic operation uses software binary80.
 from pathlib import Path
 import re
 ROOT=Path(__file__).resolve().parents[1]
-SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver_no_eddy']
+SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver_no_eddy','argument_value','input_normalization']
 
 def translate(name,s):
     # Loads/stores of finite double values. Signaling NaN status is not exposed.
@@ -22,12 +22,13 @@ def translate(name,s):
     for op, instruction in [('-', 'fsubl'),('+','faddl')]:
         s=s.replace(f'asm volatile("fldl %1; {instruction} %2" : "=t"(result) : "m"(segment.endpoints[index]),"m"(origin[index%3]));',f'result=static_cast<long double>(segment.endpoints[index]){op}origin[index%3];')
     s=s.replace('asm volatile("fstpl %0" : "=m"(destination) : "t"(value) : "st");','destination=x87::binary64(value);')
+    s=s.replace('asm volatile("fldl %1; fstpt %0":"=m"(out):"m"(n):"st");','out=n;')
     # Whole helpers containing control-word changes, whose intended rounding
     # mode is explicit in the recovered source.
-    helper={'ceiling':'ceil','floor_binary64':'floor','truncate64':'truncate64'}
+    helper={'ceiling':'ceil','floor_binary64':'floor','floor_spill':'floor','truncate64':'truncate64'}
     for func,op in helper.items():
         pattern=r'((?:long double|double|long long) '+func+r'\((?:long double|double) (\w+)\) \{)[^{}]*?asm[^{}]*?\n\}'
-        s=re.sub(pattern,lambda m:m[1]+f' return '+('binary64(' if func=='floor_binary64' else '')+f'x87::{op}({m[2]})'+(')' if func=='floor_binary64' else '')+';\n}',s)
+        s=re.sub(pattern,lambda m:m[1]+f' return '+('x87::binary64(' if func in ('floor_binary64','floor_spill') else '')+f'x87::{op}({m[2]})'+(')' if func in ('floor_binary64','floor_spill') else '')+';\n}',s)
     s=s.replace('asm volatile("fldl %1; fsubl %2; fstpl %0" : "=m"(direction[i]) : "m"(s.endpoints[i+3]),"m"(s.endpoints[i]) : "st","memory");','direction[i]=binary64(static_cast<long double>(s.endpoints[i+3])-s.endpoints[i]);')
     s=s.replace('asm volatile("fptan; fstp %%st(0); fstp %%st(0)" :: "t"(half) : "st","st(1)","memory");','(void)half; // discarded tangent; FP status is not yet exposed')
     s=s.replace('asm volatile("fldz; fsubrl %1; fstpt %0" : "=m"(rounded_height) : "m"(height) : "st","memory");','rounded_height=static_cast<long double>(height)-0.L;')
@@ -48,6 +49,14 @@ def source(name):
         # Exclude unrelated command dispatch to avoid pulling in the whole host.
         s=(ROOT/'vendor/asitic/src/analysis_commands.cpp').read_text()
         return s[:s.index('long double shape_coupling_estimate(')]+'}\n'
+    if name=='argument_value':
+        s=(ROOT/'vendor/asitic/src/command_runtime.cpp').read_text()
+        helpers=s[s.index('bool equal('):s.index('const CommandDefinition* native_command_catalog()')]
+        body=s[s.index('bool parse_command_argument('):s.index('int parse_command_arguments(')]
+        return '#include \"asitic/command_runtime.hpp\"\n#include \"x87.hpp\"\nnamespace asitic { namespace {\n'+helpers+body+'}\n'
+    if name=='input_normalization':
+        s=(ROOT/'vendor/asitic/src/technology_text.cpp').read_text()
+        return s[:s.index('namespace {')]+'}\n'
     if name=='solver_no_eddy':
         # Retain the original no-eddy entry and its complete driver. Removing
         # the unused eddy entry makes the null eddy argument constant, so the

@@ -20,7 +20,7 @@ namespace {
 GeometryShape* head=nullptr;
 MetalLayer metals[32]{};ViaLayer vias[32]{};double heights[32]{};int metal_count=0,via_count=0;
 double substrate[32]{};int substrate_count=0;
-double origin_x=0,origin_y=0;int winding_phase=1;
+double origin_x=0,origin_y=0,parsed_ring_gap=0;int winding_phase=1;bool has_parsed_gap=false;
 char result[4*1024*1024],message[1024],warnings[4096];unsigned warning_length=0;
 void* allocate(unsigned n,void*) { return calloc(1,n+16); } // pad native MMSQUARE pointer workspace overrun
 void release(void* p,void*) { free(p); }
@@ -39,7 +39,8 @@ void clear_diagnostics() { warning_length=0;warnings[0]=0; }
 }
 extern "C" {
 void reset_technology() { clear();metal_count=via_count=substrate_count=0;origin_x=origin_y=0;winding_phase=1; }
-void set_geometry_options(double x,double y,int phase) { origin_x=x;origin_y=y;winding_phase=phase?phase:1; }
+void set_geometry_options(double x,double y,int phase) { origin_x=x;origin_y=y;winding_phase=phase?phase:1;has_parsed_gap=false; }
+void set_ring_gap_radians(double gap) { parsed_ring_gap=gap;has_parsed_gap=true; }
 void set_substrate(int i,double thickness) { if(i<0 || i>=32)return;substrate[i]=thickness;if(i>=substrate_count)substrate_count=i+1; }
 void finalize_technology() { for(int i=substrate_count-2;i>=0;--i)substrate[i]=x87::binary64(Real(substrate[i])+substrate[i+1]); }
 void set_metal(int i,double height,double thickness,double resistance,int layer) {
@@ -93,7 +94,7 @@ const char* generate(int kind,const double* p) {
     GeometryShape a{};integer(a,0x50)=kind==1?1:kind==2?2:kind==3?16:kind==4?17:kind==5?22:kind==8?18:0;
     a.filaments.prefix[0]='P';a.attributes=static_cast<unsigned>(winding_phase);number(a,0x54)=origin_x;number(a,0x5c)=origin_y;integer(a,0x64)=static_cast<int>(p[6]);integer(a,0x68)=metal;integer(a,0x6c)=exit;
     number(a,0x70)=p[0];number(a,0x78)=(kind==3 || kind==4)?p[10]:p[1];number(a,0x80)=p[5];
-    number(a,0x88)=p[2];number(a,0x90)=kind==5?x87::binary64(Real(p[3])*Real(0x1.1df46a2529d39p-6)):p[3];number(a,0x98)=p[4];number(a,0xa0)=p[9];
+    number(a,0x88)=p[2];number(a,0x90)=kind==5?(has_parsed_gap?parsed_ring_gap:x87::binary64(Real(p[3])*Real(0x1.1df46a2529d39p-6))):p[3];number(a,0x98)=p[4];number(a,0xa0)=p[9];
     GeometryTechnology tech{metals,vias,heights,metal_count};
     SpiralConstructionRuntime runtime{geometry,via_count,{warn,nullptr},sprintf,message,invalid,nullptr};
     SquareConstructionHistory square{{-1,-1},{}};

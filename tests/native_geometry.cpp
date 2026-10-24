@@ -4,6 +4,8 @@ extern "C" void set_substrate(int,double);
 extern "C" void finalize_technology();
 extern "C" const char* analyze(double);
 extern "C" const char* probe_math(int,double,double,double);
+extern "C" double normalize_value(double,int,double,int);
+extern "C" int printf(const char*,...);
 extern "C" const char* simulate(int,double,double,double,double,double,int);
 extern "C" void set_via(int,int,int,double,double,double,double,double);
 extern "C" const char* generate(int,const double*);
@@ -12,6 +14,7 @@ extern "C" double strtod(const char*,char**);
 extern "C" int puts(const char*);
 extern "C" int atoi(const char*);
 extern "C" int main(int argc,char** argv,char**) {
+    if(argc==6 && argv[1][0]=='-' && argv[1][2]=='i') { printf("%.17g\n",normalize_value(strtod(argv[2],nullptr),atoi(argv[3]),strtod(argv[4],nullptr),atoi(argv[5])));return 0; }
     if(argc==6 && argv[1][0]=='-') { puts(probe_math(atoi(argv[2]),strtod(argv[3],nullptr),strtod(argv[4],nullptr),strtod(argv[5],nullptr)));return 0; }
     if(argc!=14 && argc!=15 && argc!=19 && argc!=20 && argc!=21 && argc!=23)return 2;
     reset_technology();set_substrate(0,700.);set_substrate(1,50.);finalize_technology();

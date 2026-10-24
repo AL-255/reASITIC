@@ -17,7 +17,7 @@ The browser workbench includes square/polygon/symmetric/multi-metal
 windings, planar and 3D transformer builders, rings, wires and a 2×2 via-array
 example. Parameters use micrometres. The original `RESIS` DC resistance, `INDUCTANCE` conductor estimate and `RESISHF`
 high-frequency resistance paths run inside the C++ kernel. These are the original
-conductor estimates; the original no-eddy LMAT filament solver is now available in the WASM API.
+conductor estimates; the original no-eddy LMAT filament solver is available in the workbench.
 Substrate and distributed-network simulation are still being integrated. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
@@ -32,6 +32,10 @@ node tests/connected-analysis.mjs
 node tests/lmat.mjs
 node tests/original-lmat.mjs
 node tests/lmat-lifecycle.mjs
+node tests/worker-simulation.mjs
+node tests/command-input.mjs
+node tests/simulation-data.mjs
+node tests/retained-math.mjs
 node tests/worker.mjs
 python3 -m pip install gdstk==1.0.2
 python3 tests/gds_reader.py
@@ -53,6 +57,11 @@ Current measured evidence:
   and 33,704 matrix components at the original LMAT 20-decimal output boundary.
 - Seven additional original SAVE fixtures pass 955 printed-precision checks;
   eleven connected command reports pass 121 L / DC / R(f) checks.
+- All 681 hardware-x87 instruction/arithmetic cases match their consumed
+  binary64 outputs. Nine raw binary80 differences are recorded separately;
+  this remains a limit on universal microcode identity.
+- All 96 recovered scalar/frequency/grid/angle parser cases match i386 exactly,
+  including the original negative-angle normalization behavior.
 - Both transformer windings match the unchanged i386 solver. Rejected meshes
   recover, simulation does not mutate source geometry, and 100 repeated solves
   retain a bounded heap. An independent gdstk reader validates 20 GDS exports.
@@ -66,6 +75,19 @@ Emscripten's binary64 `logl` fallback. The SoftFloat license ships with the site
 Raw binary80 microcode equality beyond the consumed/tested stores remains
 unproven. Native comparison builds use the reference's
 `-fexcess-precision=standard` rule.
+
+The workbench exposes one-winding LMAT solves, mesh controls, conductor series
+Q, linear/log frequency sweeps, selectable L/R/Q plots, sample-to-matrix inspection,
+and matrix/results CSV downloads. Sweeps stream summaries and retain a complete
+matrix only for the latest inspected sample. Cancellation stops between samples.
+Phase, origin, snap and grid controls use the recovered native input parser;
+frequency and angle conversion retain native binary32 boundaries and quirks.
+Substantive native solver warnings remain visible.
+
+The worker protocol is tested with actual WASM startup, original wire matrices,
+streamed frequency samples, cancellation and error recovery. Scientific export
+checks preserve SI units, signed zeros and negative results. Rendered browser QA
+remains outstanding because no browser was available in this session.
 
 `simulate(winding, frequency_hz, length_cell, width_cell, thickness_cell,
 subdivision_trigger, filament_limit)` exports the complete impedance matrix,
@@ -88,8 +110,8 @@ This test-only command requires the original executable's legacy runtime DSOs;
 BSAVE files and LMAT outputs are retained under `build/original-lmat`.
 
 Next required work includes capacitor/balun command composition, arbitrary via
-arrays, command parameter normalization, original eddy and CAP/network
-solvers, frequency sweeps, and original-executable end-to-end
+arrays, remaining creator validation and turn normalization, original eddy and
+CAP/network solvers, coupled-winding and multiport metrics, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.
 

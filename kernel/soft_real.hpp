@@ -22,6 +22,7 @@ struct SoftReal {
  }
  SoftReal(double x){union{double d;float64_t f;}u={.d=x};value=f64_to_extF80(u.f);}
  explicit SoftReal(extFloat80_t x):value(x){}
+ explicit operator float()const{return static_cast<float>(wide());}
  explicit operator double()const{union{double d;float64_t f;}u;u.f=extF80_to_f64(value);return u.d;}
  SoftReal operator-()const{auto x=value;x.signExp^=0x8000;return SoftReal(x);}
  SoftReal& operator+=(SoftReal x){value=extF80_add(value,x.value);return *this;}

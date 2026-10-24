@@ -29,8 +29,17 @@ export function configureKernel(kernel,technology) {
   technology.vias.forEach((v,i)=>kernel._set_via(i,v.bottom,v.top,v.width,v.spacing,v.over1,v.over2,v.resistance));
 }
 export function generateGeometry(kernel,kind,parameters,options={}) {
-  kernel._set_geometry_options(options.x??0,options.y??0,options.phase??1);
+  let values=[...parameters],x=options.x??0,y=options.y??0;
+  const parse=(value,type)=>kernel._normalize_value(value,type,options.grid??.1,options.snap===false?0:1);
+  if(options.nativeInput){
+    for(const i of [0,1,2,5,10])values[i]=parse(values[i],7);
+    if(kind!==5)values[3]=parse(values[3],7);
+    for(const i of [4,11])values[i]=parse(values[i],4);
+    values[9]=parse(values[9],10);x=parse(x,7);y=parse(y,7);
+  }
+  kernel._set_geometry_options(x,y,options.phase??1);
+  if(options.nativeInput && kind===5)kernel._set_ring_gap_radians(parse(parameters[3],10));
   const p=kernel._malloc(12*8);
-  try{kernel.HEAPF64.set(parameters,p/8);const result=JSON.parse(kernel.UTF8ToString(kernel._generate(kind,p)));if(result.error)throw Error(result.error);result.warnings=kernel.UTF8ToString(kernel._last_warnings());return result;}
+  try{kernel.HEAPF64.set(values,p/8);const result=JSON.parse(kernel.UTF8ToString(kernel._generate(kind,p)));if(result.error)throw Error(result.error);result.warnings=kernel.UTF8ToString(kernel._last_warnings());return result;}
   finally{kernel._free(p);}
 }
