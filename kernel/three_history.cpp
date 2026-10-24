@@ -39,7 +39,15 @@ ThreePortHistoryScope::~ThreePortHistoryScope(){active=previous;}
 }
 namespace asitic {
 bool run_three_port_equations(ComplexMatrix& cap,const ComplexMatrix& ind,int first,int second,int n,ThreePortImpedance& output,SolverMemory memory,const NodeEquationOptions& options) {
-    if(!active)return solve_three_port_equations(cap.data,ind.data,first,second,n,output,memory,options);
+    if(!active){
+        // Both solvers already eliminated reference conductors. Their actual
+        // dimension is the node-system contract; a reference cannot create
+        // extra current unknowns without corresponding matrix coefficients.
+        if(n<1 || cap.rows!=n || cap.columns!=n || ind.rows!=n || ind.columns!=n || cap.stride!=n || ind.stride!=n){
+            options.warnings.emit("Three-port matrices do not match the node-system dimension.");return false;
+        }
+        return solve_three_port_equations(cap.data,ind.data,first,second,n,output,memory,options);
+    }
     auto& h=*active;if(!prepare(h,cap,ind,n)){h.contract_matches=false;return false;}
     const SolverMemory overlay{{get,&h},put};return solve_three_port_equations(static_cast<ComplexValue*>(h.blocks[0]),static_cast<const ComplexValue*>(h.blocks[1]),first,second,n,output,overlay,options);
 }

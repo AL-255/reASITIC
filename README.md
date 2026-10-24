@@ -57,6 +57,11 @@ precision, capacitance and Green tables, and nonfinite rejection behavior.
 The original instruction/store sequence remains available through the explicitly
 named `tests/reference-kernel.mjs` audit helper; those historical bit comparisons
 do not choose the production numerical policy or depend on a runtime CPU profile.
+Transformer host audits retain bounded rounding observations in inductance-derived
+fields while requiring ten-digit relative agreement. CAP, metadata, structure,
+signed zero, headers and all captured original Y/node/model checks remain strict.
+`node tests/transformer.mjs --strict-native` separately requests host instruction-bit
+identity; hosted native x87 results can differ from the original capture machine.
 `tools/reference_gmd.py` regenerates the distance fixtures with mpmath 1.3.0 and
 checks the antiderivative against direct quadrature of mean log-distance.
 `tools/reference_error_power.py` independently uses `sqrt(x**3)` for exact
@@ -64,6 +69,7 @@ binary64 inputs at 200 decimal digits.
 
 ```sh
 # Emscripten 6.0.6, Python 3, Node 24
+python3 -m pip install gdstk==1.0.2 mpmath==1.3.0
 python3 tools/build.py                    # or --emxx /path/to/em++
 python3 tools/build_native.py             # GCC i386 + libc.so.6 reference audit
 python3 tools/build_portable_math.py       # native/WASM software-math verification
@@ -75,6 +81,7 @@ node tests/two-port-output.mjs
 node tests/port-schedule.mjs
 node tests/port-sweep.mjs
 node tests/worker-port-sweep.mjs
+node tests/portable-three-port.mjs
 node tests/native-creators.mjs
 node tests/original-creator-binary.mjs
 node tests/parity.mjs
@@ -120,7 +127,6 @@ node tests/command-input.mjs
 node tests/simulation-data.mjs
 node tests/retained-math.mjs
 node tests/worker.mjs
-python3 -m pip install gdstk==1.0.2
 python3 tests/gds_reader.py
 python3 -m http.server 8766 --directory dist
 ```
@@ -397,8 +403,10 @@ geometry; lifecycle checks alternate coupled/CAP/PI2 solves and verify recovery
 and bounded repeated allocations. Undefined derived metrics retain null/empty
 output rather than invented finite values.
 
-The three-port panel runs original 3PORT composition, reference-inclusive node
-assembly, general factor/solve, narrowband model extraction and S/Y/Z conversion.
+The three-port panel runs original 3PORT composition, node assembly, general
+factor/solve, narrowband model extraction and S/Y/Z conversion. Production uses
+the actual reduced matrix dimension, so a separate reference can be solved
+without native process-state captures.
 It exposes all three L/R values, three mutual inductances, cross resistances and
 couplings. Raw matrix/model CSVs retain SI units and every cell. Native numerical
 record downloads use the original C++ writer, including its entry ordering,
@@ -408,18 +416,36 @@ behavior. The writer's raw argument words retain the i386 numerical payloads.
 `simulate_three_port(first, second, third, ground, frequency_hz, length_cell,
 width_cell, thickness_cell, contact_length, contact_width, chip_x, chip_y, fft_x,
 fft_y, contact_limit, filament_limit, eddy_mode, layer_count, first_layer,
-second_layer, evaluation_limit)` provides the default/first-winding reference.
-All geometry, contact, filament and node budgets use native counts and preserve
+second_layer, evaluation_limit)` provides default/first-winding and separate references.
+Geometry, contact and filament budgets use native counts and preserve
 the original subdivision/mesh arithmetic. The source geometry remains private
 and unchanged across successful or rejected calls.
 
-A separately named reference triggers an original defect: its records increase
-the node count beyond the reduced matrix dimensions. The node routine reads
+A separately named reference triggers an original defect: the legacy driver
+increases its node count beyond the reduced matrix dimensions. The node routine reads
 unwritten/out-of-bounds data, including bytes aliased to its live LU workspace.
 Ordinary original-executable runs with identical physical input can produce
 different finite outputs. A uniquely determined result cannot be inferred from
-geometry/technology alone on this path. The workbench requires a native backing
-capture for this reference choice and rejects unspecified state explicitly.
+geometry/technology alone on this historical path.
+
+The production correction binds the node count to the joined signal-conductor
+count, which equals both solvers’ reduced matrix dimensions. Reference
+conductors already contribute through the folded capacitance matrix; counting
+them again creates unknowns without coefficients. The node solver now rejects
+any matrix/dimension mismatch. Its assembly, general LU solve, port extraction
+and model formulas are unchanged. This removes overreads and dependence on
+heap layout. It does not claim to reproduce the undefined native-state outputs.
+
+Nine separate-reference cases cover frequency, subdivision, cross-section
+meshing, rotation, eddy currents, square coils and polygons. They agree within
+1e-10 relative scale with an independent 80-decimal-digit nodal reduction:
+`(Y + Dᵀ Z⁻¹ D) V = J`, eliminating currents before solving for voltage instead
+of factoring the original 2n block system. The original captured matrix prefixes
+are checked separately. Allocation perturbations and historical replay leave
+production results unchanged. `tools/reference_three_port.py` uses mpmath 1.3.0;
+set `MPMATH_PYTHON` to an environment with that version if needed.
+
+Historical reference mode still requires captured backing for this defect.
 
 `probe_three_port(...same arguments..., capacitance_backing, inductance_backing,
 backing_cells, native_addresses)` takes the measured incoming state. The two
@@ -434,7 +460,7 @@ calculation. Unwritten native process state is an explicit input, as with the
 other recovered construction/cache histories; input-only universal identity on
 this undefined original path is not claimed.
 
-Import `backing.json` from the capture tool into the three-port panel after
+Optionally import `backing.json` for a historical native-state comparison after
 creating its winding/reference records. The import restores available mesh,
 frequency and eddy settings. The worker checks winding order, reference,
 frequency and technology hash, and C++ verifies the actual matrix prefixes.

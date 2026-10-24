@@ -202,7 +202,7 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         GeometryShape* pad_shapes[]={pad1,pad2};for(auto* shape:pad_shapes){int n=0;while(reinterpret_cast<const char*>(shape)[n] && n<78)++n;if(n>=78)return "{\"error\":\"Native PI4 pad temporary names exceed their safe capacity\"}";}
     }
     if(!source || !reference)return "{\"error\":\"Select a valid device and ground winding\"}";
-    if(three && !same_name(*source,*reference) && (!network->cap_history || !network->ind_history || network->history_cells<1))return "{\"error\":\"Native separate-reference three-port results depend on out-of-bounds matrix backing; captured backing is required for exact comparison\"}";
+    if(three && reasitic::reference_numerics() && !same_name(*source,*reference) && (!network->cap_history || !network->ind_history || network->history_cells<1))return "{\"error\":\"Native separate-reference three-port results depend on out-of-bounds matrix backing; captured backing is required for exact comparison\"}";
     if(three && (network->history_cells<0 || network->history_cells>512*512))return "{\"error\":\"Invalid three-port backing size\"}";
     if(engine.substrate_count<2)return "{\"error\":\"The layered potential solve requires a substrate stack\"}";
     for(int i=0;i<engine.substrate_count;++i) { double eps;__builtin_memcpy(&eps,engine.substrate[i].prefix+4,8);

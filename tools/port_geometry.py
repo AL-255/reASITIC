@@ -147,7 +147,7 @@ def source(name):
         s=(ROOT/'vendor/asitic/src/three_port_analysis.cpp').read_text();signature='bool solve_three_port_network('
         begin=s.index('    const auto& runtime=o.commands.construction.geometry;',s.index(signature));end=s.index('    const GeometryShape* ground=',begin)
         prefix=s[begin:end].replace('const int first_count=','first_count=').replace('const int second_count=','second_count=').replace('unsigned n=','n=')
-        helper='GeometryShape* prepare_three_port_geometry(const GeometryShape& first,const GeometryShape& second,const GeometryShape& third,GeometryShape& reference,ThreePortAnalysisState& state,const ThreePortAnalysisOptions& o,int& first_count,int& second_count,unsigned& n) {\n'+prefix+'    return joined;\n}\n'
+        helper='GeometryShape* prepare_three_port_geometry(const GeometryShape& first,const GeometryShape& second,const GeometryShape& third,GeometryShape& reference,ThreePortAnalysisState& state,const ThreePortAnalysisOptions& o,int& first_count,int& second_count,unsigned& n) {\n'+prefix+'    // Reference conductors are already eliminated from both physical matrices.\n    if(!reasitic::reference_numerics())n=static_cast<unsigned>(count_geometry_metals(*joined,o.technology.metal_count));\n    return joined;\n}\n'
         s=s[:begin]+'    const auto& runtime=o.commands.construction.geometry;const auto memory=runtime.memory;\n    int first_count,second_count;unsigned n;auto* joined=prepare_three_port_geometry(first,second,third,reference,state,o,first_count,second_count,n);\n'+s[end:]
         s=s.replace(signature,helper+signature,1)
         needle='    auto inductance=matrix(static_cast<int>(n),memory,runtime.errors);';assert s.count(needle)==1
@@ -155,7 +155,7 @@ def source(name):
         needle='    remove_geometry_shape(state.shapes,joined,memory);\n    if(!solve_three_port_equations(';assert s.count(needle)==1
         s=s.replace(needle,'    if(o.inductance.snapshot)o.inductance.snapshot("YM.out",inductance,o.inductance.snapshot_user);\n'+needle)
         s=s.replace('namespace asitic {','namespace asitic {\nbool run_three_port_equations(ComplexMatrix&,const ComplexMatrix&,int,int,int,ThreePortImpedance&,SolverMemory,const NodeEquationOptions&);',1)
-        return s.replace('solve_three_port_equations(capacitance.data,inductance.data,','run_three_port_equations(capacitance,inductance,',1)
+        return '#include \"numerical_policy.hpp\"\n'+s.replace('solve_three_port_equations(capacitance.data,inductance.data,','run_three_port_equations(capacitance,inductance,',1)
     if name=='potential_solver':
         s=(ROOT/'vendor/asitic/src/potential_solver.cpp').read_text()
         s=s.replace('namespace asitic {','namespace asitic {\nvoid record_capacitance_totals(double,double);',1)
