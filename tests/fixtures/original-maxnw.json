@@ -1,0 +1,169 @@
+{
+  "reference": "Unmodified MAXNW/WIRE/LMAT in two fresh processes per case; original full-precision LMAT matrix files",
+  "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+  "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+  "cases": [
+    {
+      "name": "graded-3",
+      "max_width_cells": 3,
+      "width": 24,
+      "width_cell": 1,
+      "thickness_cell": 1,
+      "orientation": 0,
+      "keywords": "NAME=A:LEN=40:WID=24:METAL=M5:XORG=100:YORG=100:ORIENT=0",
+      "filaments": 3,
+      "matrix": [
+        [
+          [
+            0.051049992834188894,
+            0.09221519493840952
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "graded-4",
+      "max_width_cells": 4,
+      "width": 24,
+      "width_cell": 1,
+      "thickness_cell": 1,
+      "orientation": 0,
+      "keywords": "NAME=A:LEN=40:WID=24:METAL=M5:XORG=100:YORG=100:ORIENT=0",
+      "filaments": 4,
+      "matrix": [
+        [
+          [
+            0.02619254525062466,
+            0.08169776741554109
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "graded-5",
+      "max_width_cells": 5,
+      "width": 24,
+      "width_cell": 1,
+      "thickness_cell": 1,
+      "orientation": 0,
+      "keywords": "NAME=A:LEN=40:WID=24:METAL=M5:XORG=100:YORG=100:ORIENT=0",
+      "filaments": 5,
+      "matrix": [
+        [
+          [
+            0.08822902406829371,
+            0.10213937318069632
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "graded-8",
+      "max_width_cells": 8,
+      "width": 24,
+      "width_cell": 1,
+      "thickness_cell": 1,
+      "orientation": 0,
+      "keywords": "NAME=A:LEN=40:WID=24:METAL=M5:XORG=100:YORG=100:ORIENT=0",
+      "filaments": 8,
+      "matrix": [
+        [
+          [
+            0.06979072294631307,
+            0.10308841065915827
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "graded-10",
+      "max_width_cells": 10,
+      "width": 24,
+      "width_cell": 1,
+      "thickness_cell": 1,
+      "orientation": 0,
+      "keywords": "NAME=A:LEN=40:WID=24:METAL=M5:XORG=100:YORG=100:ORIENT=0",
+      "filaments": 10,
+      "matrix": [
+        [
+          [
+            0.07676628535368146,
+            0.0836086835544883
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "graded-500",
+      "max_width_cells": 500,
+      "width": 24,
+      "width_cell": 1,
+      "thickness_cell": 1,
+      "orientation": 0,
+      "keywords": "NAME=A:LEN=40:WID=24:METAL=M5:XORG=100:YORG=100:ORIENT=0",
+      "filaments": 24,
+      "matrix": [
+        [
+          [
+            0.050969968834274786,
+            0.09255251708139148
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "below-threshold",
+      "max_width_cells": 3,
+      "width": 2.9,
+      "width_cell": 1,
+      "thickness_cell": 1,
+      "orientation": 0,
+      "keywords": "NAME=A:LEN=40:WID=2.9:METAL=M5:XORG=100:YORG=100:ORIENT=0",
+      "filaments": 3,
+      "matrix": [
+        [
+          [
+            0.41385860273446706,
+            0.17825653797407034
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "above-threshold",
+      "max_width_cells": 3,
+      "width": 3.1,
+      "width_cell": 1,
+      "thickness_cell": 1,
+      "orientation": 0,
+      "keywords": "NAME=A:LEN=40:WID=3.1:METAL=M5:XORG=100:YORG=100:ORIENT=0",
+      "filaments": 3,
+      "matrix": [
+        [
+          [
+            0.38718079782756626,
+            0.16652674528062422
+          ]
+        ]
+      ]
+    },
+    {
+      "name": "rotated-layers",
+      "max_width_cells": 5,
+      "width": 24,
+      "width_cell": 1,
+      "thickness_cell": 0.25,
+      "orientation": 37,
+      "keywords": "NAME=A:LEN=40:WID=24:METAL=M5:XORG=100:YORG=100:ORIENT=37",
+      "filaments": 25,
+      "matrix": [
+        [
+          [
+            0.08813402414368422,
+            0.101792956368135
+          ]
+        ]
+      ]
+    }
+  ]
+}

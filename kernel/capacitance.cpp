@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include "filament_policy.hpp"
 #include "json.hpp"
 #include "eddy_runtime.hpp"
 #include "three_history.hpp"
@@ -266,8 +267,9 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
                 return "{\"error\":\"Network cross-section mesh exceeds the selected filament budget\"}";
         if(!setup_filament_groups(context,engine.metal_count,memory.arrays,engine.warnings) || context.group_count<1 ||
            !index_conductor_segments(context,engine.metal_count,memory.arrays,engine.warnings) ||
-           !set_filament_counts(context,network->width,network->thickness,500,memory.arrays,engine.warnings) || context.filament_count>network->filament_limit)
+           !set_filament_counts(context,network->width,network->thickness,engine.max_width_cells,memory.arrays,engine.warnings) || context.filament_count>network->filament_limit)
             return "{\"error\":\"Network cross-section mesh exceeds the selected filament budget\"}";
+        if(!reasitic::valid_width_grading<Real>(context,network->width,engine.max_width_cells))return "{\"error\":\"MAXNW edge grading produces a nonfinite width; use at least three width cells or a larger width cell size\"}";
         network_filaments=context.filament_count;
     }
     const PotentialContactOptions contacts{nx,ny,engine.metal_count,chip_x,chip_y,length_cell,width_cell};int count=0,groups=0;
@@ -301,7 +303,7 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         if(groups-ground_segments!=expected_groups)return "{\"error\":\"Native network capacitance and inductance dimensions do not agree\"}";
         CombinedNetworkState combined{};combined.capacitance=state;LaterAnalysisState coupled{};coupled.capacitance=state;
         NetworkSnapshots intermediate{memory};
-        const InductanceRunOptions inductance{{network->width,500,engine.metals},network->thickness,engine.metal_count,engine.vias,false};
+        const InductanceRunOptions inductance{{network->width,engine.max_width_cells,engine.metals},network->thickness,engine.metal_count,engine.vias,false};
         const CombinedNetworkOptions network_options{{network->length,length_cell},options,inductance,reasitic::eddy_options(*network->eddy,engine),
             {true,sprintf,engine.warnings,NetworkSnapshots::record_nodes,&intermediate},engine.warnings,false,false,NetworkSnapshots::record,&intermediate,{}};
         const GeometryRuntime geometry{memory,engine.warnings,network_terminate,nullptr};
@@ -331,6 +333,7 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
             const unsigned capacity=64u*(intermediate.capacitance.elements+intermediate.inductance.elements+intermediate.system_before.elements+intermediate.system_after.elements)+65536u;
             output=static_cast<char*>(calloc(1,capacity));if(!output)return "{\"error\":\"Unable to allocate three-port output\"}";char* out=output;
             out+=sprintf(out,"{\"names\":[");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_source));out+=sprintf(out,",");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_secondary));out+=sprintf(out,",");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_third));out+=sprintf(out,"],\"ground\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_reference));
+            if(engine.max_width_cells!=500)out+=sprintf(out,",\"max_width_cells\":%d",engine.max_width_cells);
             out+=sprintf(out,",\"frequency_hz\":%.17g,\"contacts\":%d,\"groups\":%d,\"filaments\":%d,\"node_count\":%u,\"winding_groups\":[%d,%d,%d],\"mesh\":{\"length\":%.17g,\"width\":%.17g,\"thickness\":%.17g,\"contact_length\":%.17g,\"contact_width\":%.17g,\"chip_x\":%.17g,\"chip_y\":%.17g,\"fft_x\":%d,\"fft_y\":%d},\"impedance_matrix\":",frequency,snapshots.contacts,expected_groups,network_filaments,node_count,boundary,second_boundary,expected_groups-boundary-second_boundary,network->length,network->width,network->thickness,length_cell,width_cell,chip_x,chip_y,nx,ny);
 
             out=cells_json(out,z,3);out+=sprintf(out,",\"admittance_matrix\":");out=cells_json(out,reinterpret_cast<const ComplexValue*>(&admittance),3);out+=sprintf(out,",\"scattering_matrix\":");out=cells_json(out,reinterpret_cast<const ComplexValue*>(&scattering),3);
@@ -358,6 +361,7 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         out+=sprintf(out,"{\"name\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_source));out+=sprintf(out,",\"ground\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_reference));
         if(padbed){out+=sprintf(out,",\"model\":\"PI4\",\"pads\":[");out=reasitic::json_string(out,reinterpret_cast<const char*>(pad1));out+=sprintf(out,",");out=reasitic::json_string(out,reinterpret_cast<const char*>(pad2));out+=sprintf(out,"],\"pad_contacts\":%d",pad_contacts);}
         if(transformer){out+=sprintf(out,",\"secondary\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_secondary));out+=sprintf(out,",\"termination_ohm\":%.17g,\"boundary\":%d",network->termination,boundary);}
+        if(engine.max_width_cells!=500)out+=sprintf(out,",\"max_width_cells\":%d",engine.max_width_cells);
         out+=sprintf(out,",\"frequency_hz\":%.17g,\"contacts\":%d,\"groups\":%d,\"filaments\":%d,\"mesh\":{\"length\":%.17g,\"width\":%.17g,\"thickness\":%.17g,\"contact_length\":%.17g,\"contact_width\":%.17g,\"chip_x\":%.17g,\"chip_y\":%.17g,\"fft_x\":%d,\"fft_y\":%d},\"matrix\":[[",frequency,padbed?count:snapshots.contacts,expected_groups,network_filaments,network->length,network->width,network->thickness,length_cell,width_cell,chip_x,chip_y,nx,ny);
         out=complex_json(out,y.y11);out+=sprintf(out,",");out=complex_json(out,y.y12);out+=sprintf(out,"],[");out=complex_json(out,y.y21);out+=sprintf(out,",");out=complex_json(out,y.y22);out+=sprintf(out,"]]");
         if(transformer){

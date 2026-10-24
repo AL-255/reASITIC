@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include "filament_policy.hpp"
 #include "eddy_runtime.hpp"
 #include "json.hpp"
 #include "asitic/shape_construction.hpp"
@@ -91,16 +92,19 @@ static const char* simulate_impl(int winding,double frequency,double length_cell
         // the original context can publish its exact total.
         if(Real(s->thickness)/thickness_cell+Real(.5)>filament_limit)
             return "{\"error\":\"Thickness mesh exceeds the selected filament limit\"}";
+        if(Real(s->width)/width_cell+Real(.5)>2147483647.L)
+            return "{\"error\":\"Width mesh exceeds the native integer range\"}";
     }
     if(!conductors)return "{\"error\":\"LMAT requires at least one metal conductor\"}";
     InductanceContext context{};context.shape=&shape->filaments;
     if(!setup_filament_groups(context,engine.metal_count,memory.arrays,engine.warnings) ||
        !index_conductor_segments(context,engine.metal_count,memory.arrays,engine.warnings) ||
-       !set_filament_counts(context,width_cell,thickness_cell,500,memory.arrays,engine.warnings))
+       !set_filament_counts(context,width_cell,thickness_cell,engine.max_width_cells,memory.arrays,engine.warnings))
         return "{\"error\":\"Could not prepare the original filament context\"}";
     if(context.filament_count>filament_limit)
         return "{\"error\":\"Cross-section mesh exceeds the selected filament limit; increase width/thickness cells or the limit\"}";
-    ComplexMatrix matrix{};InductanceRunOptions options{{width_cell,500,engine.metals},thickness_cell,engine.metal_count,engine.vias,true};
+    if(!reasitic::valid_width_grading<Real>(context,width_cell,engine.max_width_cells))return "{\"error\":\"MAXNW edge grading produces a nonfinite width; use at least three width cells or a larger width cell size\"}";
+    ComplexMatrix matrix{};InductanceRunOptions options{{width_cell,engine.max_width_cells,engine.metals},thickness_cell,engine.metal_count,engine.vias,true};
     const bool solved=eddy?solve_inductance(shape->filaments,matrix,frequency,options,reasitic::eddy_options(*eddy,engine),memory,engine.warnings):solve_inductance_without_eddy(shape->filaments,matrix,frequency,options,memory,engine.warnings);
     if(eddy && eddy->exceeded)return "{\"error\":\"Eddy evaluation budget exceeded; reduce the mesh size or increase the Green budget\"}";
     if(!solved)
@@ -119,6 +123,7 @@ static const char* simulate_impl(int winding,double frequency,double length_cell
     simulation_result=static_cast<char*>(calloc(1,capacity));if(!simulation_result)return "{\"error\":\"Could not allocate matrix output\"}";
     char* out=simulation_result;
     out+=sprintf(out,"{\"name\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(shape->filaments.prefix));
+    if(engine.max_width_cells!=500)out+=sprintf(out,",\"max_width_cells\":%d",engine.max_width_cells);
     out+=sprintf(out,",\"frequency_hz\":%.17g,\"conductors\":%d,\"filaments\":%d,\"resistance\":%.17g,\"reactance\":%.17g,\"inductance_h\":%.17g,\"series_q\":",frequency,context.group_count,context.filament_count,real,imag,inductance);
     const double q=x87::binary64(Real(imag)/real);
     out+=__builtin_isfinite(q)?sprintf(out,"%.17g",q):sprintf(out,"null");

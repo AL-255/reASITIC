@@ -2,6 +2,8 @@
 // computed doubles and must not pass through the command dimension parser.
 export function solverCells(kernel,data,hz,kind){
   if(!['inductance','network','capacitance'].includes(kind))throw Error('Unknown solver mesh.');
+  const maximum=data.max_width_cells??500;
+  if(!Number.isInteger(maximum)||maximum<1||maximum>2147483647||!kernel._set_max_width_cells(maximum))throw Error('Use a positive integer MAXNW width limit up to 2147483647.');
   const automatic=data.automatic_cells;
   if(automatic!==undefined&&automatic!==null&&automatic!==false){
     if(typeof automatic!=='object'||Array.isArray(automatic))throw Error('Use alpha and beta for automatic cells.');

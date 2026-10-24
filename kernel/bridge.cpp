@@ -34,7 +34,7 @@ extern "C" void abort();
 using namespace asitic;
 namespace {
 GeometryShape* head=nullptr;
-MetalLayer metals[32]{};ViaLayer vias[32]{};double heights[32]{};int metal_count=0,via_count=0;
+MetalLayer metals[32]{};ViaLayer vias[32]{};double heights[32]{};int metal_count=0,via_count=0,max_width_cells=500;
 double substrate[32]{};SubstrateLayer dielectric[32]{};int substrate_count=0;
 double origin_x=0,origin_y=0,parsed_ring_gap=0;int winding_phase=1;bool has_parsed_gap=false;
 char result[4*1024*1024],message[1024],warnings[4096];unsigned warning_length=0;
@@ -153,11 +153,12 @@ void guard_native_creation(int id,const ConsoleGeometryState& state) {
 }
 }
 namespace reasitic {
-EngineView engine_view() { return {head,metals,vias,metal_count,{warn,nullptr},dielectric,substrate_count,heights}; }
+EngineView engine_view() { return {head,metals,vias,metal_count,{warn,nullptr},dielectric,substrate_count,heights,max_width_cells}; }
 void clear_diagnostics() { warning_length=0;warnings[0]=0; }
 }
 extern "C" {
-void reset_technology() { clear();metal_count=via_count=substrate_count=0;origin_x=origin_y=0;winding_phase=1; }
+int set_max_width_cells(int value) { if(value<=0)return 0;max_width_cells=value;return 1; }
+void reset_technology() { clear();max_width_cells=500;metal_count=via_count=substrate_count=0;origin_x=origin_y=0;winding_phase=1; }
 void set_geometry_options(double x,double y,int phase) { origin_x=x;origin_y=y;winding_phase=phase?phase:1;has_parsed_gap=false; }
 void set_ring_gap_radians(double gap) { parsed_ring_gap=gap;has_parsed_gap=true; }
 void set_substrate(int i,double thickness) { if(i<0 || i>=32)return;substrate[i]=thickness;dielectric[i]={};dielectric[i].thickness=thickness;if(i>=substrate_count)substrate_count=i+1; }

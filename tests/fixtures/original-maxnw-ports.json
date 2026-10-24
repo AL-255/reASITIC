@@ -1,0 +1,254 @@
+{
+  "reference": "Unmodified original port commands with MAXNW; full numerical files from two fresh processes per model",
+  "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+  "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+  "cases": [
+    {
+      "family": "network",
+      "max_width_cells": 3,
+      "case": {
+        "name": "wire-coarse",
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+        "grid": [
+          8,
+          8
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "cells": [
+        1000,
+        1,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "records": {
+        "s": "\n# GHZ S RI S11r       S11i       S12r       S12i       S21r       S21i       S22r       S22i       \n1.000000000000000e+00  -3.449066715540793e-03  -9.641925855213067e-02  9.958843077069438e-01  -5.243644965071689e-02  9.958843077069438e-01  -5.243644965071689e-02  -1.117778311083397e-03  -4.670118435415183e-02\n",
+        "y": "\n# GHZ Y RI Y11r       Y11i       Y12r       Y12i       Y21r       Y21i       Y22r       Y22i       \n1.000000000000000e+00  1.561151004611299e+00  -2.673065755964927e+00  -1.561150733013142e+00  2.675056717069944e+00  -1.561150733013142e+00  2.675056717069944e+00  1.561150733013142e+00  -2.67505671706994   \n"
+      }
+    },
+    {
+      "family": "extended",
+      "max_width_cells": 4,
+      "case": {
+        "name": "square-no-eddy",
+        "id": 0,
+        "keywords": "NAME=A:LEN=200:WID=220:W=32:S=16:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100",
+        "grid": [
+          32,
+          32
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "cells": [
+        1000,
+        1,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "records": {
+        "s": "\n# GHZ S RI S11r       S11i       S12r       S12i       S21r       S21i       S22r       S22i       \n1.000000000000000e+00  9.677519185535553e-03  -1.014503940607929e-02  9.858358102047100e-01  -8.190335636290985e-02  9.858358102047099e-01  -8.190335636290971e-02  9.918013934868811e-03  -9.425522015399607e-03\n",
+        "y": "\n# GHZ Y RI Y11r       Y11i       Y12r       Y12i       Y21r       Y21i       Y22r       Y22i       \n1.000000000000000e+00  7.277350510670860e-02  -2.480455172579126e-01  -7.276868536887224e-02  2.489753906831805e-01  -7.276868536887224e-02  2.489753906831805e-01  7.276424656653331e-02  -0.24807410171903   \n"
+      },
+      "raw_stages": {
+        "capacitance_matrix": "f612f2540256413eaeab042ad762393fc348ad76e93d2d3e6414d37d4f1efabe9f41911af6501e3e420fa18c8f6dbf3eda0c97798a99273effc9490da168a9be04b0d4ce1bc6293e832cdbbe7908e1be8df63a5acb810f3ed50ea5dbe9d5a2be0d96054b9461263eec88f2daffedbbbec348ad76e93d2d3e6414d37d4f1efabecba90d1bafd6423eeb0faa2bffb23b3f25641854f280223ec5e211fc8aacfabe7893f88f4c42253e7ddb09e55993bd3e9b4f5a01a94d213e30ffceb8c65aa2be617c8bf969d9163ea8fa896315cad0be5e6f343a52b7323e3d65226d8634b03ea041911af6501e3e410fa18c8f6dbf3e28641854f280223ec5e211fc8aacfabef79e4094f0d9363eaea35a7b45f7383fac07b54906c2223e2f3611a211fcfcbe4e7f5b05dfbf123e28df239eb0d3c03e94c54e22bfb4fd3d6f94827a0709c33e0e044d9f9381263e4ef942263b0f1bbfd90c97798a99273efec9490da168a9be7993f88f4c42253e7bdb09e55993bd3eab07b54906c2223e2f3611a211fcfcbe15d25102242f3a3ea7e0a152a62e353f3e02c9494c271f3e07ec90acbcccfbbe78c6fcfc02b9053e4d73862c5ef9c33edc5214d1c85e253e1d90031d1060e13e05b0d4ce1bc6293e832cdbbe7908e1be9c4f5a01a94d213e31ffceb8c65aa2be4d7f5b05dfbf123e29df239eb0d3c03e3e02c9494c271f3e07ec90acbcccfbbeffeba8f88c882f3e083879b82310313f4547742861a1033eb90248e4157cfdbefc5c8609c9e41d3ee209b28dc0c492be8ff63a5acb810f3ed60ea5dbe9d5a2be617c8bf969d9163ea8fa896315cad0be96c54e22bfb4fd3d6f94827a0709c33e79c6fcfc02b9053e4d73862c5ef9c33e4547742861a1033eb90248e4157cfdbeb94b5a96659b123ea2d9d014e6ce1f3f9fb67257343a113ea54a69b0ac39e5be0d96054b9461263eeb88f2daffedbbbe5e6f343a52b7323e3565226d8634b03e0c044d9f9381263e4ef942263b0f1bbfdc5214d1c85e253e1c90031d1060e13efc5c8609c9e41d3ee309b28dc0c492be9fb67257343a113ea54a69b0ac39e5be5b5f738f269a413ecf8c8c71a27c3b3f",
+        "inductance_impedance_matrix": "deeb5efb5ae2c73ffbbcb47976d1e33f76a7cdee2813233f54984e9f59dc14bfd340c25b27686cbf54a3029fac4db8bfdb49c803a5f143bf1150cacdc0bb423f5e46c7e86697843f6bd0023f0713ca3fde2ad5627ba00b3fcb60575ed627febe66af93863b1a293f934012ce1ca41bbf76a7cdee2813233f54984e9f59dc14bfafbc936a424cc83f349d93d60c46e43f4127965f15e746bf852ab6b4a9f8483f04bec6527b8658bf6a8cd7a592e1b6bfccfd2c03ae5a213f72c96f52df0512bf0d8978d7e8a3853f4596b337a4b8c13fe36584197cc2903f31331656e913cb3fd340c25b27686cbf54a3029fac4db8bf4127965f15e746bf852ab6b4a9f8483f3b95743b66a6c33f042ae628af9ae13f679a6183c883533f7a9fc64291c659bf650d4ba8450360bfddb571e12ca6b4bf83ff89d9441b31bf600eb2d9194a353f0105e271331151bfa846ceabcbbd543fdb49c803a5f143bf1150cacdc0bb423f04bec6527b8658bf6a8cd7a592e1b6bf679a6183c883533f7a9fc64291c659bf7fae22043373c03ff4bb7f7a054adb3fb85e4d6556e643bf79cc7a32041b483f46e9cffdccf4413f548d2829acffa9bfcaafcbf9925357bfc8514ab58362b7bf5e46c7e86697843f6bd0023f0713ca3fccfd2c03ae5a213f72c96f52df0512bf650d4ba8450360bfddb571e12ca6b4bfb85e4d6556e643bf79cc7a32041b483f8c7857fdccffbc3fbf4625e64d72d53f9acf1c3379ae093fd252eea1a3fff4beffc090002239233fc567b74be9df13bfde2ad5627ba00b3fcb60575ed627febe0d8978d7e8a3853f4596b337a4b8c13f83ff89d9441b31bf600eb2d9194a353f46e9cffdccf4413f548d2829acffa9bf9acf1c3379ae093fd252eea1a3fff4be36c11d8d1b82b43f59b7838352acc63f93b1b2913e0b813f8bf546b98b73bb3f66af93863b1a293f934012ce1ca41bbfe36584197cc2903f31331656e913cb3f0105e271331151bfa846ceabcbbd543fcaafcbf9925357bfc8514ab58362b7bfffc090002239233fc567b74be9df13bf93b1b2913e0b813f8bf546b98b73bb3f5ad39c08b06dc43fd3d8bd9180e4dc3f"
+      }
+    },
+    {
+      "family": "pad",
+      "max_width_cells": 5,
+      "case": {
+        "name": "wire-distinct-ground",
+        "device": {
+          "id": 2,
+          "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+        },
+        "pads": [
+          {
+            "id": 2,
+            "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+          }
+        ],
+        "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "cells": [
+        1000,
+        1,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "records": {
+        "s": "\n# GHZ S RI S11r       S11i       S12r       S12i       S21r       S21i       S22r       S22i       \n1.000000000000000e+00  -4.114895133624649e-03  -7.557814307770107e-02  9.939998842630834e-01  -5.512999020981921e-02  9.939998842630834e-01  -5.512999020981921e-02  9.726208225447305e-04  -3.873328284081514e-02\n",
+        "y": "\n# GHZ Y RI Y11r       Y11i       Y12r       Y12i       Y21r       Y21i       Y22r       Y22i       \n1.000000000000000e+00  4.695980937232241e-01  -1.021186423978683e+00  -4.695248796088784e-01  1.022869621104626e+00  -4.695248796088784e-01  1.022869621104626e+00  4.694519836136244e-01  -1.02266444016304   \n"
+      }
+    },
+    {
+      "family": "transformer",
+      "max_width_cells": 8,
+      "case": {
+        "primary": {
+          "id": 2,
+          "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+        },
+        "secondary": {
+          "id": 2,
+          "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+        },
+        "grid": [
+          16,
+          16
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "termination": 0,
+        "name": "wires-default"
+      },
+      "cells": [
+        1000,
+        1,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "records": {
+        "s": "\n# GHZ S RI S11r       S11i       S12r       S12i       S21r       S21i       S22r       S22i       \n1.000000000000000e+00  -9.818989520381450e-01  -3.390672827714467e-01  -1.830441603451482e-05  -2.995114608647418e-03  -1.830441603451482e-05  -2.995114608647418e-03  -9.922187613802131e-01  1.105811944695715e-02\n",
+        "y": "\n# GHZ Y RI Y11r       Y11i       Y12r       Y12i       Y21r       Y21i       Y22r       Y22i       \n1.000000000000000e+00  2.635813710847730e+00  -1.705407882203905e+00  6.986843792219988e-01  2.533203726210534e-02  6.986843792219988e-01  2.533203726210534e-02  1.806314339235836e+00  -2.32642892941712   \n"
+      }
+    },
+    {
+      "family": "three-port",
+      "max_width_cells": 10,
+      "case": {
+        "creators": [
+          {
+            "id": 2,
+            "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=C:LEN=100:WID=40:METAL=M5:XORG=100:YORG=260"
+          }
+        ],
+        "names": [
+          "A",
+          "B",
+          "C"
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "name": "wires-default"
+      },
+      "cells": [
+        1000,
+        1,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "records": {
+        "s": "\n!\tS11r\tS11i\tS12r\tS12i\tS13r\tS13i\n!\tS21r\tS21i\tS22r\tS22i\tS23r\tS23i\n!\tS31r\tS31i\tS32r\tS32i\tS33r\tS33i\n1.000000000000000e+09\n-9.869910481151432e-01  6.806923563914259e-03  -4.266001995551110e-06  1.572502362205641e-03  -4.266001995551110e-06  1.572502362205641e-03\n2.370064436456243e-05  3.180417630008023e-03  4.122874782353537e-05  2.949505917917791e-03  4.122874782353537e-05  2.949505917917791e-03\n-4.266001995551108e-06  1.572502362205641e-03  0.000000000000000e+00  0.000000000000000e+00  -9.948949494973252e-01  1.106582371701136e-02\n",
+        "y": "\n!\tY11r\tY11i\tY12r\tY12i\tY13r\tY13i\n!\tY21r\tY21i\tY22r\tY22i\tY23r\tY23i\n!\tY31r\tY31i\tY32r\tY32i\tY33r\tY33i\n1.000000000000000e+09\n2.441599334778230e+00  -1.129300997271947e+00  -2.462256025759823e-01  7.975759983417635e-02  -2.462256025759823e-01  7.975759983417635e-02\n-5.264037992766371e-01  -1.342439575965403e-01  -5.791183676379319e-01  2.910243120477363e-01  -5.791183676379319e-01  2.910243120477363e-01\n-2.462256025759824e-01  7.975759983417635e-02  0.000000000000000e+00  0.000000000000000e+00  1.544823096250475e+00  -2.983792511184148e+00\n",
+        "z": "\n!\tZ11r\tZ11i\tZ12r\tZ12i\tZ13r\tZ13i\n!\tZ21r\tZ21i\tZ22r\tZ22i\tZ23r\tZ23i\n!\tZ31r\tZ31i\tZ32r\tZ32i\tZ33r\tZ33i\n1.000000000000000e+09\n3.266023462938372e-01  1.724061997031413e-01  -5.824501431481698e-04  3.966840307676769e-02  -5.824501431481698e-04  3.966840307676769e-02\n-1.825103687435570e-04  8.040439073951162e-02  1.494428518488785e-04  7.427508148154166e-02  1.494428518488785e-04  7.427508148154166e-02\n-5.824501431481698e-04  3.966840307676769e-02  0.000000000000000e+00  0.000000000000000e+00  1.262693911595976e-01  2.780551821714887e-01\n"
+      }
+    }
+  ]
+}

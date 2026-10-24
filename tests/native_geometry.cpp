@@ -30,10 +30,12 @@ extern "C" void set_via(int,int,int,double,double,double,double,double);
 extern "C" const char* generate(int,const double*);
 extern "C" const char* create_geometry(int,const char*,const char*,double,double,int,int,double,int,int);
 extern "C" void set_geometry_options(double,double,int);
+extern "C" const char* getenv(const char*);
 extern "C" double strtod(const char*,char**);
 extern "C" int puts(const char*);
 extern "C" int atoi(const char*);
 extern "C" const char* automatic_cell_limits(double,double,double);
+extern "C" int set_max_width_cells(int);
 extern "C" int main(int argc,char** argv,char**) {
     if(argc==21 && argv[1][0]=='-' && argv[1][1]=='-' && argv[1][2]=='o'){double values[17];for(int i=0;i<17;++i)values[i]=strtod(argv[i+4],nullptr);puts(probe_two_port_output(values,values+8,atoi(argv[3]),strtod(argv[2],nullptr)));return 0;}
     if(argc==6 && argv[1][0]=='-' && argv[1][1]=='-' && argv[1][2]=='s'){puts(port_frequency_schedule(strtod(argv[2],nullptr),strtod(argv[3],nullptr),strtod(argv[4],nullptr),atoi(argv[5])));return 0;}
@@ -42,11 +44,14 @@ extern "C" int main(int argc,char** argv,char**) {
     if(argc==6 && argv[1][0]=='-' && argv[1][2]=='i') { printf("%.17g\n",normalize_value(strtod(argv[2],nullptr),atoi(argv[3]),strtod(argv[4],nullptr),atoi(argv[5])));return 0; }
     if(argc==6 && argv[1][0]=='-') { puts(probe_math(atoi(argv[2]),strtod(argv[3],nullptr),strtod(argv[4],nullptr),strtod(argv[5],nullptr)));return 0; }
     if(argc==5 && (argv[1][0]!='-' || argv[1][1]!='-' || argv[1][2]!='a'))return 2;
-    if(argc!=5 && argc!=26 && argc!=22 && argc!=10 && argc!=12 && argc!=7 && argc!=14 && argc!=15 && argc!=19 && argc!=20 && argc!=21 && argc!=23)return 2;
+    if(argc==8 && (argv[1][0]!='-' || argv[1][1]!='-' || argv[1][2]!='m'))return 2;
+    if(argc!=8 && argc!=5 && argc!=26 && argc!=22 && argc!=10 && argc!=12 && argc!=7 && argc!=14 && argc!=15 && argc!=19 && argc!=20 && argc!=21 && argc!=23)return 2;
     reset_technology();set_substrate(0,700.);set_substrate(1,50.);set_substrate_material(0,11.9,1e-3);set_substrate_material(1,3.9,1e10);finalize_technology();
     double height[]={1.3,2.4,3.5,4.5,6},sheet[]={65,55,55,55,30};
     for(int i=0;i<5;++i)set_metal(i,height[i],i==4?1.:.5,sheet[i],1);
     for(int i=0;i<4;++i)set_via(i,i,i+1,i==0?.5:.4,i==3?1.2:1.1,.2,.2,4);
+    if(const char* maximum=getenv("REASITIC_MAXNW"))if(!set_max_width_cells(atoi(maximum)))return 2;
+    if(argc==8 && argv[1][2]=='m') { create_geometry(2,argv[2],"",512,512,128,128,.1,1,0);if(!set_max_width_cells(atoi(argv[7])))return 2;puts(simulate(0,strtod(argv[3],nullptr),strtod(argv[4],nullptr),strtod(argv[5],nullptr),strtod(argv[6],nullptr),strtod(argv[4],nullptr),1024));return 0; }
     if((argc==5 || argc==7) && argv[1][2]=='a') { if(argc==7)set_metal(4,6.,strtod(argv[5],nullptr),strtod(argv[6],nullptr),1);puts(automatic_cell_limits(strtod(argv[2],nullptr),strtod(argv[3],nullptr),strtod(argv[4],nullptr)));return 0; }
     if(argc==7 && argv[1][2]=='c') { puts(create_geometry(atoi(argv[2]),argv[3],argv[4],512,512,128,128,strtod(argv[5],nullptr),atoi(argv[6]),0));return 0; }
     if(argc==12 && argv[1][2]=='c') {

@@ -60,6 +60,30 @@ of a subdivided three-port mesh, and recovery after invalid cells.
 entry/return observations; `tools/reference_automatic_cells.py` is the independent
 physics oracle.
 
+The original `MAXNW` width-subdivision limit is configurable for LMAT, eddy,
+PI2/PIX/PI4, CALCTRANS and 3PORT, including frequency sweeps and automatic cells.
+Its default is 500. Both preflight filament counts and the actual filament
+placement use this value, retaining the original nonuniform edge grading and
+3x3 incoming-history override. The worker sets the policy on every solve, so a
+nondefault value cannot leak into a subsequent request using the default. CAP
+is independent of this inductive subdivision limit. Nondefault limits appear in
+result metadata and the displayed mesh description.
+
+`tests/maxnw.mjs` checks nine repeated original LMAT matrices, including grading
+thresholds, rotated geometry and thickness subdivision. `tests/maxnw-ports.mjs`
+checks eleven full original S/Y/Z files across PI2, PIX, PI4, CALCTRANS and 3PORT.
+Production uses the stable integral and retains ten-digit agreement by matrix
+norm on these cases. An independent 80-digit PIX reduction eliminates the chain
+currents before solving a smaller system and checks the admittance, currents and
+voltages. Original PIX C/Z inputs are captured separately with read-only GDB
+observations. The retained-arithmetic WASM audit matches nine files exactly and
+records two PIX low-bit differences; these observations do not select production
+arithmetic. `--strict-historical` and `--strict-native` separately request exact
+instruction-based file identity, which can depend on a host's x87 implementation. Worker checks cover all inductive paths, port sweeps,
+automatic cells, budget admission and request isolation. The original zero-edge
+case (active grading with fewer than three width filaments) is rejected before
+its division by zero; a small limit with uniform placement remains valid.
+
 Production numerics use deterministic software arithmetic. The rectangular
 cross-section integral is normalized by geometry scale, keeps guard precision
 through its cancelling terms, and rounds to binary64 once. It starts at binary128
@@ -102,6 +126,9 @@ node tests/portable-pad.mjs
 node tests/two-port-output.mjs
 node tests/port-schedule.mjs
 node tests/automatic-cells.mjs
+node tests/maxnw.mjs
+node tests/maxnw-ports.mjs
+node tests/worker-maxnw.mjs
 node tests/worker-automatic-cells.mjs
 node tests/port-sweep.mjs
 node tests/worker-port-sweep.mjs
@@ -524,6 +551,8 @@ Regenerate the independent original executable fixtures with:
 
 ```sh
 python3 tools/capture_lmat.py --reference ~/github/asitic-re
+python3 tools/capture_maxnw.py --reference ~/github/asitic-re
+python3 tools/capture_maxnw_ports.py --reference ~/github/asitic-re
 python3 tools/capture_automatic_cells.py --reference ~/github/asitic-re # requires GDB
 python3 tools/capture_creators.py --reference ~/github/asitic-re
 python3 tools/capture_capacitance.py --reference ~/github/asitic-re
@@ -552,7 +581,8 @@ valid descriptor values are passed unchanged to the original builders. Native
 unwritten parser/history and mesh words use explicit zero initial state, rather
 than claiming process-independent parity for uninitialized bytes.
 
-Next recreation work includes broader original-executable creator/input coverage,
+Next recreation work includes native geometry editing and assembly commands,
+broader original-executable creator/input coverage,
 additional validation of stable full-network metrics, and original-executable
 end-to-end parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.

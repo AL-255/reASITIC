@@ -11,6 +11,7 @@ struct EngineView {
     const asitic::SubstrateLayer* substrate;
     int substrate_count;
     const double* metal_heights;
+    int max_width_cells;
 };
 EngineView engine_view();
 void clear_diagnostics();

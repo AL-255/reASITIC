@@ -43,6 +43,9 @@ jobs:
           node tests/two-port-output.mjs
           node tests/port-schedule.mjs
           node tests/automatic-cells.mjs
+          node tests/maxnw.mjs
+          node tests/maxnw-ports.mjs
+          node tests/worker-maxnw.mjs
           node tests/worker-automatic-cells.mjs
           node tests/port-sweep.mjs
           node tests/worker-port-sweep.mjs
