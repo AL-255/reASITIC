@@ -194,6 +194,22 @@ using namespace asitic;
         s=(ROOT/'vendor/asitic/src/analysis_reports.cpp').read_text()
         begin=s.index('long double divide_memory(');end=s.index('void update_frequency_geometry(',begin)
         return s[:begin]+'}\n'+s[end:s.index('void report_inductance_matrix(')]+'}\n'
+    if name in ('potential','potential_tables'):
+        s=(ROOT/'vendor/asitic/src'/(name+'.cpp')).read_text()
+        # A rectangular cosine transform has nx+1 rows of ny+1 cells.
+        # The original producer/lookup use nx+1 while its transform uses ny+1.
+        # Keep the historical layout only behind the diagnostic boundary.
+        if name=='potential':
+            old='wrap_mul(rows[row],wrap_add(g.nx,1))'
+            new='wrap_mul(rows[row],wrap_add(reasitic::reference_numerics()?g.nx:g.ny,1))'
+        else:
+            old='out.xy[x*(g.nx+1)+y]'
+            new='out.xy[x*((reasitic::reference_numerics()?g.nx:g.ny)+1)+y]'
+            scratch='memory.arrays.get(static_cast<unsigned>(nx)*32u)'
+            assert s.count(scratch)==1
+            s=s.replace(scratch,'memory.arrays.get(static_cast<unsigned>(reasitic::reference_numerics()?nx:(nx>ny?nx:ny))*32u)')
+        assert s.count(old)==1
+        return '#include "numerical_policy.hpp"\n'+s.replace(old,new)
     if name=='quadrature':
         s=(ROOT/'vendor/asitic/src/quadrature.cpp').read_text();needle='double error_power(double x) {'
         assert s.count(needle)==1

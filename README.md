@@ -664,8 +664,22 @@ limit to the worker, which validates integer budgets before crossing the WASM
 ABI. Collapsed/out-of-bounds contacts
 and native fault cases are rejected before matrix indexing. There is no
 persistent browser table cache yet; fine grids can take tens of seconds. The
-original nonsquare indexing is preserved with sufficient zero backing storage;
-original-executable parity is currently measured on square FFT grids only.
+original square-grid results remain identical. Rectangular grids use a consistent
+`ny+1` row stride through generation, FFT and contact lookup, with scratch sized
+for both axes. The original mixes `nx+1` and `ny+1` strides and undersizes its
+scratch buffer: both 8×16 and 16×8 abort in two fresh original runs. Those fault
+paths remain isolated diagnostics with bounded backing, not production answers.
+
+The rectangular calculation keeps the same spectral Green functions, cosine
+transform, contact integrals and matrix solve. An independent 80-digit reference
+inverts a fresh original 32×32 Green cache with direct cosine sums, truncates its
+spectral modes to each requested grid, and analytically integrates the cosine
+basis over contacts. It checks potential matrices, inverse/folding and equivalent
+impedance in 23 one-/two-/four-contact cases, including both rectangular
+orientations and one-cell axes. Native/WASM, worker and cache round trips match
+exactly. Four two-segment rectangular PI2 cases also check the contact-to-network
+folding, independent nodal reduction and worker solve. This verifies the corrected
+mathematical layout; it does not claim numerical parity with an original rectangular run that aborts.
 
 Two further original cases use 660 and 661 contacts for CAP and grounded PI2.
 Fresh repeated original runs retain the complete 660×660 potential matrix,

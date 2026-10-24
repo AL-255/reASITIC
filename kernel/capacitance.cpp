@@ -46,12 +46,14 @@ struct Workspace {
     ~Workspace() { while(allocations) { auto* p=allocations;allocations=p->next;free(p->pointer);free(p); } }
     static void* get(unsigned n,void* user) {
         auto& w=*static_cast<Workspace*>(user);unsigned backing=n;
-        // Keep the original nonsquare grid strides and scratch request. Supply
-        // backing for every original access, including native over-allocation
-        // requirements documented in potential_tables.hpp.
-        const unsigned largest=w.nx>w.ny?w.nx:w.ny;
-        if(n==static_cast<unsigned>((w.nx+1)*(w.ny+1))*16u)backing=(largest+1)*(largest+1)*16u;
-        if(n==static_cast<unsigned>(w.nx)*32u)backing=largest*32u;
+        // Historical nonsquare diagnostics need backing for inconsistent
+        // strides/scratch requests. Production uses a contiguous rectangular
+        // table and scratch sized for both axes by the source adapter.
+        if(reasitic::reference_numerics()){
+            const unsigned largest=w.nx>w.ny?w.nx:w.ny;
+            if(n==static_cast<unsigned>((w.nx+1)*(w.ny+1))*16u)backing=(largest+1)*(largest+1)*16u;
+            if(n==static_cast<unsigned>(w.nx)*32u)backing=largest*32u;
+        }
         if(n==w.matrix_request && backing<w.matrix_backing)backing=w.matrix_backing;
         auto* p=calloc(1,backing+16);auto* node=static_cast<Allocation*>(calloc(1,sizeof(Allocation)));
         if(!p || !node)abort();node->pointer=p;node->next=w.allocations;w.allocations=node;return p;

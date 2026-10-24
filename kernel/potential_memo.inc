@@ -14,9 +14,9 @@ struct PotentialMemoFile {
     PotentialMemoFile(const reasitic::EngineView& engine,double frequency,double x,double y,int nx,int ny){
         const unsigned pairs=engine.metal_count*(engine.metal_count+1)/2;
         const unsigned bytes=16+engine.substrate_count*40+engine.metal_count*236+pairs*((nx+1)*(ny+1)+2*nx+2*ny)*16u;
-        // Rectangular grids retain original scratch/stride behavior. Recompute
-        // them until their cache-file round trip is independently verified.
-        enabled=potential_memo_enabled&&nx==ny&&bytes<=16u*1024u*1024u;if(!enabled)return;
+        // Production uses a consistent rectangular layout. The historical
+        // diagnostic still needs padding not represented by the file protocol.
+        enabled=potential_memo_enabled&&(nx==ny||!reasitic::reference_numerics())&&bytes<=16u*1024u*1024u;if(!enabled)return;
         capacity=bytes;key.nx=nx;key.ny=ny;key.metals=engine.metal_count;key.layers=engine.substrate_count;key.frequency=frequency;key.chip_x=x;key.chip_y=y;
         __builtin_memcpy(key.metal,engine.metals,engine.metal_count*236u);__builtin_memcpy(key.substrate,engine.substrate,engine.substrate_count*40u);
         entry=&potential_memos[reasitic::reference_numerics()?1:0];

@@ -1,5 +1,6 @@
 extern "C" const char* port_frequency_schedule(double,double,double,int);
 extern "C" void reset_technology();
+extern "C" void set_reference_numerics(int);
 extern "C" void set_metal(int,double,double,double,int);
 extern "C" const char* set_metal_rules(int,double,double);
 extern "C" void set_substrate(int,double);
@@ -54,6 +55,7 @@ extern "C" int main(int argc,char** argv,char**) {
     if(argc==5 && (argv[1][0]!='-' || argv[1][1]!='-' || argv[1][2]!='a'))return 2;
     if(argc==8 && (argv[1][0]!='-' || argv[1][1]!='-' || argv[1][2]!='m'))return 2;
     if(argc!=4 && argc!=8 && argc!=5 && argc!=26 && argc!=22 && argc!=10 && argc!=12 && argc!=7 && argc!=14 && argc!=15 && argc!=19 && argc!=20 && argc!=21 && argc!=23 && !(argc==13 && __builtin_strcmp(argv[1],"--cap")==0))return 2;
+    if(const char* diagnostic=getenv("REASITIC_REFERENCE_NUMERICS"))set_reference_numerics(atoi(diagnostic));
     reset_technology();set_substrate(0,700.);set_substrate(1,50.);set_substrate_material(0,11.9,1e-3);set_substrate_material(1,3.9,1e10);finalize_technology();
     double height[]={1.3,2.4,3.5,4.5,6},sheet[]={65,55,55,55,30};
     for(int i=0;i<5;++i)set_metal(i,height[i],i==4?1.:.5,sheet[i],1);
