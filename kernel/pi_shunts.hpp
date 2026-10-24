@@ -1,5 +1,10 @@
 #pragma once
 namespace reasitic {
+// Original two-port S formulas and port order, evaluated from exact dyadic
+// coefficients with direct IEEE binary64 quotient rounding. Input is
+// y11,y12,y21,y22, in the original struct order. Output is
+// s11,s12,s21,s22; each complex cell stores real,imaginary components.
+bool two_port_scattering(const double* admittance,double* scattering);
 // Original 2PZIN port order: port 1 drives y22. Capacitor 1 shunts y22,
 // capacitor 2 shunts y11. Evaluate the loaded nodal equations with exact
 // dyadic coefficients and one IEEE binary64 division per result component.

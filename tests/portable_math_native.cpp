@@ -11,7 +11,18 @@ extern "C" const char* probe_extended_ports(const double*,const double*,int);
 extern "C" const char* probe_folded_ports(const double*,const double*,int,const double*,int);
 extern "C" const char* probe_pi_impedance(const double*);
 extern "C" const char* loaded_port_impedance(const double*,double,double,int,double,double,double);
+extern "C" const char* probe_scattering(const double*);
 int main(int argc,char** argv){
+    if(argc==3&&(!std::strcmp(argv[1],"--scattering")||!std::strcmp(argv[1],"--scattering-rounding"))){
+        auto* file=fopen(argv[2],"rb");if(!file)return 2;double v[8];const bool read=fread(v,8,8,file)==8;fclose(file);if(!read)return 2;
+        if(!std::strcmp(argv[1],"--scattering")){puts(probe_scattering(v));return 0;}
+        const int saved=fegetround(),modes[]={FE_TONEAREST,FE_DOWNWARD,FE_UPWARD,FE_TOWARDZERO};double baseline[8],actual[8];int index=0;bool identical=true;
+        for(int mode:modes){
+            if(fesetround(mode)||!reasitic::two_port_scattering(v,actual)){identical=false;break;}
+            if(index++==0)memcpy(baseline,actual,sizeof(actual));else if(memcmp(baseline,actual,sizeof(actual)))identical=false;
+        }
+        fesetround(saved);puts(identical?"{\"rounding_modes\":4,\"identical\":true}":"{\"error\":\"Host rounding mode changed scattering parameters\"}");return identical?0:1;
+    }
     if(argc==3&&(!std::strcmp(argv[1],"--loaded-port")||!std::strcmp(argv[1],"--loaded-port-rounding"))){
         auto* file=fopen(argv[2],"rb");if(!file)return 2;double v[14];const bool read=fread(v,8,14,file)==14;fclose(file);if(!read)return 2;
         if(!std::strcmp(argv[1],"--loaded-port")){puts(loaded_port_impedance(v,v[8],v[9],static_cast<int>(v[10]),v[11],v[12],v[13]));return 0;}

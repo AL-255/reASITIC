@@ -46,6 +46,14 @@ Complex guarded_quotient(const Complex& a,const Complex& b){
     return {exact_sum(exact_product(a.real,b.real),exact_product(a.imag,b.imag))/denominator,
             exact_sum(exact_product(a.imag,b.real),exact_product(a.real,b.imag),true)/denominator};
 }
+bool binary64_quotient(const Complex& numerator,const Complex& denominator,double* output){
+    auto& c=*numerator.real.context;
+    const auto norm=exact_sum(exact_product(denominator.real,denominator.real),exact_product(denominator.imag,denominator.imag));
+    const Number components[]={exact_sum(exact_product(numerator.real,denominator.real),exact_product(numerator.imag,denominator.imag)),
+                               exact_sum(exact_product(numerator.imag,denominator.real),exact_product(numerator.real,denominator.imag),true)};
+    for(int i=0;i<2;++i){Number quotient(c);c.status|=bf_div(&quotient.value,&components[i].value,&norm.value,53,BF_RNDN|BF_FLAG_SUBNORMAL|bf_set_exp_bits(11));output[i]=quotient.rounded();}
+    return !(c.status&BF_ST_MEM_ERROR);
+}
 Complex shift(const Complex& a,slimb_t exponent){Complex r(a);a.real.context->status|=bf_mul_2exp(&r.real.value,exponent,BF_PREC_INF,BF_RNDN);a.imag.context->status|=bf_mul_2exp(&r.imag.value,exponent,BF_PREC_INF,BF_RNDN);return r;}
 Complex negate(const Complex& a){Complex r(a);bf_neg(&r.real.value);bf_neg(&r.imag.value);return r;}
 Number norm(const Complex& a){return a.real*a.real+a.imag*a.imag;}
@@ -80,6 +88,23 @@ bool solve(Values& a,Values& rhs,Complex* solution,int m,int columns=1){
 
 }
 namespace reasitic {
+bool two_port_scattering(const double* admittance,double* scattering){
+    if(!admittance||!scattering)return false;
+    for(int i=0;i<8;++i)if(!__builtin_isfinite(admittance[i]))return false;
+    Context c;const double reference[]={0x1.47ae147ae147bp-6,0},two_value[]={-2,0};
+    const Complex g(c,reference),two(c,two_value),a(c,admittance+6),b(c,admittance),cross=exact_product(Complex(c,admittance+2),Complex(c,admittance+4));
+    const auto plus=exact_sum(a,g),denominator=exact_sum(exact_product(plus,exact_sum(b,g)),cross,true);
+    // Keep ASITIC's historical first diagonal: (g-a)*(g+a)+y21*y12.
+    // Every sum and product remains exact, so the small reference conductance
+    // survives even when the large branch-admittance products cancel.
+    const Complex numerators[]={exact_sum(exact_product(exact_sum(g,a,true),plus),cross),
+        exact_product(exact_product(two,g),Complex(c,admittance+2)),
+        exact_product(exact_product(two,g),Complex(c,admittance+4)),
+        exact_sum(exact_product(plus,exact_sum(g,b,true)),cross)};
+    if(c.status&BF_ST_MEM_ERROR)return false;
+    for(int i=0;i<4;++i)if(!binary64_quotient(numerators[i],denominator,scattering+2*i))return false;
+    return true;
+}
 bool loaded_port_impedance(const double* admittance,const double* load,int port,
                            double frequency,double first_cap,double second_cap,
                            double* impedance,int& status){
@@ -101,14 +126,10 @@ bool loaded_port_impedance(const double* admittance,const double* load,int port,
         status=bf_is_zero(&numerator.real.value)&&bf_is_zero(&numerator.imag.value)?2:1;
         impedance[0]=impedance[1]=__builtin_nan("");return true;
     }
-    const auto norm=exact_sum(exact_product(denominator.real,denominator.real),exact_product(denominator.imag,denominator.imag));
-    const Number components[]={exact_sum(exact_product(numerator.real,denominator.real),exact_product(numerator.imag,denominator.imag)),
-                               exact_sum(exact_product(numerator.imag,denominator.real),exact_product(numerator.real,denominator.imag),true)};
     // Round the exact rational components directly to binary64, including
     // its subnormal exponent range. There is no intermediate rounded Y bank
     // or host floating-point operation in the loaded circuit reduction.
-    for(int i=0;i<2;++i){Number quotient(c);c.status|=bf_div(&quotient.value,&components[i].value,&norm.value,53,BF_RNDN|BF_FLAG_SUBNORMAL|bf_set_exp_bits(11));impedance[i]=quotient.rounded();}
-    if(c.status&BF_ST_MEM_ERROR)return false;
+    if(!binary64_quotient(numerator,denominator,impedance))return false;
     status=__builtin_isfinite(impedance[0])&&__builtin_isfinite(impedance[1])?0:3;return true;
 }
 bool pi_branch_impedances(const double* series,const PiShunts& shunts,double* impedances,double& differential_quality){
@@ -324,4 +345,11 @@ extern "C" const char* loaded_port_impedance(const double* admittance,double loa
     const char* names[]={"finite","pole","indeterminate","overflow"};
     char* out=output;out+=sprintf(out,"{\"status\":\"%s\",\"impedance_ohm\":[",names[status]);
     for(int i=0;i<2;++i){if(i)out+=sprintf(out,",");out+=__builtin_isfinite(result[i])?sprintf(out,"%.17g",result[i]):sprintf(out,"null");}sprintf(out,"]}");return output;
+}
+
+extern "C" const char* probe_scattering(const double* admittance){
+    static char output[1024];double values[8];
+    if(!reasitic::two_port_scattering(admittance,values))return "{\"error\":\"Use a finite 2x2 admittance\"}";
+    char* out=output;out+=sprintf(out,"{\"scattering_matrix\":[");
+    for(int i=0;i<2;++i){out+=sprintf(out,"%s[",i?",":"");for(int j=0;j<2;++j){out+=sprintf(out,"%s[",j?",":"");for(int k=0;k<2;++k){const double value=values[4*i+2*j+k];if(k)out+=sprintf(out,",");out+=__builtin_isfinite(value)?sprintf(out,"%.17g",value):sprintf(out,"null");}out+=sprintf(out,"]");}out+=sprintf(out,"]");}sprintf(out,"]}");return output;
 }

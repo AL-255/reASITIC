@@ -157,6 +157,22 @@ using namespace asitic;
         old='runtime.construction.geometry.memory.arrays.get(static_cast<unsigned>(delta)*4u)'
         assert s.count(old)==1
         return s.replace(old,'runtime.construction.geometry.memory.arrays.get((static_cast<unsigned>(delta)+1u)*sizeof(GeometryShape*))')
+    if name=='two_port_output':
+        s=(ROOT/'vendor/asitic/src/two_port_output.cpp').read_text()
+        signature='TwoPortScattering convert_two_port_scattering(const TwoPortAdmittance& y) {'
+        assert s.count(signature)==1
+        dispatch="""
+#ifdef __EMSCRIPTEN__
+    if(!reasitic::reference_numerics()){
+        const double values[]={y.y11.real,y.y11.imag,y.y12.real,y.y12.imag,y.y21.real,y.y21.imag,y.y22.real,y.y22.imag};
+        double scattering[8];TwoPortScattering result;
+        if(!reasitic::two_port_scattering(values,scattering))for(int i=0;i<8;++i)scattering[i]=__builtin_nan("");
+        static_assert(sizeof(result)==sizeof(scattering));__builtin_memcpy(&result,scattering,sizeof(result));
+        return result;
+    }
+#endif
+"""
+        return '#include "pi_shunts.hpp"\n#include "numerical_policy.hpp"\n'+s.replace(signature,signature+dispatch,1)
     if name=='network':
         s=(ROOT/'vendor/asitic/src/network.cpp').read_text()
         begin=s.index('PiEquivalent extract_pi_equivalent(');end=s.rfind('\n}')

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
-import createKernel from '../dist/asitic.js';
+import createKernel from './reference-kernel.mjs';
 import {twoPortRecord,twoPortScatteringCSV} from '../web/network.mjs';
 import {parseTechnology,configureKernel,createGeometry} from '../web/technology.mjs';
 const fixture=JSON.parse(readFileSync('tests/fixtures/original-two-port.json','utf8'));
@@ -56,6 +56,7 @@ try{
   }
   // Isolate conversion from solver/history: distinct off-diagonals, singular
   // systems, signed zero, extreme values, and randomized complex matrices.
+  kernel._set_reference_numerics(1);
   let randomState=0x53504152;const random=()=>{randomState=(Math.imul(randomState,1664525)+1013904223)>>>0;return randomState/2**32;};
   for(let i=0;i<128;++i){const y=i===0?[0,0,0,0,0,0,0,0]:i===1?[-.02,-0,0,-0,0,0,-.02,0]:Array.from({length:8},()=>((random()-.5)*2)*2**Math.floor((random()-.5)*300)),bank=Array.from({length:9},(_,j)=>j%2?-j:j),actual=probe(y,bank,i%2,1e9),native=JSON.parse(execFileSync('build/native-geometry',['--output',1e9,i%2,...y,...bank].map(v=>Object.is(v,-0)?'-0':String(v)),{encoding:'utf8'}));assert.deepEqual(actual,native,'Isolated output case '+i);}
   const csv=twoPortScatteringCSV({frequency_hz:1e9,two_port:{reference_ohm:50,scattering_matrix:[[[1,-0],[2,3]],[[4,5],[null,6]]]}});

@@ -46,6 +46,7 @@ jobs:
           node tests/portable-error-power.mjs
           node tests/portable-pi-shunts.mjs
           node tests/portable-pi-impedance.mjs
+          node tests/portable-scattering.mjs
           node tests/loaded-port.mjs
           node tests/worker-loaded-port.mjs
           node tests/portable-extended-shunts.mjs

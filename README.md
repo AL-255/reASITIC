@@ -403,6 +403,21 @@ Native and WASM values agree bit for bit; all four native rounding modes give
 identical raw results. Physical PI2/PI4/PIX tests also verify this same evaluator
 is used for the returned input impedances and differential Q.
 
+The two-port S conversion also retains exact dyadic sums and products through
+the complex quotient, rounding directly to binary64. A large floating branch
+previously lost the 0.02 S reference terms during cancellation and returned NaNs
+at an admittance of `2^64` S. Exact coefficient evaluation preserves these terms
+without an arithmetic cutoff or hardware-specific case. The original formulas
+and port order remain authoritative, including the first diagonal numerator
+`(g-y22)*(g+y22)+y21*y12`, where `g` is the original stored 0.02 S constant.
+Numerical records and raw S matrices use the same conversion.
+`tests/portable-scattering.mjs` checks 90 circuits: exact-rational expanded
+polynomials, independent traveling-wave boundaries for floating series branches,
+six captured original physical matrices, asymmetric off-diagonals, true poles,
+subnormal inputs and the largest finite binary64 branch. Native/WASM results
+match bit for bit in all four host rounding modes; historical mode retains the
+original cancellation failure and original record comparisons.
+
 Loaded input impedance (`2PZIN`) uses the same two-port circuit and original port
 order: port 1 drives `y22`, capacitor 1 shunts `y22`, and capacitor 2 shunts `y11`.
 For drive/other diagonal entries `a,b`, cross entries `c,d` and load `Z`,
@@ -486,6 +501,7 @@ python3 tools/build_portable_math.py       # native/WASM software-math verificat
 node tests/portable-gmd.mjs
 node tests/portable-error-power.mjs
 node tests/portable-pi-shunts.mjs
+node tests/portable-scattering.mjs
 node tests/loaded-port.mjs
 node tests/worker-loaded-port.mjs
 node tests/portable-extended-shunts.mjs
