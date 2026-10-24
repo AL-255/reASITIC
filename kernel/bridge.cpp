@@ -44,11 +44,14 @@ jmp_buf creator_jump;bool creator_active=false;bool editing_active=false,edit_re
 struct alignas(16) Allocation { Allocation* previous;Allocation* next;bool tracked; };
 Allocation* pending=nullptr;unsigned pending_bytes=0,pending_count=0;
 constexpr unsigned creation_memory_budget=32u*1024u*1024u;
+// Prompts and keyword records can feed original signed 32-bit count fields.
+// Keep conversion in that domain; geometry work has its own resource budgets.
+constexpr double numeric_input_limit=2147483647.;
 void fail_creator(const char*);
 bool turn_records_fit(double turns,int sides) {
     // Each winding side emits a conductor record. Bound the work by the
     // allocation budget, not by a fixed number of turns in a particular coil.
-    return turns>0 && sides>=3 && turns*sides>=1 && turns<=static_cast<double>(creation_memory_budget)/(sizeof(ConductorSegment)*sides);
+    return turns>0 && sides>=3 && turns*sides>=1 && turns<=static_cast<double>(creation_memory_budget)/(static_cast<double>(sizeof(ConductorSegment))*sides);
 }
 void* allocate(unsigned n,void*) {
     if(creator_active && (n>creation_memory_budget || pending_bytes>creation_memory_budget-n || pending_count>=65536))fail_creator("Geometry exceeds the creation memory budget");
@@ -90,7 +93,7 @@ void read_answer(const char* prompt,char* out,void*) {
     if(*answers=='\n')++answers;out[n]=0;
     // Reject nonfinite numeric prompt values before native loops and casts.
     const char* at=out;while(*at) { char* end;double value=strtod(at,&end);if(end==at)break;
-        if(!__builtin_isfinite(value) || value>1000000 || value< -1000000)fail_creator("Interactive numeric input is outside the finite supported range");at=end; }
+        if(!__builtin_isfinite(value) || value>numeric_input_limit || value< -numeric_input_limit)fail_creator("Interactive numeric input is outside the finite supported range");at=end; }
 }
 ConsoleGeometryState creator_state;CommandArguments creator_arguments;
 GeometryShape* original_head=nullptr;
@@ -107,11 +110,11 @@ bool safe_keywords(const char* line) {
         if(name) { unsigned n=0;while(value[n])++n;if(n>74 || !n)return false;continue; }
         // Names of technology layers are resolved by the original parser.
         if(__builtin_strncmp(token,"METAL",5)==0 || __builtin_strcmp(token,"EXIT")==0 || __builtin_strcmp(token,"VIA")==0)continue;
-        char* end;const double n=strtod(value,&end);if(end==value || !__builtin_isfinite(n) || n>1000000 || n< -1000000)return false;
+        char* end;const double n=strtod(value,&end);if(end==value || !__builtin_isfinite(n) || n>numeric_input_limit || n< -numeric_input_limit)return false;
         const bool turns=__builtin_strcmp(token,"N")==0 || __builtin_strcmp(token,"NP")==0 || __builtin_strcmp(token,"NS")==0;
         if(turns && n<=0)return false;
-        if(__builtin_strcmp(token,"SIDES")==0 && (n<3 || n>256 || n!=static_cast<int>(n)))return false;
-        if((__builtin_strcmp(token,"NX")==0 || __builtin_strcmp(token,"NY")==0) && (n<1 || n>256 || n!=static_cast<int>(n)))return false;
+        if(__builtin_strcmp(token,"SIDES")==0 && (n<3 || n!=static_cast<int>(n)))return false;
+        if((__builtin_strcmp(token,"NX")==0 || __builtin_strcmp(token,"NY")==0) && (n<1 || n!=static_cast<int>(n)))return false;
         if((__builtin_strcmp(token,"W")==0 || __builtin_strcmp(token,"W1")==0 || __builtin_strcmp(token,"W2")==0) && n<=0)return false;
         if(__builtin_strcmp(token,"S")==0 && n<0)return false;
     }
@@ -152,19 +155,20 @@ void guard_native_creation(int id,const ConsoleGeometryState& state) {
         if(!__builtin_isfinite(number(s,off)))fail_creator("Original descriptor is nonfinite");
     if(number(s,0x88)<=0)fail_creator("Conductor width must be positive");
     if(id==14) {
-        if(integer(s,0x64)<1 || integer(s,0x64)>256 || integer(s,0x6c)<1 || integer(s,0x6c)>256)fail_creator("Via counts must be between 1 and 256");
+        if(integer(s,0x64)<1 || integer(s,0x6c)<1)fail_creator("Via counts must be positive");
         if(integer(s,0x68)<metal_count || integer(s,0x68)>=metal_count+via_count)fail_creator("Invalid via layer");return;
     }
     if(integer(s,0x68)<0 || integer(s,0x68)>=metal_count)fail_creator("Invalid primary metal");
     if(id==18 && (integer(s,0x6c)<0 || integer(s,0x6c)>=integer(s,0x68)))fail_creator("Multi-metal square requires a lower exit metal");
     if(id==10) { auto& b=const_cast<GeometryShape&>(state.arguments[1]);if(integer(b,0x68)<0 || integer(b,0x68)>=metal_count)fail_creator("Invalid secondary metal"); }
+    if(id==22 && !turn_records_fit(1,integer(s,0x64)))fail_creator("Ring exceeds the creation record budget");
     if(id!=2 && id!=4 && id!=22) {
         // BALUN's secondary has one fewer turn than its primary, including
         // the original keyword path's valid zero-turn secondary limit.
         const int count=(id==3 || id==10)?2:1;
         for(int i=0;i<count;++i){
             auto& winding=const_cast<GeometryShape&>(state.arguments[i]);const int sides=integer(winding,0x64);const double n=number(winding,0x98);
-            if(!__builtin_isfinite(n) || n<=0 || sides<3 || sides>256 || n*sides<1)fail_creator("Invalid winding turns or sides");
+            if(!__builtin_isfinite(n) || n<=0 || sides<3 || n*sides<1)fail_creator("Invalid winding turns or sides");
             if(!turn_records_fit(n,sides))fail_creator("Winding exceeds the creation record budget");
         }
         if(number(s,0x90)<0)fail_creator("Spacing must be nonnegative");
@@ -289,9 +293,10 @@ const char* generate(int kind,const double* p) {
     if(!__builtin_isfinite(origin_x) || !__builtin_isfinite(origin_y))return "{\"error\":\"Origins must be finite\"}";
     const int metal=static_cast<int>(p[7]),exit=static_cast<int>(p[8]);
     if(p[7]!=metal || p[8]!=exit)return "{\"error\":\"Metal indices must be integers\"}";
-    if(metal<0 || metal>=metal_count || exit < -1 || exit>=metal_count || p[2]<=0 || p[3]<0 || p[4]<0.25 || p[11]<=0 || p[6]<3 || p[6]>256 || kind<0 || kind>9)
+    if(metal<0 || metal>=metal_count || exit < -1 || exit>=metal_count || p[2]<=0 || p[3]<0 || p[4]<0.25 || p[11]<=0 || p[6]<3 || p[6]>=2147483647. || kind<0 || kind>9)
         return "{\"error\":\"Invalid dimensions, turns, sides or metal selection\"}";
     if((kind!=2 && kind!=5 && kind!=9 && !turn_records_fit(p[4],kind==1 || kind==4?static_cast<int>(p[6]):4)) || ((kind==6 || kind==7) && !turn_records_fit(p[11],4)))return "{\"error\":\"Winding exceeds the creation record budget\"}";
+    if(kind==5 && !turn_records_fit(1,static_cast<int>(p[6])))return "{\"error\":\"Ring exceeds the creation record budget\"}";
     if(kind==9 && !via_count)return "{\"error\":\"Technology has no via layers\"}";
     if(p[0]<=2*p[2] || p[1]<=2*p[2] || p[5]<=p[2] || p[10]<=0)return "{\"error\":\"Dimensions are too small\"}";
     if(kind==5 && p[3]>=360)return "{\"error\":\"Ring gap must be below 360 degrees\"}";

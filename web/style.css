@@ -22,3 +22,5 @@ textarea{font:12px monospace;color:var(--ink);background:#101b1e;border:1px soli
 .selfres-scroll{overflow:auto;max-height:220px}.selfres-scroll table{border-collapse:collapse;width:100%;font-size:11px}.selfres-scroll th,.selfres-scroll td{text-align:right;padding:7px 10px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}.selfres-scroll th{color:var(--muted);font-weight:500}
 
 .coupling-controls{margin-top:18px;flex-wrap:wrap}
+
+.export-controls{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px}.viewer-toolbar .gds-budget{display:flex;flex-direction:row;align-items:center;gap:7px;letter-spacing:0}.gds-budget select{width:auto;min-width:6rem;padding:7px}

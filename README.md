@@ -100,6 +100,28 @@ and actual construction/export limits still recover transactionally. The older
 low-level generator now uses the same allocation recovery. SWEEP's native and
 WASM enumerators also retain candidates beyond 64 turns.
 
+Polygon sides and via rows/columns likewise follow the original count domain,
+without the former 256 ceiling. Seventeen further original cases cover 512-side
+spirals and rings, odd-sided symmetric polygons, 300×300 via grids, rotated and
+reflected arrays, prompted counts, and a two-million-column via row. Their physical
+records and DC resistance repeat in fresh original creation/reload processes.
+VIA references use its working original prompted path; the original dispatcher
+rejects keyword arguments. The form adapter produces the same physical records.
+A complete 640×640 original LMAT reference also checks the larger polygon in
+WASM and the worker. The native/WASM SWEEP planners retain 512-side candidates.
+
+Large via previews use repeated SVG tiles instead of one DOM element per cut;
+two million cuts need eight DOM nodes. Small previews retain their former
+polygons and styling. Independent SVG raster checks verify native cut centers
+and gaps after rotation/reflection. GDS still exports every cut as a flat
+boundary, writing directly into one preflighted buffer. Seventy-eight streams
+match the previous encoder byte for byte. A separate bounded-memory reader
+checks every cut, pad, layer and signed coordinate in the 128 MB large-grid
+stream; gdstk independently parses its header, pads and farthest cut.
+The download's Export limit defaults to 64 MiB and can be increased to 512 MiB.
+Oversized exports reject before expansion or buffer allocation, preserving the
+layout for another export or further editing.
+
 The multi-metal creator allocates one pointer per layer, including both endpoints:
 `delta + 1` entries. The original allocates `delta` but writes through `delta`,
 which corrupts the heap for a three-layer difference. The port fixes the count
@@ -422,7 +444,8 @@ binary64 inputs at 200 decimal digits.
 
 ```sh
 # Emscripten 6.0.6, Python 3, Node 24
-python3 -m pip install gdstk==1.0.2 mpmath==1.3.0
+# SVG raster checks also need system Cairo (libcairo2 on Debian/Ubuntu).
+python3 -m pip install gdstk==1.0.2 mpmath==1.3.0 CairoSVG==2.9.1
 python3 tools/build.py                    # or --emxx /path/to/em++
 python3 tools/build_native.py             # GCC i386 + libc.so.6 reference audit
 python3 tools/build_portable_math.py       # native/WASM software-math verification
@@ -459,6 +482,12 @@ python3 tests/gds_creator_coverage_reader.py
 node tests/creator-coverage.mjs --ranges
 python3 tests/gds_creator_coverage_reader.py --ranges
 node tests/creator-ranges.mjs
+node tests/creator-coverage.mjs --counts
+python3 tests/gds_creator_coverage_reader.py --counts
+node tests/creator-counts.mjs
+node tests/gds-stream.mjs
+node tests/geometry-preview.mjs
+python3 tests/svg_preview_reader.py
 node tests/metal-rules.mjs
 python tests/gds_metal_rules_reader.py
 node tests/geometry-edits.mjs
@@ -949,9 +978,11 @@ CALCTRANS reports, 2PORTTRANS files and raw caches are under
 captures are under `build/original-three-port`; the variability audit is under
 `build/original-three-port-variability`.
 
-Creator input is bounded to native fixed buffers, 256 sides/via rows or columns,
-and a 32 MiB creation allocation budget with an output-size limit. Turn counts
-follow the original geometric fit rules and these resource budgets. Invalid commands recover
+Creator input is bounded to native fixed buffers and the original signed 32-bit
+numeric count domain before conversion. Creation has a 32 MiB allocation budget
+and an output-size limit. Turn and side counts follow the original geometric fit
+rules and these resource budgets. Via grids remain compact until GDS export,
+whose separate byte budget is selectable in the interface. Invalid commands recover
 without terminating the worker. Admission guards reject native fault cases;
 valid descriptor values are passed unchanged to the original builders. Native
 unwritten parser/history and mesh words use explicit zero initial state, rather

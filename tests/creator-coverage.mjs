@@ -5,10 +5,10 @@ import {execFileSync} from 'node:child_process';
 import {Worker} from 'node:worker_threads';
 import make from '../dist/asitic.js';
 import {parseCreatorCommand} from '../web/creators.mjs';
-import {parseTechnology,configureKernel,createGeometry} from '../web/technology.mjs';
+import {parseTechnology,configureKernel,createGeometry,editGeometry} from '../web/technology.mjs';
 import {writeGDS} from '../web/gds.mjs';
 
-const ranges=process.argv.includes('--ranges'),definitionName=ranges?'creator-range':'creator-coverage',proofName=ranges?'creator-ranges':'creator-coverage';
+const counts=process.argv.includes('--counts'),ranges=process.argv.includes('--ranges'),definitionName=counts?'creator-count':ranges?'creator-range':'creator-coverage',proofName=counts?'creator-counts':ranges?'creator-ranges':'creator-coverage';
 const definitions=readFileSync(`tests/fixtures/${definitionName}-cases.json`,'utf8'),cases=JSON.parse(definitions).cases,fixture=JSON.parse(readFileSync(`tests/fixtures/original-${proofName}.json`,'utf8'));
 const hash=x=>createHash('sha256').update(x).digest('hex');
 assert.equal(hash(definitions),fixture.case_definition_sha256);
@@ -23,7 +23,7 @@ const countFields=value=>typeof value==='number'?1:value&&typeof value==='object
 const bootstrap=`import {parentPort} from 'node:worker_threads';globalThis.self=globalThis;globalThis.postMessage=m=>parentPort.postMessage(m);await import(${JSON.stringify(new URL('../dist/worker.mjs',import.meta.url).href)});parentPort.on('message',data=>self.onmessage({data}));`;
 const worker=new Worker(new URL('data:text/javascript,'+encodeURIComponent(bootstrap))),inbox=[],waiters=[];
 worker.on('message',data=>waiters.length?waiters.shift()(data):inbox.push(data));
-function next(){if(inbox.length)return Promise.resolve(inbox.shift());return new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Creator coverage worker timeout')),30000);waiters.push(data=>{clearTimeout(timer);resolve(data);});});}
+function next(){if(inbox.length)return Promise.resolve(inbox.shift());return new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Creator coverage worker timeout')),counts?180000:30000);waiters.push(data=>{clearTimeout(timer);resolve(data);});});}
 let id=0;async function send(data){worker.postMessage({id:++id,...data});const result=await next();assert.equal(result.id,id);assert.ok(!result.error,result.error);return result;}
 const kernel=await make(),mesh={length:1000,width:1000,thickness:1000,subdivision_trigger:1000},reports=[];
 let fields=0,matrices=0,worstMatrixError=0;
@@ -33,16 +33,18 @@ try{
   for(const c of cases){
     const original=fixture.cases.find(v=>v.name===c.name),technology=technologies[c.technology],creator=parseCreatorCommand(c.command,c.answers);
     configureKernel(kernel,technology.parsed);
-    const actual=createGeometry(kernel,creator.id,creator.keywords,creator.answers);
+    let actual=createGeometry(kernel,creator.id,creator.keywords,creator.answers);if(c.edits)actual=editGeometry(kernel,c.edits);
     assert.deepEqual(physical(actual,original.metal_count),original.shapes,c.name+' original physical geometry');fields+=countFields(original.shapes);
     if(c.technology==='CMOS'){
-      const native=JSON.parse(execFileSync('build/native-geometry',['--creator',creator.id,creator.keywords,creator.answers,'.1','1'].map(String),{encoding:'utf8',maxBuffer:16*1024*1024}));
+      const native=JSON.parse(execFileSync('build/native-geometry',c.edits?['--edit',creator.id,c.web_keywords??creator.keywords,c.edits,'.1','1'].map(String):['--creator',creator.id,creator.keywords,creator.answers,'.1','1'].map(String),{encoding:'utf8',maxBuffer:16*1024*1024}));assert.ok(!native.error,c.name+': '+native.error);
       assert.deepEqual(physical(native,original.metal_count),original.shapes,c.name+' native C++ physical geometry');
     }
+    if(c.web_keywords){let equivalent=createGeometry(kernel,creator.id,c.web_keywords);if(c.edits)equivalent=editGeometry(kernel,c.edits);assert.deepEqual(physical(equivalent,original.metal_count),original.shapes,c.name+' keyword adapter equals original prompted geometry');}
     for(const shape of actual.shapes)assert.ok(Math.abs(shape.resistance_dc-Number(original.resistance_dc_printed[shape.name]))<=5.1e-7,c.name+' original printed DC resistance');
-    const generated=await send({technology:technology.text,creator});
+    let generated=await send({technology:technology.text,creator});if(c.edits)generated=await send({action:'edit',commands:c.edits});
     assert.deepEqual(physical(generated.layout,original.metal_count),original.shapes,c.name+' worker original physical geometry');
-    const gds=writeGDS(actual,technology.parsed);assert.deepEqual(writeGDS(generated.layout,generated.technology),gds,c.name+' worker GDS');writeFileSync(`build/gds-${proofName}/${c.name}.gds`,gds);
+    const exportOptions=c.gds_max_bytes?{maxBytes:c.gds_max_bytes}:{};
+    const gds=writeGDS(actual,technology.parsed,exportOptions);assert.deepEqual(writeGDS(generated.layout,generated.technology,exportOptions),gds,c.name+' worker GDS');writeFileSync(`build/gds-${proofName}/${c.name}.gds`,gds);
     for(const [name,expected]of Object.entries(original.matrices??{})){
       const winding=actual.shapes.findIndex(s=>s.name===name),solved=JSON.parse(kernel.UTF8ToString(kernel._simulate(winding,1e9,1000,1000,1000,1000,1024)));
       assert.ok(!solved.error,solved.error);assert.equal(solved.matrix.length,expected.length,c.name+' matrix size');assert.equal(solved.filaments,expected.length,c.name+' original filament count');
@@ -50,6 +52,7 @@ try{
       const relativeError=values.reduce((error,v,i)=>{assert.ok(Number.isFinite(v));return Math.max(error,Math.abs(v-reference[i])/scale);},0);
       // LMAT prints ten significant digits; compare the whole matrix at that precision.
       assert.ok(relativeError<=1e-10,`${c.name}/${name} original LMAT relative error ${relativeError}`);worstMatrixError=Math.max(worstMatrixError,relativeError);
+      if(expected.length>128)console.log(`${c.name}/${name}: ${expected.length}×${expected.length} original LMAT reference passes; checking worker`);
       const result=await send({action:'simulate',winding,frequency_ghz:1,mesh,filament_limit:1024});assert.deepEqual(result.simulation.matrix,solved.matrix,c.name+' worker matrix');matrices++;
     }
     reports.push({name:c.name,technology:c.technology,shapes:actual.shapes.length,original_creator_exit_status:original.creator_exit_status});

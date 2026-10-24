@@ -1,0 +1,583 @@
+{
+  "encoderCommit": "a80c3a589ced171bd6046619d32883c95a22a3cc",
+  "encoderSourceSha256": "485b94fa9ee9aa8ef250425fc55d944712f9647c70b2267803dd596e0b382c01",
+  "fixtures": [
+    {
+      "path": "tests/fixtures/original-creator-coverage.json",
+      "sha256": "3a9a90c04afb34f5157f20846701c5f0f254354dc0dbdd1fa9e1bb7dacc0e26e",
+      "cases": [
+        {
+          "name": "cmos-square",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 878,
+          "sha256": "990d21fbca5196c1b34d4de11ac9076e2dfbf7ba40e86e016a7ab2ce2a5cfe0a"
+        },
+        {
+          "name": "cmos-polygon",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 686,
+          "sha256": "5bd998acec2b1968a9bdcf276802d0897e8580f89c5b054402c25ae2943bff09"
+        },
+        {
+          "name": "cmos-symmetric_square",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 1902,
+          "sha256": "c29264087bf4eeff5dbe7f87019bbf79a2d95eb64de3dc18d95d7fbd78a9cb50"
+        },
+        {
+          "name": "cmos-symmetric_polygon",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 1838,
+          "sha256": "35002c3c4cccef9287f37d85785730f86a7545fbb4bf6f7233427f05c081b6f9"
+        },
+        {
+          "name": "cmos-wire",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 174,
+          "sha256": "ddffcc47531f844fe34b30667714f99256292e6e94d67595d764cc494f066520"
+        },
+        {
+          "name": "cmos-ring",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 1070,
+          "sha256": "67da770cb258bb7cd14a587e57699e19ad368619126fbcacf6aae17e5761a797"
+        },
+        {
+          "name": "cmos-via",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 622,
+          "sha256": "cef71c8f880813c7bf7d00b7bfa23d9ac9e033a34fae64cd8eba1d5989b2861c"
+        },
+        {
+          "name": "cmos-capacitor",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 238,
+          "sha256": "d65aeffee4a8e527543f572649b027546a9f65cdabd4da5067f6b0c85bd44541"
+        },
+        {
+          "name": "cmos-multimetal_square",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 878,
+          "sha256": "d6ea018a3df6fedb16c9d7b079dfc5492f0caf48b270b8e89c19bc0f88cf050f"
+        },
+        {
+          "name": "cmos-transformer",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 1710,
+          "sha256": "d511dd89efe6594f4427b5f3b1057512da7b7d341ae01679d218626477ae351b"
+        },
+        {
+          "name": "cmos-balun",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 2414,
+          "sha256": "aadf496a8e089ada2bc5babe4afc39b721ee202c4d18b909f84b34f20c36315e"
+        },
+        {
+          "name": "cmos-mirror_3d_transformer",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 2798,
+          "sha256": "932003bcc7df49bb1404f0a0c3a42ac53959d5c9c2705db8c01bafea305a790a"
+        },
+        {
+          "name": "bicmos-square",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 686,
+          "sha256": "52fbc3941b84a70c633c5af4a5104c143b75479442fdb61f70eea41b9c0a60e9"
+        },
+        {
+          "name": "bicmos-polygon",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 686,
+          "sha256": "deae75a3cb058666f7790702d902debcce93558f50643abc68c7fe19458a8002"
+        },
+        {
+          "name": "bicmos-symmetric_square",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 1518,
+          "sha256": "404c62ff560f5379ca985ddec0f51758f65e34f1931c16005dad49a82cf49db3"
+        },
+        {
+          "name": "bicmos-symmetric_polygon",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 1454,
+          "sha256": "1800b9f7598bcdf0afe47c76510c7d026ff6f8d1d53202b92e8ba7ca492757e5"
+        },
+        {
+          "name": "bicmos-wire",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 174,
+          "sha256": "ddffcc47531f844fe34b30667714f99256292e6e94d67595d764cc494f066520"
+        },
+        {
+          "name": "bicmos-ring",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 1070,
+          "sha256": "f4c3902882b07575b45bc0707323dca5fc3cf0960e68f41bbed3e92372aa34b3"
+        },
+        {
+          "name": "bicmos-via",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 622,
+          "sha256": "e06fc10246d8db7b6a2e5dc3ee647e0c7bd5ea25caf0433d82baa98f8112583b"
+        },
+        {
+          "name": "bicmos-capacitor",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 238,
+          "sha256": "d65aeffee4a8e527543f572649b027546a9f65cdabd4da5067f6b0c85bd44541"
+        },
+        {
+          "name": "bicmos-multimetal_square",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 622,
+          "sha256": "a2604a72f258e57440eabf6392287cd887d86083deb6384d25021f5b9fe731ec"
+        },
+        {
+          "name": "bicmos-transformer",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 1326,
+          "sha256": "271a002fdcfd8b487e7da53d6aef92f127258b4eef4fcfc05cbf08229f0ab019"
+        },
+        {
+          "name": "bicmos-balun",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 2030,
+          "sha256": "7cd3c9ac36c292dd5fa34906e37ff9fad2128a4a48689f154d9316d01a93108c"
+        },
+        {
+          "name": "bicmos-mirror_3d_transformer",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 2798,
+          "sha256": "6e65b48f0f8262b32f656639f7f9132d93e1e7ccf45e88b0be55f89bb55fc9dd"
+        },
+        {
+          "name": "cmos-square-inner",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 686,
+          "sha256": "0364a167a3b98267a96582cab293dbe43c4a528f42694f085d4e98d59e1df096"
+        },
+        {
+          "name": "cmos-polygon-odd",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 622,
+          "sha256": "2a1f6699489bacaa21b7042315e27ca4d3b35b8bb338f90809d5f7b8a468e15b"
+        },
+        {
+          "name": "cmos-wire-short-negative-angle",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 174,
+          "sha256": "3a28f3d8e76d2a5c70b24cea5df2760a9546bcd59a3c6f90bdbbf5639a649669"
+        },
+        {
+          "name": "cmos-transformer-unequal",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 1326,
+          "sha256": "26510a4f114386e3c8a03a7738824cbc4357ac43e0ef5b4bc9a597059733b923"
+        },
+        {
+          "name": "cmos-symsq-inner",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 1134,
+          "sha256": "4f033a9ca08b3715c6e8286d8ca1aabd6deda4d5982de68761e2eaa7a5d5d734"
+        },
+        {
+          "name": "cmos-sympoly-odd",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 1070,
+          "sha256": "fe6ada82d640583487be0099fa3ad3689e2c3d6167c9c10117a390af9031634f"
+        },
+        {
+          "name": "cmos-ring-clockwise",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 1070,
+          "sha256": "69a40b848225e51a8846fec08aaffe7cab8883beceb2542eb70394d685e3b9d2"
+        },
+        {
+          "name": "cmos-via-rectangular",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 1582,
+          "sha256": "25ebf8bfaea8f4e736e566720842009156529456858e8bf1b3a0f6909c1b2674"
+        },
+        {
+          "name": "cmos-capacitor-rotated",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 238,
+          "sha256": "3ac61c424e3d9380d2253beea92adef41e625264fecef46189d9c5c4714738dc"
+        },
+        {
+          "name": "cmos-balun-widths",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 1646,
+          "sha256": "7855b78b817704242b310498745bcfb27b34af584eef13b934f52f931aed42bd"
+        },
+        {
+          "name": "cmos-mirror-unequal",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 2798,
+          "sha256": "f25c419a6c4cc9254523c53c1c5bddbf1df6f46fba2d6ede0777ea7dc0f90e2b"
+        },
+        {
+          "name": "cmos-multimetal-inner",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 2926,
+          "sha256": "8de3b725c8ed6de9bdb6881c8e139d78994efb5b3c47cda36fe70045e18c8bce"
+        },
+        {
+          "name": "cmos-multimetal-full-stack",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 1710,
+          "sha256": "16a9ab864d6566624893c62af77ae80c4f309eedc258ef987de00325d91ca123"
+        }
+      ]
+    },
+    {
+      "path": "tests/fixtures/original-creator-ranges.json",
+      "sha256": "1a30e13ead790bac935db6ffb19ec39020dc800632ba5f668178b567c0da83a1",
+      "cases": [
+        {
+          "name": "cmos-square-fraction",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 17070,
+          "sha256": "5cbff6edbeb21c86793a9f37ec88a2665e0eb5a9357ffd48d2fe2f59a5206c9b"
+        },
+        {
+          "name": "cmos-polygon-fraction",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 25262,
+          "sha256": "93eb850b2e99df7017fb209fe77919dec85f0b7663bbb72fa77325e1e5e2457a"
+        },
+        {
+          "name": "cmos-symmetric-square",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 57966,
+          "sha256": "3adb6d6e4f26bcdaa32a12b96eee740ebf3cd75fe66c9f13e3aa523a74072031"
+        },
+        {
+          "name": "cmos-symmetric-polygon",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 57902,
+          "sha256": "06495c740bc451c3feb41412d6d3a90dd16663c5de68a783b7572635f49c22bb"
+        },
+        {
+          "name": "cmos-transformer",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 33838,
+          "sha256": "8cb2efdbfec3b2efbd4654f3c427e1dcb19d8b1a677942c12fd6391469afcb06"
+        },
+        {
+          "name": "cmos-balun",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 67182,
+          "sha256": "e8557382171100ebed72c1625de67fa273cb39a5c5107d1e99b653edcec7658c"
+        },
+        {
+          "name": "cmos-multimetal",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 50222,
+          "sha256": "5d5b52e1ee03835bd0be5a1778fb534ca06bfe82e5a0c4d1407bb17d39282021"
+        },
+        {
+          "name": "cmos-mirror-3d",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 103598,
+          "sha256": "41ff6d80dc511cb455905283f0db4724f64d95759a44de19a4e41ef8125953fa"
+        },
+        {
+          "name": "bicmos-square-fraction",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 16878,
+          "sha256": "ad2a024e419e84fd1ce48b88e953a616749ff690f27936fa44551dbcedd5351b"
+        },
+        {
+          "name": "bicmos-polygon-fraction",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 25262,
+          "sha256": "974c2ca5166e32163881a5e7115beab5a6fdc183402f680a816c7de50215bcee"
+        },
+        {
+          "name": "bicmos-symmetric-square",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 33390,
+          "sha256": "8bfc58b49f4f9f6eef529f1077b1fbbf1ceb3aa2f1f53e7198a99701713c1295"
+        },
+        {
+          "name": "bicmos-symmetric-polygon",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 33326,
+          "sha256": "f5a6c956f3f3a2d24272b521da742e75570dfdcace695800bc5a1a66d8cd4d14"
+        },
+        {
+          "name": "bicmos-transformer",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 33838,
+          "sha256": "e33942b4c58522ed367a42e572bc8b284058c56687c81fa8f58dbfd4b5aa5326"
+        },
+        {
+          "name": "bicmos-balun",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 67182,
+          "sha256": "05491189f56e08c457a24fbd18063fbf64465e3c2e71b1d119c20b037f6486dc"
+        },
+        {
+          "name": "bicmos-multimetal",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 33518,
+          "sha256": "1342b78a5ec30b7f2f0c98e6719a2d5ce5ec80e28384388a08d76cc8f3853c9d"
+        },
+        {
+          "name": "bicmos-mirror-3d",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 103598,
+          "sha256": "0eb59edebc16c839d2eb881deed26fa8f4a45950f3da414b7871fdb2c18d1cc2"
+        },
+        {
+          "name": "cmos-square-interactive",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 17070,
+          "sha256": "5cbff6edbeb21c86793a9f37ec88a2665e0eb5a9357ffd48d2fe2f59a5206c9b"
+        }
+      ]
+    },
+    {
+      "path": "tests/fixtures/original-creator-counts.json",
+      "sha256": "34a1500399a712f58eb852556d21af8ea0b209e3d36395bcac2b8130e31e29af",
+      "cases": [
+        {
+          "name": "cmos-polygon-512",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 41070,
+          "sha256": "b11a947ad3e24ee7146b610ae850c89d910a61b18e4f63a3d016e31a13f9f0a6"
+        },
+        {
+          "name": "cmos-sympoly-301",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 39470,
+          "sha256": "80904ac187aad86ba64ca666e77068b551c2235093667336b55499198d943fc8"
+        },
+        {
+          "name": "cmos-ring-512",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 32814,
+          "sha256": "00e0a3b7c0e28ae4d35655992008cf485a2a366c5bf43e518ced003f29a7a6d4"
+        },
+        {
+          "name": "cmos-via-columns",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 38638,
+          "sha256": "c0f0525b952d146fac563ce747d4d326cda35905d8413f484be2d3a495464d67"
+        },
+        {
+          "name": "cmos-via-rows",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 38638,
+          "sha256": "892adead35b2db2cd33aa94f6e6c293cc93cb605bf16f0a9fd1537433c88b42e"
+        },
+        {
+          "name": "cmos-via-matrix",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 5760238,
+          "sha256": "5dea9c5b72a360b06812355faaf47089b9ac1abf73485ef772e9798bd4a4319d"
+        },
+        {
+          "name": "cmos-via-rotated",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 58030,
+          "sha256": "7348b183f065ed3437da158417cf6d5d6349391944ac2f29e875d2807e3619e0"
+        },
+        {
+          "name": "bicmos-polygon-512",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 41070,
+          "sha256": "47b5a6c91ba7e025408f4790f43aada1eb27567139a04b576875b0d437309cef"
+        },
+        {
+          "name": "bicmos-sympoly-301",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 39086,
+          "sha256": "cb1e2ba367b54f843d8d1849eb640d9719179cbbbcfeb203353d76dd271bb520"
+        },
+        {
+          "name": "bicmos-ring-512",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 32814,
+          "sha256": "04a74a05bbe3b2e65aa3b05eebeff7a35581b7a5dc464f4f9d255fb7335f502d"
+        },
+        {
+          "name": "bicmos-via-columns",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 38638,
+          "sha256": "9161b27fe8472fcd1810da5b06aa2e9e00033c18438aed05cdf668cdba2ad640"
+        },
+        {
+          "name": "bicmos-via-rows",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 38638,
+          "sha256": "2551951d5f21c3970efb856ba794ebfaabb23f2113dbcf19aac317e42a6e0501"
+        },
+        {
+          "name": "bicmos-via-matrix",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 5760238,
+          "sha256": "f5c2f3ab2a931d62d63b9a36cbc32c877a29ca19116626af2ff8bd219f0e73a4"
+        },
+        {
+          "name": "bicmos-via-rotated",
+          "technology": "BiCMOS",
+          "technology_sha256": "adc649b4a21b9b1d23d206844fadf9ba24fbe598b711e74182a683a39f19a184",
+          "bytes": 58030,
+          "sha256": "ab6832b9ec2db5816daf756f6034e75c28c9ba11bd78c3b6fbbad6b0f4f415b2"
+        },
+        {
+          "name": "cmos-via-count-alias",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 5760238,
+          "sha256": "5dea9c5b72a360b06812355faaf47089b9ac1abf73485ef772e9798bd4a4319d"
+        },
+        {
+          "name": "cmos-via-prompted",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 65902,
+          "sha256": "8a766a80c75baa1e86d53f141fc7d88372308b327975d821be6d036f921d6cbd"
+        }
+      ]
+    },
+    {
+      "path": "tests/fixtures/original-geometry-edits.json",
+      "sha256": "a0e0c7c1bd2aea2c40fa08cfe8b4e56dd2296ee6a11f26f4f835cd647a337639",
+      "cases": [
+        {
+          "name": "rigid-phase-selection",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 238,
+          "sha256": "091bd5dde8b45c6b4fafdbfd6eb93c01b3406f4f87abddaac08f05deff52115e"
+        },
+        {
+          "name": "join-split",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 2798,
+          "sha256": "749a59892e91ce3b8495d295ca97e8f1ca7e4c4db7cbcc5d74d45f4bd5f453e1"
+        },
+        {
+          "name": "shunt-branch-transform",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 5486,
+          "sha256": "9c5bb702cd7bd0ba89e5876d893a2ae3f6f3b6bb5788d193d13714e799b2d36e"
+        },
+        {
+          "name": "wire-conversion",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 2286,
+          "sha256": "c14f1e9204e9c3102cd7fcb8146a9c70c7688ce2ef2b1fb3a239c5c4650e8e43"
+        },
+        {
+          "name": "paired-move",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 4206,
+          "sha256": "ef77994b59b46f7a23f8e46a10a60415c1491890916a2df14237f0b3fafa3963"
+        },
+        {
+          "name": "friendship",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 174,
+          "sha256": "996d0589c215398c9b294eba836c55f16d332b748e70efd8727b859a644d7f5b"
+        },
+        {
+          "name": "delete-selected",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 238,
+          "sha256": "13f28e164fcf004def5c2256730c598098d7770f45ebee61131acd1aeadad606"
+        },
+        {
+          "name": "negative-split",
+          "technology": "CMOS",
+          "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+          "bytes": 4078,
+          "sha256": "43b01e6ea39dc88b4ef75bf6bc504c31d9a231698654e4d2da77a9f97da437e3"
+        }
+      ]
+    }
+  ],
+  "skipped": [
+    {
+      "path": "tests/fixtures/original-creator-counts.json",
+      "name": "cmos-via-million-row",
+      "reason": "Former-encoder capture bounded to 64 MiB; large-grid output has a separate streaming reference check"
+    }
+  ]
+}

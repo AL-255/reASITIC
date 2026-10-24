@@ -52,7 +52,7 @@ if(!lifecycleOnly)for(const c of cases){
 }
 const technology=parseTechnology(readFileSync('web/technology/CMOS.tek','utf8'));configureKernel(k,technology);
 const before=createGeometry(k,2,'NAME=KEEP:LEN=40:WID=8:METAL=M1'),valid=JSON.parse(readFileSync('tests/fixtures/optimization-cases.json','utf8')).cases[0].keywords;
-for(const keywords of ['::',valid.replace('AINC=10','AINC=0'),valid.replace('SIMTYPE=2','SIMTYPE=1'),valid.replace('SIDES=4','SIDES=257'),valid.replace('NAME=OPT','NAME=KEEP')])assert.throws(()=>optimizationPlan(k,keywords,technology.domain));
+for(const keywords of ['::',valid.replace('AINC=10','AINC=0'),valid.replace('SIMTYPE=2','SIMTYPE=1'),valid.replace('SIDES=4','SIDES=2'),valid.replace('NAME=OPT','NAME=KEEP')])assert.throws(()=>optimizationPlan(k,keywords,technology.domain));
 assert.throws(()=>optimizationPlan(k,valid,technology.domain,{candidate_limit:2}),/budget/);assert.deepEqual(clean(editGeometry(k,'UNSELECT')),clean(before),'Rejected plan changed source');
 const plan=optimizationPlan(k,valid,technology.domain),descriptor=plan.candidates[0];
 for(const bad of [[...descriptor.slice(0,4),-1,...descriptor.slice(5)],[...descriptor.slice(0,7),64,...descriptor.slice(8)]])assert.throws(()=>createOptimizationCandidate(k,'BAD',bad));

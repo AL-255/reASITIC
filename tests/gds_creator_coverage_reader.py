@@ -1,9 +1,10 @@
 """Independently verify creator GDS on both process stacks against original geometry."""
-import collections,json,math,re,sys
+import collections,hashlib,json,math,re,sys
 from pathlib import Path
 import gdstk
+from gds_large_grid_reader import verify_large_grid
 
-proof_name='creator-ranges' if '--ranges' in sys.argv else 'creator-coverage'
+proof_name='creator-counts' if '--counts' in sys.argv else 'creator-ranges' if '--ranges' in sys.argv else 'creator-coverage'
 original=json.loads(Path('tests/fixtures/original-'+proof_name+'.json').read_text())
 def vertices(points):return frozenset((math.floor(x*1000+.5),math.floor(y*1000+.5)) for x,y in points)
 files=polygons=0
@@ -12,7 +13,10 @@ for case in original['cases']:
     for block in re.split(r'<via>\s*\d*',technology,flags=re.I)[1:]:
         vias.append({k.lower():float(v) for k,v in re.findall(r'^\s*(\w+)\s*=\s*([-+\d.eE]+)',block,re.M)})
     metals=case['metal_count']
-    library=gdstk.read_gds(Path('build/gds-'+proof_name)/(case['name']+'.gds'))
+    path=Path('build/gds-'+proof_name)/(case['name']+'.gds')
+    if path.stat().st_size>16*1024*1024:
+        polygons+=verify_large_grid(path,case,vias);files+=1;continue
+    library=gdstk.read_gds(path)
     assert library.unit==1e-6 and library.precision==1e-9
     assert len(library.cells)==1 and not library.cells[0].references
     actual=library.cells[0].polygons;expected=collections.Counter()
@@ -35,3 +39,5 @@ for case in original['cases']:
     assert all(p.area()>0 and p.datatype==0 for p in actual),case['name']
     files+=1;polygons+=len(actual)
 print(f'Independent creator GDS reader: {files} libraries, {polygons} polygons; original ribbons, every via cut/pad, units and nonzero boundaries pass')
+evidence=Path('build/evidence');evidence.mkdir(exist_ok=True,parents=True)
+(evidence/('gds-'+proof_name+'.json')).write_text(json.dumps(dict(reference='Original native physical records; independent gdstk and bounded-memory GDS readers',fixture_sha256=hashlib.sha256(Path('tests/fixtures/original-'+proof_name+'.json').read_bytes()).hexdigest(),libraries=files,polygons=polygons),indent=2)+'\n')

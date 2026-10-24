@@ -28,8 +28,8 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update -qq
-          sudo apt-get install -y g++-multilib libc6:i386
-          pip install gdstk==1.0.2 mpmath==1.3.0
+          sudo apt-get install -y g++-multilib libc6:i386 libcairo2
+          pip install gdstk==1.0.2 mpmath==1.3.0 CairoSVG==2.9.1
       - run: python tools/build.py
       - run: python tools/build_native.py
       - run: python tools/build_portable_math.py
@@ -72,6 +72,12 @@ jobs:
           node tests/creator-coverage.mjs --ranges
           python tests/gds_creator_coverage_reader.py --ranges
           node tests/creator-ranges.mjs
+          node tests/creator-coverage.mjs --counts
+          python tests/gds_creator_coverage_reader.py --counts
+          node tests/creator-counts.mjs
+          node tests/gds-stream.mjs
+          node tests/geometry-preview.mjs
+          python tests/svg_preview_reader.py
           node tests/metal-rules.mjs
           python tests/gds_metal_rules_reader.py
           node tests/geometry-edits.mjs

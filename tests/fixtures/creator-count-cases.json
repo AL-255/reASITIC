@@ -1,0 +1,173 @@
+{
+  "cases": [
+    {
+      "name": "cmos-polygon-512",
+      "technology": "CMOS",
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=512:W=3:S=2:N=1.25:METAL=M4:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ],
+      "matrix_names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-sympoly-301",
+      "technology": "CMOS",
+      "command": "SYMPOLY NAME=A:RAD=100:ILEN=15:SIDES=301:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-ring-512",
+      "technology": "CMOS",
+      "command": "RING NAME=A:RAD=100:W=3:GAP=37:SIDES=512:METAL=M4:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-via-columns",
+      "technology": "CMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n300\n2\n1\n256 256\n",
+      "names": [
+        "A"
+      ],
+      "web_keywords": "NAME=A:NX=300:NY=2:VIA=VIA2:XORG=256:YORG=256"
+    },
+    {
+      "name": "cmos-via-rows",
+      "technology": "CMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n2\n300\n1\n256 256\n",
+      "names": [
+        "A"
+      ],
+      "web_keywords": "NAME=A:NX=2:NY=300:VIA=VIA2:XORG=256:YORG=256"
+    },
+    {
+      "name": "cmos-via-matrix",
+      "technology": "CMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n300\n300\n1\n256 256\n",
+      "names": [
+        "A"
+      ],
+      "web_keywords": "NAME=A:NX=300:NY=300:VIA=VIA2:XORG=256:YORG=256"
+    },
+    {
+      "name": "cmos-via-rotated",
+      "technology": "CMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n3\n301\n1\n256 256\n",
+      "names": [
+        "A"
+      ],
+      "edits": "ROTATE A 37\nFLIPH A\nPHASE A -1",
+      "web_keywords": "NAME=A:NX=3:NY=301:VIA=VIA2:XORG=256:YORG=256"
+    },
+    {
+      "name": "bicmos-polygon-512",
+      "technology": "BiCMOS",
+      "command": "SPIRAL NAME=A:RAD=100:SIDES=512:W=3:S=2:N=1.25:METAL=M3:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-sympoly-301",
+      "technology": "BiCMOS",
+      "command": "SYMPOLY NAME=A:RAD=100:ILEN=15:SIDES=301:W=3:S=2:N=2:METAL=M3:METAL2=M2:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-ring-512",
+      "technology": "BiCMOS",
+      "command": "RING NAME=A:RAD=100:W=3:GAP=37:SIDES=512:METAL=M3:XORG=256:YORG=256",
+      "answers": "",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "bicmos-via-columns",
+      "technology": "BiCMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n300\n2\n1\n256 256\n",
+      "names": [
+        "A"
+      ],
+      "web_keywords": "NAME=A:NX=300:NY=2:VIA=VIA2:XORG=256:YORG=256"
+    },
+    {
+      "name": "bicmos-via-rows",
+      "technology": "BiCMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n2\n300\n1\n256 256\n",
+      "names": [
+        "A"
+      ],
+      "web_keywords": "NAME=A:NX=2:NY=300:VIA=VIA2:XORG=256:YORG=256"
+    },
+    {
+      "name": "bicmos-via-matrix",
+      "technology": "BiCMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n300\n300\n1\n256 256\n",
+      "names": [
+        "A"
+      ],
+      "web_keywords": "NAME=A:NX=300:NY=300:VIA=VIA2:XORG=256:YORG=256"
+    },
+    {
+      "name": "bicmos-via-rotated",
+      "technology": "BiCMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n3\n301\n1\n256 256\n",
+      "names": [
+        "A"
+      ],
+      "edits": "ROTATE A 37\nFLIPH A\nPHASE A -1",
+      "web_keywords": "NAME=A:NX=3:NY=301:VIA=VIA2:XORG=256:YORG=256"
+    },
+    {
+      "name": "cmos-via-count-alias",
+      "technology": "CMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n300\n300\n1\n256 256\n",
+      "names": [
+        "A"
+      ],
+      "web_keywords": "NAME=A:N=300:VIA=VIA2:XORG=256:YORG=256"
+    },
+    {
+      "name": "cmos-via-prompted",
+      "technology": "CMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n513\n2\n1\n256 256\n",
+      "names": [
+        "A"
+      ]
+    },
+    {
+      "name": "cmos-via-million-row",
+      "technology": "CMOS",
+      "command": "VIA",
+      "answers": "A\nVIA2\n2000000\n1\n1\n256 256\n",
+      "names": [
+        "A"
+      ],
+      "web_keywords": "NAME=A:NX=2000000:NY=1:VIA=VIA2:XORG=256:YORG=256",
+      "gds_max_bytes": 134217728
+    }
+  ]
+}

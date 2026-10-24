@@ -1,7 +1,8 @@
 import {optimizationCSV} from './optimization.mjs';
 import {conductorEstimatesCSV} from './estimates.mjs';
 import {resonanceHistoryCSV} from './self-resonance.mjs';
-import {polygons,writeGDS,segmentRecords} from './gds.mjs';
+import {writeGDS,segmentRecords} from './gds.mjs';
+import {renderGeometryPreview} from './geometry-preview.mjs';
 import {parseTechnology} from './technology.mjs';
 import {creatorRecipe,parseCreatorCommand} from './creators.mjs';
 import {capacitanceMatrixCSV,capacitanceDiagnostics} from './capacitance.mjs';
@@ -180,14 +181,13 @@ $('controls').onsubmit=e=>{e.preventDefault();generate();};
 function setView(){if(view)$('preview').setAttribute('viewBox',view.join(' '));}
 $('fit').onclick=()=>{if(initialView){view=[...initialView];setView();}};
 function render(){
-  const list=[...polygons(layout,technology,{visibleOnly:true})];let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
-  for(const polygon of list)for(const [x,y] of polygon.points){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);}
-  if(!list.length){initialView=[0,-technology.domain.y,technology.domain.x,technology.domain.y];view=[...initialView];$('preview').replaceChildren();$('legend').replaceChildren();setView();$('footprint').textContent='No visible geometry';$('segments').textContent=layout.shapes.reduce((n,s)=>n+[...segmentRecords(s.segments)].length,0);$('resistance').textContent=layout.shapes.map(s=>`${s.name}: ${s.resistance_dc.toFixed(3)} Ω`).join(' · ')||'—';return;}
+  const preview=renderGeometryPreview($('preview'),layout,technology,{colors});
+  if(!preview.bounds){initialView=[0,-technology.domain.y,technology.domain.x,technology.domain.y];view=[...initialView];$('legend').replaceChildren();setView();$('footprint').textContent='No visible geometry';$('segments').textContent=layout.shapes.reduce((n,s)=>n+[...segmentRecords(s.segments)].length,0);$('resistance').textContent=layout.shapes.map(s=>`${s.name}: ${s.resistance_dc.toFixed(3)} Ω`).join(' · ')||'—';return;}
+  const [x0,y0,x1,y1]=preview.bounds;
   const w=Math.max(1,x1-x0),h=Math.max(1,y1-y0),padding=Math.max(w,h)*.15;
-  initialView=[x0-padding,-y1-padding,w+padding*2,h+padding*2];view=[...initialView];$('preview').replaceChildren();
-  for(const polygon of list){const p=document.createElementNS(svgNS,'polygon');p.setAttribute('points',polygon.points.map(([x,y])=>`${x},${-y}`).join(' '));p.setAttribute('fill',colors[(polygon.layer-1)%colors.length]);p.setAttribute('fill-opacity','.77');p.setAttribute('stroke',colors[(polygon.layer-1)%colors.length]);p.setAttribute('stroke-width','.15');$('preview').append(p);}setView();
+  initialView=[x0-padding,-y1-padding,w+padding*2,h+padding*2];view=[...initialView];setView();
   $('layout-title').textContent=$('native-command').value.trim()?$('native-command').value.match(/[^ \t\r\n\f\v,]+/)[0].toUpperCase():$('kind').selectedOptions[0].textContent.toUpperCase();$('footprint').textContent=`${w.toFixed(1)} × ${h.toFixed(1)} µm`;$('segments').textContent=layout.shapes.reduce((n,s)=>n+[...segmentRecords(s.segments)].length,0);$('resistance').textContent=layout.shapes.map(s=>`${s.name}: ${s.resistance_dc.toFixed(3)} Ω`).join(' · ');
-  $('legend').replaceChildren();for(const layer of [...new Set(list.map(p=>p.layer))].sort((a,b)=>a-b)){const el=document.createElement('span');el.style.setProperty('--color',colors[(layer-1)%colors.length]);el.textContent=layer>=100?technology.vias[layer-100].name:technology.metals[layer-1].name;$('legend').append(el);}
+  $('legend').replaceChildren();for(const layer of preview.layers){const el=document.createElement('span');el.style.setProperty('--color',colors[(layer-1)%colors.length]);el.textContent=layer>=100?technology.vias[layer-100].name:technology.metals[layer-1].name;$('legend').append(el);}
 }
 function clearThreePort(){threeResult=null;portSamples['three-port']=[];for(const id of ['three-record','three-raw-csv','three-metrics-csv','three-sweep-csv'])$(id).disabled=true;$('three-sweep-state').textContent='No port sweep samples.';threeBacking=null;$('three-backing-file').value='';$('three-backing-status').textContent='Normal numerical solve. An optional native-state capture replays historical output for comparison.';for(const id of ['three-l1','three-l2','three-l3'])$(id).textContent='—';$('three-details').textContent='Generate or add three windings, then solve the original three-port model.';}
 $('three-backing-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;setBusy(true);$('status').textContent='Loading native three-port backing capture…';if(file.size>20*1024*1024)throw Error('Native backing capture exceeds 20 MiB.');const source=JSON.parse(await file.text()),h=validateThreePortBacking(source),indices=h.names.map(name=>layout?.shapes.findIndex(s=>s.name===name)),ground=layout?.shapes.findIndex(s=>s.name===h.ground);if(indices.some(i=>i===undefined||i<0)||ground===undefined||ground<0)throw Error('Generate the captured windings and reference before importing their native backing.');
@@ -251,7 +251,7 @@ $('preview').onpointerdown=e=>{if(!view)return;drag={x:e.clientX,y:e.clientY,vie
 $('preview').onpointermove=e=>{if(!drag)return;const rect=$('preview').getBoundingClientRect(),scale=Math.max(drag.view[2]/rect.width,drag.view[3]/rect.height);view=[drag.view[0]-(e.clientX-drag.x)*scale,drag.view[1]-(e.clientY-drag.y)*scale,drag.view[2],drag.view[3]];setView();};
 $('preview').onpointerup=$('preview').onpointercancel=()=>drag=null;
 function download(data,name,type){const url=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-$('download').onclick=()=>{try{download(writeGDS(layout,technology),'reASITIC-coil.gds','application/octet-stream');}catch(e){failure(e.message);}};
+$('download').onclick=()=>{try{download(writeGDS(layout,technology,{maxBytes:Number($('gds-limit').value)*1024*1024}),'reASITIC-coil.gds','application/octet-stream');}catch(e){failure(e.message);}};
 $('cap-matrix-csv').onclick=()=>{try{download(capacitanceMatrixCSV(capacitanceResult),'reASITIC-CAP-admittance.csv','text/csv');}catch(e){failure(e.message);}};
 $('potential-matrix-csv').onclick=()=>{try{download(capacitanceMatrixCSV(capacitanceResult,true),'reASITIC-CAP-potential.csv','text/csv');}catch(e){failure(e.message);}};
 $('three-record').onclick=()=>{try{download(portSweepRecord(portResults('three-port'),$('three-parameter').value,$('three-format').value==='polar'),'reASITIC-three-port-native.txt','text/plain');}catch(e){failure(e.message);}};

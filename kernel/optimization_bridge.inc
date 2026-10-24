@@ -11,8 +11,8 @@ bool safe_grid_keywords(const char* line){
         for(char* p=token;*p;++p)if(*p>='a'&&*p<='z')*p-=32;
         if(__builtin_strcmp(token,"NAME")==0||__builtin_strcmp(token,"FNAME")==0){if(__builtin_strlen(value)>74)return false;continue;}
         if(__builtin_strcmp(token,"METAL")==0||__builtin_strcmp(token,"EXIT")==0||__builtin_strcmp(token,"TAP")==0)continue;
-        char* end;double n=strtod(value,&end);if(end==value||!__builtin_isfinite(n)||n>1000000||n< -1000000)return false;
-        if(__builtin_strcmp(token,"SIDES")==0&&(n<3||n>256||n!=static_cast<int>(n)))return false;
+        char* end;double n=strtod(value,&end);if(end==value||!__builtin_isfinite(n)||n>numeric_input_limit||n< -numeric_input_limit)return false;
+        if(__builtin_strcmp(token,"SIDES")==0&&(n<3||n!=static_cast<int>(n)))return false;
     }return found;
 }
 bool retain_grid_candidate(const GeometryShape& shape,unsigned,void*){
@@ -52,7 +52,7 @@ extern "C" int optimization_accept(double inductance,double quality,double minim
 extern "C" const char* optimization_create(const char* name,const double* values,int append){
     reasitic::clear_diagnostics();
     if(!name||!values)return "{\"error\":\"Supply an optimizer name and descriptor\"}";
-    for(int i=0;i<10;++i)if(!__builtin_isfinite(values[i])||values[i]>1000000||values[i]< -1000000)return "{\"error\":\"Use a finite optimizer descriptor within the supported range\"}";
+    for(int i=0;i<10;++i)if(!__builtin_isfinite(values[i])||values[i]>numeric_input_limit||values[i]< -numeric_input_limit)return "{\"error\":\"Use a finite optimizer descriptor within the supported range\"}";
     if(values[4]<=0||values[5]<=0||values[6]<0)return "{\"error\":\"Use positive optimizer dimensions and nonnegative spacing\"}";
     for(int i=0;i<4;++i)if(values[i]!=static_cast<int>(values[i]))return "{\"error\":\"Use integer optimizer shape/layer fields\"}";
     if((values[0]!=0&&values[0]!=1&&values[0]!=18&&values[0]!=20)||values[3]< -1||values[3]>=metal_count)return "{\"error\":\"Use a supported optimizer descriptor and valid exit metal\"}";
