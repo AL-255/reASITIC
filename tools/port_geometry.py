@@ -228,6 +228,12 @@ using namespace asitic;
         needle='    remove_geometry_shape(state.shapes,pads,memory);'
         assert s.count(needle)==1
         return s.replace(needle,'    if(options.combined.snapshot) {\n        options.combined.snapshot("Pads.out",capacitance,options.combined.snapshot_user);\n        ComplexValue values[]={saved.y11,saved.y21,saved.y12,saved.y22};const ComplexMatrix ports{values,4,1,2,2,2,1};\n        options.combined.snapshot("WithPads.out",ports,options.combined.snapshot_user);\n    }\n'+needle)
+    if name=='extended_node':
+        s=(ROOT/'vendor/asitic/src/extended_node.cpp').read_text()
+        signature='void solve_extended_node_equations('
+        begin=s.index('{',s.index(signature))+1
+        guard='\n#ifdef __EMSCRIPTEN__\n    if(!reasitic::reference_numerics()){reasitic::solve_portable_extended_nodes(cap,ind,output,memory,o);return;}\n#endif\n'
+        return '#ifdef __EMSCRIPTEN__\n#include "extended_network.hpp"\n#include "numerical_policy.hpp"\n#endif\n'+s[:begin]+guard+s[begin:]
     if name=='extended_driver':
         s=(ROOT/'vendor/asitic/src/extended_twoport.cpp').read_text()
         # Verbatim PIX driver and its timer helpers. Host command dispatch is

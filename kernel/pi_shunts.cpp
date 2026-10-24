@@ -53,22 +53,70 @@ bool store(Context& c,const Complex& far,const Complex& near,reasitic::PiShunts&
     out=result;return true;
 }
 
-bool solve(Values& a,Values& rhs,Complex* solution,int m){
+bool solve(Values& a,Values& rhs,Complex* solution,int m,int columns=1){
     // Partial-pivot elimination with 128 bits of software guard precision.
     // No host transcendental or floating-point control mode is used.
     for(int k=0;k<m;++k){
         int pivot=k;auto largest=norm(a[k*m+k]);
         for(int i=k+1;i<m;++i){auto candidate=norm(a[i*m+k]);if(bf_cmp_lt(&largest.value,&candidate.value)){largest=candidate;pivot=i;}}
         if(bf_is_zero(&largest.value)||bf_is_nan(&largest.value))return false;
-        if(pivot!=k){for(int j=k;j<m;++j){const auto saved=a[k*m+j];a[k*m+j]=a[pivot*m+j];a[pivot*m+j]=saved;}const auto saved=rhs[k];rhs[k]=rhs[pivot];rhs[pivot]=saved;}
-        for(int i=k+1;i<m;++i){const auto factor=a[i*m+k]/a[k*m+k];for(int j=k+1;j<m;++j)a[i*m+j]=a[i*m+j]-factor*a[k*m+j];rhs[i]=rhs[i]-factor*rhs[k];}
+        if(pivot!=k){for(int j=k;j<m;++j){const auto saved=a[k*m+j];a[k*m+j]=a[pivot*m+j];a[pivot*m+j]=saved;}for(int c=0;c<columns;++c){const auto saved=rhs[c*m+k];rhs[c*m+k]=rhs[c*m+pivot];rhs[c*m+pivot]=saved;}}
+        for(int i=k+1;i<m;++i){const auto factor=a[i*m+k]/a[k*m+k];for(int j=k+1;j<m;++j)a[i*m+j]=a[i*m+j]-factor*a[k*m+j];for(int c=0;c<columns;++c)rhs[c*m+i]=rhs[c*m+i]-factor*rhs[c*m+k];}
     }
-    for(int i=m-1;i>=0;--i){auto value=rhs[i];for(int j=i+1;j<m;++j)value=value-a[i*m+j]*solution[j];solution[i]=value/a[i*m+i];}
+    for(int c=0;c<columns;++c)for(int i=m-1;i>=0;--i){auto value=rhs[c*m+i];for(int j=i+1;j<m;++j)value=value-a[i*m+j]*solution[c*m+j];solution[c*m+i]=value/a[i*m+i];}
     return true;
 }
 
 }
 namespace reasitic {
+bool extended_port_network(const double* cap,const double* impedance,int n,
+                           int cap_stride,int ind_stride,double* ports,
+                           double* currents,double* voltages){
+    if(n<1||n>1024||!ports||!currents||!voltages||!finite(cap,n,cap_stride)||!finite(impedance,n,ind_stride))return false;
+    Context c;Values a(c,n*n),rhs(c,2*n),solution(c,2*n),hc(c,n*n),zhc(c,n*n),states(c,2*(n+1)),port(c,4);
+    if(!a.data||!rhs.data||!solution.data||!hc.data||!zhc.data||!states.data||!port.data)return false;
+    double largest=0;
+    for(int j=0;j<n;++j)for(int i=0;i<2*n;++i){const double v=__builtin_fabs(impedance[2*j*ind_stride+i]);if(v>largest)largest=v;}
+    if(largest==0)return false;
+    const Number scale(c,largest);
+    const auto C=[&](int i,int j){return Complex(c,cap+2*(i+j*cap_stride));};
+    const auto Z=[&](int i,int j){return Complex(c,impedance+2*(i+j*ind_stride));};
+    const double half_value[]={.5,0},one_value[]={1,0};const Complex half(c,half_value),one(c,one_value),zero(c);
+    const Complex impedance_scale(scale,Number(c));
+    // Conservation: I=1*I0-T*C*B*V. Voltage drops: D*V=Z*B*I.
+    // Eliminate currents, fix both endpoint voltages, and solve n equations
+    // for n-1 interior voltages and J0=scale*I0. H=B*T is triangular.
+    // Scaling the current unknown removes the arbitrary voltage/current unit
+    // ratio from pivot selection; no inverse of Z is needed.
+    for(int j=0;j<n;++j){Complex prefix(c);for(int i=0;i<n;++i){const auto cell=C(i,j);hc[i*n+j]=prefix+half*cell;prefix=prefix+cell;}}
+    for(int i=0;i<n;++i){
+        Complex row_sum(c);
+        for(int j=0;j<n;++j){for(int k=0;k<n;++k)zhc[i*n+j]=zhc[i*n+j]+Z(i,k)*hc[k*n+j];row_sum=row_sum+Z(i,j)/impedance_scale;}
+        for(int j=1;j<n;++j){auto cell=half*(zhc[i*n+j-1]+zhc[i*n+j]);if(i==j)cell=cell+one;if(i+1==j)cell=cell-one;a[i*n+j-1]=cell;}
+        a[i*n+n-1]=zero-row_sum;
+        rhs[i]=zero-half*zhc[i*n];if(i==0)rhs[i]=rhs[i]-one;
+        rhs[n+i]=zero-half*zhc[i*n+n-1];if(i==n-1)rhs[n+i]=rhs[n+i]+one;
+    }
+    if(!solve(a,rhs,solution.data,n,2))return false;
+    for(int drive=0;drive<2;++drive){
+        const auto V=[&](int vertex){return vertex==0?(drive==0?one:zero):vertex==n?(drive==1?one:zero):solution[drive*n+vertex-1];};
+        const auto near=solution[drive*n+n-1]/impedance_scale;auto current=near;
+        if(drive==0){states[0]=current;states[n+1]=one;}
+        for(int i=0;i<n;++i){
+            for(int j=0;j<n;++j)current=current-C(i,j)*(half*(V(j)+V(j+1)));
+            if(drive==0){states[i+1]=current;states[n+2+i]=V(i+1);}
+        }
+        // Native port order: far endpoint first, near endpoint second.
+        port[drive==0?2:0]=zero-current;port[drive==0?3:1]=near;
+    }
+    // Validate all outputs before publishing any of them.
+    for(int i=0;i<states.count;++i){const double r=states[i].real.rounded(),v=states[i].imag.rounded();if(!__builtin_isfinite(r)||!__builtin_isfinite(v))return false;}
+    for(int i=0;i<4;++i){const double r=port[i].real.rounded(),v=port[i].imag.rounded();if(!__builtin_isfinite(r)||!__builtin_isfinite(v))return false;}
+    if(c.status&(BF_ST_MEM_ERROR|BF_ST_INVALID_OP|BF_ST_DIVIDE_ZERO|BF_ST_OVERFLOW))return false;
+    for(int i=0;i<4;++i){ports[2*i]=port[i].real.rounded();ports[2*i+1]=port[i].imag.rounded();}
+    for(int i=0;i<=n;++i){currents[2*i]=states[i].real.rounded();currents[2*i+1]=states[i].imag.rounded();voltages[2*i]=states[n+1+i].real.rounded();voltages[2*i+1]=states[n+1+i].imag.rounded();}
+    return true;
+}
 bool common_mode_shunts(const double* cap,const double* ind,int n,int cap_stride,int ind_stride,
                        const double* pads,int pad_stride,PiShunts& out){
     if(n<1||n>1024||!finite(cap,n,cap_stride)||!finite(ind,n,ind_stride)||(pads&&!finite(pads,2,pad_stride)))return false;

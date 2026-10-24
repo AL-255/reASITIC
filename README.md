@@ -297,8 +297,17 @@ the common-mode system has `n` unknowns instead of the original `2n+2`.
 The same 128-bit software arithmetic is used. For a single segment, the midpoint
 capacitor splits equally between endpoints; cancelling the impedance
 symbolically preserves components even when their magnitudes differ by hundreds
-of bits. PIX port matrices and saved current/voltage snapshots retain their
-original solver path, and historical mode retains the original pi extraction.
+of bits.
+
+PIX port matrices and saved current/voltage states also use current elimination.
+Charge conservation gives `I = I0 - T*C*B*V`; substituting this into the voltage
+drop equations and fixing both endpoint voltages leaves `n` unknowns instead of
+the original mixed-unit `2n+2` system. The remaining current unknown is scaled by
+the largest branch-impedance component. This removes arbitrary voltage/current
+units from pivot selection without inverting the impedance matrix or changing
+the circuit model. Both endpoint drives share one factorization in 128-bit
+software arithmetic, and results round to binary64 only when published.
+Historical audit mode retains the original node solver and pi extraction.
 
 `tests/portable-pi-shunts.mjs` checks an exact rational RC circuit whose shunt
 conductance disappears entirely when rounded port entries are added, plus
@@ -313,9 +322,17 @@ error in these cases fell from about `3.7e-7` to below `5.2e-12`.
 subdivision, against an independent 80-digit current-elimination reference for
 the complete port matrix, saved currents/voltages, pi metrics, input impedance
 and resonance. Common-mode shunts match bit for bit in native and WASM builds.
-The worst metric error in these cases fell from `3.7e-7` to below `1.5e-11`.
+The worst metric error in these cases fell from `3.7e-7` to below `2.5e-11`.
 `tests/portable-extended-shunts.mjs` adds exact midpoint-circuit limits, a
 400-bit component magnitude range, impedance independence and error recovery.
+`tests/portable-extended-ports.mjs` checks an exact one-midpoint circuit and
+fifteen coupled circuits with impedance factors from `2^-800` through `2^800`.
+Voltages are invariant and normalized currents/ports match bit for bit across
+these factors and native/WASM builds. An independent 400-digit solve checks all
+node states; native states also remain bit-identical under all four host rounding
+modes. Ordinary physical cases retain the independent 80-digit reference.
+All thirteen physical PIX cases also check native/WASM port-state identity and
+require matrix/state norm errors below `1e-14`.
 
 The primary numerical checks compare the same C++ implementation compiled for a
 native host and WASM against independent mpmath references: 203 geometric-mean
@@ -347,6 +364,7 @@ node tests/portable-gmd.mjs
 node tests/portable-error-power.mjs
 node tests/portable-pi-shunts.mjs
 node tests/portable-extended-shunts.mjs
+node tests/portable-extended-ports.mjs
 node tests/portable-simulation.mjs
 node tests/portable-pad.mjs
 node tests/portable-two-port.mjs

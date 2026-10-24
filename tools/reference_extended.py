@@ -10,8 +10,10 @@ import json,sys
 import mpmath as mp
 from reference_two_port import metrics
 
-def reference(result):
-    with mp.workdps(80):
+def reference(result,*,nodes_only=False):
+    digits=int(result.get('reference_decimal_digits',80))
+    assert 80<=digits<=1000
+    with mp.workdps(digits):
         def matrix(values):return mp.matrix([[mp.mpc(mp.mpf(z[0]),mp.mpf(z[1])) for z in row] for row in values])
         c=matrix(result['capacitance_matrix']);z=matrix(result['inductance_impedance_matrix']);n=c.rows
         assert n==c.cols==z.rows==z.cols and n>0
@@ -30,9 +32,11 @@ def reference(result):
         y=mp.matrix([[-currents[n,1],-currents[n,0]],[currents[0,1],currents[0,0]]])
         encode=lambda m:[[[float(mp.re(m[i,j])),float(mp.im(m[i,j]))] for j in range(m.cols)] for i in range(m.rows)]
         scalar_pair=lambda z:[float(mp.re(z)),float(mp.im(z))]
-        return dict(mpmath_version=mp.__version__,decimal_digits=80,groups=n,matrix=encode(y),currents=encode(currents[:,0:1]),voltages=encode(voltages[:,0:1]),
-                    circuit_shunts=dict(first=scalar_pair(y[0,0]+y[0,1]),second=scalar_pair(y[1,0]+y[1,1])),
-                    circuit_metrics=metrics(y,mp.mpf(result['frequency_hz'])),
-                    reported_metrics=metrics(matrix(result['matrix']),mp.mpf(result['frequency_hz']),result.get('pi_shunts')))
+        output=dict(mpmath_version=mp.__version__,decimal_digits=digits,groups=n,matrix=encode(y),currents=encode(currents[:,0:1]),voltages=encode(voltages[:,0:1]),
+                    circuit_shunts=dict(first=scalar_pair(y[0,0]+y[0,1]),second=scalar_pair(y[1,0]+y[1,1])))
+        if not nodes_only:
+            output.update(circuit_metrics=metrics(y,mp.mpf(result['frequency_hz'])),
+                          reported_metrics=metrics(matrix(result['matrix']),mp.mpf(result['frequency_hz']),result.get('pi_shunts')))
+        return output
 
-if __name__=='__main__':print(json.dumps(reference(json.load(sys.stdin)),allow_nan=False))
+if __name__=='__main__':print(json.dumps(reference(json.load(sys.stdin),nodes_only='--nodes-only' in sys.argv[1:]),allow_nan=False))

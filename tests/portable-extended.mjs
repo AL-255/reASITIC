@@ -25,11 +25,14 @@ for(const c of cases){
     const expected=JSON.parse(execFileSync(python,['tools/reference_extended.py'],{input:JSON.stringify(actual),encoding:'utf8',maxBuffer:16*1024*1024}));assert.equal(expected.mpmath_version,'1.3.0');assert.equal(expected.groups,actual.groups);
     const n=actual.groups,values=[...columnMajor(actual.capacitance_matrix),...columnMajor(actual.inductance_impedance_matrix)],bytes=Buffer.alloc(8+values.length*8);bytes.writeInt32LE(n);values.forEach((v,i)=>bytes.writeDoubleLE(v,8+i*8));writeFileSync('build/portable-two-port/extended.bin',bytes);
     const native=JSON.parse(execFileSync('build/portable-math/gmd-native',['--extended-shunts','build/portable-two-port/extended.bin'],{encoding:'utf8'}));
-    const pointer=math._malloc(values.length*8);let software;
-    try{math.HEAPF64.set(values,pointer/8);software=JSON.parse(math.UTF8ToString(math._probe_extended_pi_shunts(pointer,pointer+16*n*n,n)));}finally{math._free(pointer);}
+    const nativePorts=JSON.parse(execFileSync('build/portable-math/gmd-native',['--extended-ports','build/portable-two-port/extended.bin'],{encoding:'utf8'}));
+    const pointer=math._malloc(values.length*8);let software,softwarePorts;
+    try{math.HEAPF64.set(values,pointer/8);software=JSON.parse(math.UTF8ToString(math._probe_extended_pi_shunts(pointer,pointer+16*n*n,n)));softwarePorts=JSON.parse(math.UTF8ToString(math._probe_extended_ports(pointer,pointer+16*n*n,n)));}finally{math._free(pointer);}
     assert.deepEqual(software,native,c.name+' native/WASM shunts');assert.deepEqual(actual.pi_shunts,software,c.name+' production shunts');
+    assert.deepEqual(softwarePorts,nativePorts,c.name+' native/WASM port solve');
+    for(const key of ['matrix','currents','voltages'])assert.deepEqual(actual[key],softwarePorts[key],c.name+' production '+key);
     for(const key of ['first','second'])software[key].forEach((v,i)=>assert.ok(relative(v,expected.circuit_shunts[key][i])<=1e-10,c.name+' independent '+key+' shunt '+i));
-    const stageErrors={};for(const key of ['matrix','currents','voltages'])stageErrors[key]=matrixError(actual[key],expected[key],c.name+' '+key);
+    const stageErrors={};for(const key of ['matrix','currents','voltages']){stageErrors[key]=matrixError(actual[key],expected[key],c.name+' '+key);assert.ok(stageErrors[key]<=1e-14,c.name+' reduced '+key+' error '+stageErrors[key]);}
     const metricErrors={};for(const [key,value]of Object.entries(expected.circuit_metrics.pi)){
       assert.equal(actual.pi[key]===null,value===null,c.name+' '+key+' classification');
       if(value!==null)metricErrors[key]=relative(actual.pi[key],value);
