@@ -1,6 +1,6 @@
 # reASITIC · C++ / WebAssembly
 
-A browser recreation of ASITIC, targeting GitHub Pages. The recovered C++
+A browser recreation of ASITIC hosted on [GitHub Pages](https://al-255.github.io/reASITIC/). The recovered C++
 implementation from `~/github/asitic-re` is preserved unchanged under
 `vendor/asitic`; `provenance.json` pins the source commit and every file hash.
 
@@ -15,8 +15,10 @@ the math kernel. JavaScript handles the interface and GDSII serialization.
 
 The first browser milestone includes square/polygon/symmetric/multi-metal
 windings, planar and 3D transformer builders, rings, wires and a 2×2 via-array
-example. Parameters use micrometres. The original `RESIS` DC resistance path runs
-inside the C++ kernel. GDSII uses native ribbon boundaries, real via cuts and
+example. Parameters use micrometres. The original `RESIS` DC resistance, `INDUCTANCE` conductor estimate and `RESISHF`
+high-frequency resistance paths run inside the C++ kernel. These are the original
+conductor estimates; the full filament/substrate/network simulation is still
+being integrated. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
 ```sh
@@ -25,6 +27,8 @@ python3 tools/build.py                    # or --emxx /path/to/em++
 python3 tools/build_native.py             # GCC i386 + libc.so.6 comparison
 node tests/parity.mjs
 node tests/original-geometry.mjs
+node tests/estimates.mjs
+node tests/connected-analysis.mjs
 node tests/worker.mjs
 python3 -m pip install gdstk==1.0.2
 python3 tests/gds_reader.py
@@ -48,9 +52,16 @@ operation and square root uses Berkeley SoftFloat binary80; trig/log/exp
 instructions currently use Emscripten libm and remain a fidelity gap. The
 SoftFloat license is distributed alongside the site.
 
+The conductor-estimate gate checks 120 numeric fields over 50 frequency cases
+against unchanged recovered i386 bodies: 36 differ, with maximum relative error
+9.1e-15. Eleven connected-process report fixtures additionally pass 121 comparisons
+at their printed precision. `node tests/estimates.mjs --strict` exposes the
+remaining bitwise differences. Native technology initialization retains both
+height-conversion stores and sheet-resistance unit conversion in C++.
+
 Next required work includes capacitor/balun command composition, arbitrary via
-arrays, command parameter normalization, original inductance/filament/eddy and
-CAP/network solvers, frequency metrics/sweeps, and original-executable end-to-end
+arrays, command parameter normalization, original filament/eddy and CAP/network
+solvers, frequency metrics/sweeps, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.
 

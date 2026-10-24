@@ -36,6 +36,8 @@ jobs:
         run: |
           node tests/original-geometry.mjs
           node tests/parity.mjs
+          node tests/estimates.mjs
+          node tests/connected-analysis.mjs
           node tests/worker.mjs
           python tests/gds_reader.py
       - name: Retain fidelity evidence, including known x87 differences

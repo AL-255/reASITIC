@@ -2,6 +2,7 @@
 #include "asitic/symmetric_construction.hpp"
 #include "asitic/transformer3d.hpp"
 #include "asitic/resistance.hpp"
+#include "asitic/analysis_commands.hpp"
 #ifdef __EMSCRIPTEN__
 #include "x87_port.hpp"
 using Real=SoftReal;
@@ -17,6 +18,7 @@ using namespace asitic;
 namespace {
 GeometryShape* head=nullptr;
 MetalLayer metals[32]{};ViaLayer vias[32]{};double heights[32]{};int metal_count=0,via_count=0;
+double substrate[32]{};int substrate_count=0;
 char result[4*1024*1024],message[1024],warnings[4096];unsigned warning_length=0;
 void* allocate(unsigned n,void*) { return calloc(1,n+16); } // pad native MMSQUARE pointer workspace overrun
 void release(void* p,void*) { free(p); }
@@ -30,9 +32,13 @@ GeometryRuntime geometry{{{allocate,nullptr},release},{warn,nullptr},terminate,n
 void clear() { if(head)release_geometry_shapes(head,geometry.memory);head=nullptr;warning_length=0;warnings[0]=0; }
 }
 extern "C" {
-void reset_technology() { clear();metal_count=via_count=0; }
-void set_metal(int i,double height,double thickness,double resistance) {
-    if(i<0 || i>=32)return;heights[i]=height;metals[i].thickness=thickness;metals[i].resistance=resistance;
+void reset_technology() { clear();metal_count=via_count=substrate_count=0; }
+void set_substrate(int i,double thickness) { if(i<0 || i>=32)return;substrate[i]=thickness;if(i>=substrate_count)substrate_count=i+1; }
+void finalize_technology() { for(int i=substrate_count-2;i>=0;--i)substrate[i]=x87::binary64(Real(substrate[i])+substrate[i+1]); }
+void set_metal(int i,double height,double thickness,double resistance,int layer) {
+    if(i<0 || i>=32)return;if(layer<0 || layer>=substrate_count)return;
+    const double z=x87::binary64(Real(substrate[layer])-height);
+    heights[i]=x87::binary64(Real(substrate[layer])-z);metals[i].thickness=thickness;metals[i].resistance=x87::binary64(Real(resistance)*Real(0.001));
     if(i>=metal_count)metal_count=i+1;
 }
 void set_via(int i,int bottom,int top,double width,double spacing,double over1,double over2,double resistance) {
@@ -41,6 +47,18 @@ void set_via(int i,int bottom,int top,double width,double spacing,double over1,d
     *reinterpret_cast<double*>(p+0xb0)=over1;*reinterpret_cast<double*>(p+0xb8)=over2;
     *reinterpret_cast<double*>(p+0xc0)=resistance;*reinterpret_cast<int*>(p+0xcc)=bottom;*reinterpret_cast<int*>(p+0xd0)=top;
     if(i>=via_count)via_count=i+1;
+}
+const char* analyze(double frequency_hz) {
+    if(!head || !__builtin_isfinite(frequency_hz) || frequency_hz<=0)return "{\"error\":\"Generate a layout and supply a positive frequency\"}";
+    char* out=result;out+=sprintf(out,"{\"frequency_hz\":%.17g,\"windings\":[",frequency_hz);int index=0;
+    for(auto* shape=head;shape;shape=shape->next,++index) {
+        ResistanceTechnology tech{metals,vias,metal_count};
+        const double l=x87::binary64(shape_inductance_estimate(shape->filaments,tech,{warn,nullptr}));
+        const double r=x87::binary64(shape_resistance_high_frequency(shape->filaments,frequency_hz,tech));
+        if(!__builtin_isfinite(l) || !__builtin_isfinite(r))return "{\"error\":\"Original estimate produced a nonfinite result\"}";
+        out+=sprintf(out,"%s{\"name\":\"%s\",\"inductance_nh\":%.17g,\"resistance_hf\":%.17g}",index?",":"",shape->filaments.prefix,l,r);
+    }
+    sprintf(out,"]}");return result;
 }
 const char* last_warnings() { return warnings; }
 // p: length,height,width,spacing,turns,radius,sides,metal,exit,angle,inner,secondary_turns

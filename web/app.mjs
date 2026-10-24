@@ -9,13 +9,15 @@ worker.onerror=event=>failure(event.message||'Unable to load the WebAssembly ker
 worker.onmessage=({data})=>{
   if(data.ready){ready=true;$('engine').textContent='● C++ / WASM ready';$('generate').disabled=false;if(technologyText)generate();return;}
   if(data.id!==request)return;
-  $('generate').disabled=false;$('loading').textContent='';
+  $('generate').disabled=false;$('analyze').disabled=!layout;$('loading').textContent='';
+  if(data.analysis){$('electrical').textContent=data.analysis.windings.map(w=>`${w.name} · L = ${w.inductance_nh.toPrecision(7)} nH · R(${(data.analysis.frequency_hz/1e9).toPrecision(4)} GHz) = ${w.resistance_hf.toPrecision(7)} Ω`).join('\n');$('status').textContent=data.warnings||'Original conductor estimates calculated. These do not include the distributed substrate network.';return;}
   if(data.error){failure(data.error);return;}
-  layout=data.layout;technology=data.technology;$('engine').textContent='● C++ / WASM ready';render();$('download').disabled=false;
+  layout=data.layout;technology=data.technology;$('engine').textContent='● C++ / WASM ready';render();$('download').disabled=false;$('analyze').disabled=false;$('electrical').textContent='Choose a frequency and calculate the conductor estimates.';
   $('status').textContent=layout.warnings||'Layout generated. GDS export uses a 1 nm grid.';
 };
 function parameters(){return ['length','height','width','spacing','turns','radius','sides','metal','exit','angle','inner','secondary'].map(id=>Number($(id).value)*(id==='angle'?Math.PI/180:1));}
-function generate(){if(!ready || !technologyText)return;$('download').disabled=true;$('generate').disabled=true;$('loading').textContent='Generating geometry…';worker.postMessage({id:++request,kind:Number($('kind').value),parameters:parameters(),technology:technologyText});}
+$('analyze').onclick=()=>{const frequency=Number($('frequency').value)*1e9;if(!Number.isFinite(frequency) || frequency<=0){$('status').textContent='Enter a positive frequency.';return;}if(!layout)return;$('analyze').disabled=true;$('generate').disabled=true;$('status').textContent='Calculating original conductor estimates…';worker.postMessage({id:++request,action:'analyze',frequency});};
+function generate(){if(!ready || !technologyText)return;$('download').disabled=true;$('analyze').disabled=true;$('generate').disabled=true;$('loading').textContent='Generating geometry…';worker.postMessage({id:++request,kind:Number($('kind').value),parameters:parameters(),technology:technologyText});}
 function updateMetals(text){const t=parseTechnology(text);for(const id of ['metal','exit']){$(id).replaceChildren();t.metals.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.name;$(id).append(o);});}const none=document.createElement('option');none.value=-1;none.textContent='None';$('exit').append(none);$('metal').value=Math.min(3,t.metals.length-1);$('exit').value=Math.min(2,t.metals.length-1);}
 async function loadProcess(){try{if($('process').value==='custom'){updateMetals(importedText);technologyText=importedText;generate();return;}const response=await fetch(`technology/${$('process').value}.tek`);if(!response.ok)throw Error('Unable to load technology');const text=await response.text();updateMetals(text);technologyText=text;generate();}catch(e){failure(e.message);}}
 $('process').onchange=loadProcess;

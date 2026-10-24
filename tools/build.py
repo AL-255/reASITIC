@@ -24,7 +24,7 @@ def main():
     cmd=[args.emxx,'-std=c++17',*flags,*inc,'-include',str(ROOT/'kernel/soft_real.hpp'),'-fpack-struct=4',
          *[str(port/(n+'.cpp')) for n in SOURCES],str(ROOT/'kernel/bridge.cpp'),*objects,
          '-sMODULARIZE=1','-sEXPORT_ES6=1','-sENVIRONMENT=web,worker,node','-sALLOW_MEMORY_GROWTH=1','-sFILESYSTEM=0',
-         '-sEXPORTED_FUNCTIONS=["_malloc","_free","_generate","_reset_technology","_set_metal","_set_via","_last_warnings"]',
+         '-sEXPORTED_FUNCTIONS=["_malloc","_free","_generate","_reset_technology","_set_substrate","_finalize_technology","_set_metal","_set_via","_last_warnings","_analyze"]',
          '-sEXPORTED_RUNTIME_METHODS=["UTF8ToString","HEAPF64"]','-o',str(dist/'asitic.js')]
     subprocess.run(cmd,check=True)
     print('Built',dist/'asitic.wasm')

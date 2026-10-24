@@ -24,3 +24,14 @@ inline long long truncate64(SoftReal x) { return static_cast<long long>(x); }
 inline SoftReal pow2m1(SoftReal x) { return SoftReal(exp2l(x.wide())-1.L); }
 inline SoftReal scale(SoftReal x,SoftReal e) { return SoftReal(ldexpl(x.wide(),truncate_int(e))); }
 }
+
+namespace asitic::x87 {
+inline SoftReal log2e() { return SoftReal(extFloat80_t{0xb8aa3b295c17f0bcULL,0x3fff}); }
+inline SoftReal exp(SoftReal x) { const SoftReal e=x*log2e(),i=round(e);return scale(pow2m1(e-i)+1,i); }
+inline SoftReal atanh(SoftReal x) {
+    const SoftReal a=abs(x),u=-(a+a)/(a+1);
+    const SoftReal crossover=SoftReal(0x95f619980c4336f8p-65L);
+    const SoftReal logarithm=abs(u)>=crossover?log(1+u):log1p(u);
+    return (SoftReal(-.5)*logarithm)*(x>=0?1:-1);
+}
+}
