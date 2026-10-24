@@ -297,6 +297,16 @@ software guard precision instead of a logarithm/exponential sequence. The
 portable fallback is pinned LibBF C with explicit rounding and its SIMD path
 disabled; the vendored MIT license is included in deployment.
 
+Folded networks (PI2, PI4 and CALCTRANS) stamp the physical nodal admittance
+`C + D^T*Y*D` from the raw capacitance and branch-admittance inputs. Assembly
+uses exact dyadic sums and a power-of-two normalization. With the endpoint
+voltages fixed, the interior system has `n-1` unknowns. Both drives share a 128-bit software
+factorization. The port matrix and node-capacitance snapshot round to binary64
+only when published. PI4 also subtracts its original first-two-pad model before
+rounding the final port matrix, preserving small deembedded components that
+would disappear in subtraction of the published with-pad matrix. Historical
+audit mode retains the original mixed current/voltage solve and pad subtraction.
+
 PI2 and PI4 compute their small shunt admittances by a common-mode drive rather
 than summing large, nearly opposite port Y entries. Writing every node voltage
 as `1 + delta` makes the forcing term the raw capacitance diagonal. Internal
@@ -332,9 +342,19 @@ one-segment and zero-capacitance limits, invalid/singular inputs and recovery.
 `tests/portable-two-port.mjs` checks 26 PI2/PI4 cases using an independent
 80-digit endpoint Schur complement, including pad subtraction and full-precision
 pi, impedance and resonance metrics. All 23 finite cases also compare the
-same C++ common-mode solve in native and WASM builds bit for bit; three original
+same C++ port solve, pad subtraction, node snapshot and common-mode solve in
+native and WASM builds bit for bit; three original
 nonfinite cases retain their rejection. The largest circuit-metric relative
-error in these cases fell from about `3.7e-7` to below `5.2e-12`.
+error in these cases fell from about `3.7e-7` to below `4.8e-12`; the final port
+matrices match the rounded independent reference exactly.
+`tests/portable-folded-ports.mjs` adds 24 analytical and scaled circuits,
+including an exact rational two-branch reference, a 400-bit pad-subtraction
+limit, minimum-subnormal inputs, asymmetric inputs, zero/singular limits and rejection recovery.
+Native/WASM values remain bit-identical over an 1800-bit admittance-unit range
+and all four host rounding modes; 400-digit reductions check the scaled circuits.
+`tests/portable-transformer.mjs` checks all 16 CALCTRANS cases against independent
+vertex elimination and transformer-label extraction, with native/WASM node-solve
+identity and matrix/model integration checks.
 `tests/portable-extended.mjs` checks another 13 PIX cases, including width
 subdivision, against an independent 80-digit current-elimination reference for
 the complete port matrix, saved currents/voltages, pi metrics, input impedance
@@ -382,9 +402,11 @@ node tests/portable-error-power.mjs
 node tests/portable-pi-shunts.mjs
 node tests/portable-extended-shunts.mjs
 node tests/portable-extended-ports.mjs
+node tests/portable-folded-ports.mjs
 node tests/portable-simulation.mjs
 node tests/portable-pad.mjs
 node tests/portable-two-port.mjs
+node tests/portable-transformer.mjs
 node tests/portable-extended.mjs
 node tests/two-port-output.mjs
 node tests/port-schedule.mjs
@@ -682,8 +704,10 @@ H/F/ohm/Hz units.
 thickness_cell, contact_length, contact_width, chip_x, chip_y, fft_x, fft_y,
 contact_limit, filament_limit, eddy_mode, layer_count, first_layer, second_layer,
 evaluation_limit)` calls the original `solve_combined_network` entry. The native
-private clone, folded capacitance, reduced inductance admittance, node stamping,
-general LU solve and pi extraction retain their original sequence and arithmetic.
+private clone, folded capacitance and reduced inductance admittance retain the
+original driver sequence. Production uses the endpoint-voltage reduction and
+guarded shunt extraction described above; historical arithmetic mode keeps the
+original node stamping, general LU solve and pi extraction.
 Preflight clones run the same original count routines before admitting matrix
 allocations. Ground type-8 acquisition preserves its native -1/-1 mesh behavior,
 including explicit self-ground. Stage matrices are copied at original snapshot

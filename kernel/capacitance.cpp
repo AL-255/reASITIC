@@ -355,8 +355,15 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
             ok=solve_transformer_network(*original_source,*original_secondary,*original_reference,frequency,network->termination,coupled,coupled_options);
         }else ok=solve_combined_network(*original_source,*reference,frequency,combined,network_options,geometry);
         if(network->eddy->exceeded)return "{\"error\":\"Network eddy evaluation budget exceeded\"}";
+        if(padbed && (intermediate.pads.rows<2 || !finite_matrix(intermediate.pads) || !finite_matrix(intermediate.with_pads) || !finite_matrix(intermediate.capacitance) || !finite_matrix(intermediate.inductance)))return "{\"error\":\"Original pad deembedding did not produce finite stage matrices\"}";
+#ifdef __EMSCRIPTEN__
+        if(ok&&padbed&&!reasitic::reference_numerics()){
+            double ports[8];
+            if(!reasitic::folded_port_network(reinterpret_cast<const double*>(intermediate.capacitance.data),reinterpret_cast<const double*>(intermediate.inductance.data),intermediate.capacitance.rows,intermediate.capacitance.stride,intermediate.inductance.stride,reinterpret_cast<const double*>(intermediate.pads.data),intermediate.pads.stride,ports,nullptr))return "{\"error\":\"Guarded pad deembedding did not produce finite stage matrices\"}";
+            combined.ports={{ports[0],ports[1]},{ports[4],ports[5]},{ports[2],ports[3]},{ports[6],ports[7]}};
+        }
+#endif
         if(network->extended && (!finite_matrix(intermediate.currents) || !finite_matrix(intermediate.voltages)))return "{\"error\":\"Original extended node equations produced nonfinite vectors\"}";
-        if(padbed && (intermediate.pads.rows<2 || !finite_matrix(intermediate.pads) || !finite_matrix(intermediate.with_pads)))return "{\"error\":\"Original pad deembedding did not produce finite stage matrices\"}";
         const auto& y=transformer?coupled.ports:combined.ports;const ComplexValue ports[]={y.y11,y.y12,y.y21,y.y22};
         if(!ok || !finite_matrix(intermediate.capacitance) || !finite_matrix(intermediate.inductance))return "{\"error\":\"Original combined solver did not produce finite matrices\"}";
         for(const auto z:ports)if(!__builtin_isfinite(z.real) || !__builtin_isfinite(z.imag))return "{\"error\":\"Original node equations produced nonfinite admittance\"}";

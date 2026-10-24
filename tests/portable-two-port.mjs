@@ -44,11 +44,14 @@ for(const {model,item:c} of cases){
     const n=actual.groups,pads=actual.pad_capacitance_matrix?.length??0,values=[...columnMajor(actual.capacitance_matrix),...columnMajor(actual.inductance_admittance_matrix),...(pads?columnMajor(actual.pad_capacitance_matrix):[])],bytes=Buffer.alloc(8+values.length*8);
     bytes.writeInt32LE(n);bytes.writeInt32LE(pads,4);values.forEach((v,i)=>bytes.writeDoubleLE(v,8+i*8));writeFileSync('build/portable-two-port/shunts.bin',bytes);
     const native=JSON.parse(execFileSync('build/portable-math/gmd-native',['--shunts','build/portable-two-port/shunts.bin'],{encoding:'utf8'}));
-    const pointer=math._malloc(values.length*8);let software;
-    try{math.HEAPF64.set(values,pointer/8);software=JSON.parse(math.UTF8ToString(math._probe_pi_shunts(pointer,pointer+16*n*n,n,pads?pointer+32*n*n:0,pads)));}finally{math._free(pointer);}
+    const nativePorts=JSON.parse(execFileSync('build/portable-math/gmd-native',['--folded-ports','build/portable-two-port/shunts.bin'],{encoding:'utf8'}));
+    const pointer=math._malloc(values.length*8);let software,softwarePorts;
+    try{math.HEAPF64.set(values,pointer/8);software=JSON.parse(math.UTF8ToString(math._probe_pi_shunts(pointer,pointer+16*n*n,n,pads?pointer+32*n*n:0,pads)));softwarePorts=JSON.parse(math.UTF8ToString(math._probe_folded_ports(pointer,pointer+16*n*n,n,pads?pointer+32*n*n:0,pads)));}finally{math._free(pointer);}
     assert.deepEqual(native,software,name+' native/WASM common-mode shunts');assert.deepEqual(software,actual.pi_shunts,name+' production common-mode integration');
+    assert.deepEqual(nativePorts,softwarePorts,name+' native/WASM endpoint solve');
+    for(const [key,value]of Object.entries(softwarePorts))assert.deepEqual(actual[key],value,name+' production '+key);
     for(const key of ['first','second'])software[key].forEach((v,i)=>{const expected=reference.circuit_shunts[key][i];assert.ok(relative(v,expected)<=1e-10,name+' independent '+key+' shunt '+i);assert.equal(bits(v),bits(native[key][i]));});
-    const stages={};for(const key of ['node_capacitance_matrix','with_pad_admittance_matrix','matrix'])if(reference[key])stages[key]=compareMatrix(actual[key],reference[key],name+' '+key);
+    const stages={};for(const key of ['node_capacitance_matrix','with_pad_admittance_matrix','matrix'])if(reference[key]){stages[key]=compareMatrix(actual[key],reference[key],name+' '+key);assert.ok(stages[key]<=1e-14,name+' endpoint reduction '+key+' error '+stages[key]);}
     const metrics=reference.reported_metrics;let metricError=0,circuitMetricError=0;const circuitMetricErrors={};
     for(const [key,value]of Object.entries(metrics.pi)){
       if(value===null)assert.equal(actual.pi[key],null,name+' '+key+' classification');

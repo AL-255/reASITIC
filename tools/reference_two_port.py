@@ -2,8 +2,9 @@
 
 Build an (n+1)-vertex chain from the physical branch admittance and mutual
 capacitances, then eliminate its internal vertices with a Schur complement.
-The recovered driver instead solves two mixed current/voltage boundary problems
-and converts their transfer coefficients to Y. No C++ factors, node snapshots,
+The historical recovered driver solves two mixed current/voltage boundary problems
+and converts their transfer coefficients to Y. This independent implementation
+uses mpmath incidence products and matrix inverses; no C++ factors, node snapshots,
 or exported final admittances are used as inputs to this reduction.
 """
 import json
@@ -75,8 +76,10 @@ def metrics(y, frequency, shunts=None):
                                  for z in [1 / y[1, 1], 1 / y[0, 0], differential]])
 
 
-def reference(result):
-    with mp.workdps(80):
+def reference(result, *, nodes_only=False):
+    digits=int(result.get('reference_decimal_digits',80))
+    assert 80<=digits<=1000
+    with mp.workdps(digits):
         cap = matrix(result['capacitance_matrix'])
         branch = matrix(result['inductance_admittance_matrix'])
         n = cap.rows
@@ -102,13 +105,15 @@ def reference(result):
             # multisegment pad. Keep that original model choice at this boundary.
             a, b, d = pads[0, 0], pads[1, 0], pads[1, 1]
             y -= mp.matrix([[d + b, -b], [-b, a + b]])
-        return dict(mpmath_version=mp.__version__, decimal_digits=80, groups=n,
+        output=dict(mpmath_version=mp.__version__, decimal_digits=digits, groups=n,
                     matrix=encode(y), **stages,
                     circuit_shunts=dict(first=[float(mp.re(y[0, 0]+y[0, 1])), float(mp.im(y[0, 0]+y[0, 1]))],
-                                        second=[float(mp.re(y[1, 0]+y[1, 1])), float(mp.im(y[1, 0]+y[1, 1]))]),
-                    circuit_metrics=metrics(y, mp.mpf(result['frequency_hz'])),
-                    reported_metrics=metrics(matrix(result['matrix']), mp.mpf(result['frequency_hz']), result.get('pi_shunts')))
+                                        second=[float(mp.re(y[1, 0]+y[1, 1])), float(mp.im(y[1, 0]+y[1, 1]))]))
+        if not nodes_only:
+            output.update(circuit_metrics=metrics(y, mp.mpf(result['frequency_hz'])),
+                          reported_metrics=metrics(matrix(result['matrix']), mp.mpf(result['frequency_hz']), result.get('pi_shunts')))
+        return output
 
 
 if __name__ == '__main__':
-    print(json.dumps(reference(json.load(sys.stdin)), allow_nan=False))
+    print(json.dumps(reference(json.load(sys.stdin),nodes_only='--nodes-only' in sys.argv[1:]), allow_nan=False))

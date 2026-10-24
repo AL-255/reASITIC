@@ -241,6 +241,11 @@ using namespace asitic;
         needle='    remove_geometry_shape(state.shapes,pads,memory);'
         assert s.count(needle)==1
         return s.replace(needle,'    if(options.combined.snapshot) {\n        options.combined.snapshot("Pads.out",capacitance,options.combined.snapshot_user);\n        ComplexValue values[]={saved.y11,saved.y21,saved.y12,saved.y22};const ComplexMatrix ports{values,4,1,2,2,2,1};\n        options.combined.snapshot("WithPads.out",ports,options.combined.snapshot_user);\n    }\n'+needle)
+    if name=='node_equations':
+        s=(ROOT/'vendor/asitic/src/node_equations.cpp').read_text()
+        begin=s.index('{',s.index('bool solve_node_equations('))+1
+        guard='\n#ifdef __EMSCRIPTEN__\n    if(!reasitic::reference_numerics())return reasitic::solve_portable_folded_nodes(cap,ind,n,output,o);\n#endif\n'
+        return '#ifdef __EMSCRIPTEN__\n#include "folded_network.hpp"\n#include "numerical_policy.hpp"\n#endif\n'+s[:begin]+guard+s[begin:]
     if name=='extended_node':
         s=(ROOT/'vendor/asitic/src/extended_node.cpp').read_text()
         signature='void solve_extended_node_equations('

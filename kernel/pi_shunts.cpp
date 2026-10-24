@@ -37,6 +37,10 @@ Complex operator+(const Complex& a,const Complex& b){return {a.real+b.real,a.ima
 Complex operator-(const Complex& a,const Complex& b){return {a.real-b.real,a.imag-b.imag};}
 Complex operator*(const Complex& a,const Complex& b){return {a.real*b.real-a.imag*b.imag,a.real*b.imag+a.imag*b.real};}
 Complex operator/(const Complex& a,const Complex& b){const auto norm=b.real*b.real+b.imag*b.imag;return {(a.real*b.real+a.imag*b.imag)/norm,(a.imag*b.real-a.real*b.imag)/norm};}
+Number exact_sum(const Number& a,const Number& b,bool subtract=false){Number r(*a.context);a.context->status|=subtract?bf_sub(&r.value,&a.value,&b.value,BF_PREC_INF,BF_RNDN):bf_add(&r.value,&a.value,&b.value,BF_PREC_INF,BF_RNDN);return r;}
+Complex exact_sum(const Complex& a,const Complex& b,bool subtract=false){return {exact_sum(a.real,b.real,subtract),exact_sum(a.imag,b.imag,subtract)};}
+Complex shift(const Complex& a,slimb_t exponent){Complex r(a);a.real.context->status|=bf_mul_2exp(&r.real.value,exponent,BF_PREC_INF,BF_RNDN);a.imag.context->status|=bf_mul_2exp(&r.imag.value,exponent,BF_PREC_INF,BF_RNDN);return r;}
+Complex negate(const Complex& a){Complex r(a);bf_neg(&r.real.value);bf_neg(&r.imag.value);return r;}
 Number norm(const Complex& a){return a.real*a.real+a.imag*a.imag;}
 struct Values {
     Complex* data;int count;
@@ -69,6 +73,62 @@ bool solve(Values& a,Values& rhs,Complex* solution,int m,int columns=1){
 
 }
 namespace reasitic {
+bool folded_port_network(const double* cap,const double* ind,int n,int cap_stride,int ind_stride,
+                         const double* pads,int pad_stride,double* ports,double* node_cap,double* with_pads){
+    if(n<1||n>1024||!ports||!finite(cap,n,cap_stride)||!finite(ind,n,ind_stride)||(pads&&!finite(pads,2,pad_stride)))return false;
+    Context c;const int width=n+1,m=n-1;
+    Values nodal(c,width*width),capacitive(c,n*n),a(c,m*m),rhs(c,2*m),solution(c,2*m),port(c,4),raw(c,4);
+    if(!nodal.data||!capacitive.data||!port.data||!raw.data||(m&&(!a.data||!rhs.data||!solution.data)))return false;
+    double largest=0;
+    for(int j=0;j<n;++j)for(int i=0;i<2*n;++i){const double x=__builtin_fabs(cap[2*j*cap_stride+i]),y=__builtin_fabs(ind[2*j*ind_stride+i]);if(x>largest)largest=x;if(y>largest)largest=y;}
+    const Number scale(c,largest?largest:1.);const auto exponent=scale.value.expn-1;
+    const Complex zero(c);
+    const auto C=[&](int i,int j){return Complex(c,cap+2*(i+j*cap_stride));};
+    // Assemble the dyadic input coefficients exactly before factorization.
+    // Their finite binary64 exponent range bounds the size of these sums.
+    // Every coefficient has admittance units. An exact power-of-two scale
+    // makes the endpoint-voltage problem dimensionless without changing the
+    // circuit or introducing a second rounding at a unit conversion.
+    for(int i=0;i<n;++i){
+        Complex diagonal(c);
+        for(int j=0;j<n;++j){const auto cell=C(i,j);diagonal=exact_sum(diagonal,cell);if(i!=j)capacitive[i*n+j]=negate(cell);}
+        capacitive[i*n+i]=diagonal;
+        for(int j=0;j<n;++j)nodal[i*width+j]=shift(capacitive[i*n+j],-exponent);
+    }
+    // D is the oriented branch/vertex incidence. Stamp the four contributions
+    // of each branch-admittance cell directly; never invert the branch matrix.
+    for(int i=0;i<n;++i)for(int j=0;j<n;++j){
+        const auto value=shift(Complex(c,ind+2*(i+j*ind_stride)),-exponent);
+        nodal[i*width+j]=exact_sum(nodal[i*width+j],value);
+        nodal[i*width+j+1]=exact_sum(nodal[i*width+j+1],value,true);
+        nodal[(i+1)*width+j]=exact_sum(nodal[(i+1)*width+j],value,true);
+        nodal[(i+1)*width+j+1]=exact_sum(nodal[(i+1)*width+j+1],value);
+    }
+    // The far endpoint is native port 1; near is native port 2. Both drives
+    // share the same (n-1)-node factorization, including the n=1 direct limit.
+    const int endpoints[]={n,0};
+    for(int i=0;i<m;++i){
+        for(int j=0;j<m;++j)a[i*m+j]=nodal[(i+1)*width+j+1];
+        for(int drive=0;drive<2;++drive)rhs[drive*m+i]=zero-nodal[(i+1)*width+endpoints[drive]];
+    }
+    if(!solve(a,rhs,solution.data,m,2))return false;
+    for(int drive=0;drive<2;++drive)for(int row=0;row<2;++row){
+        Complex reaction(c);
+        for(int j=0;j<m;++j)reaction=reaction+nodal[endpoints[row]*width+j+1]*solution[drive*m+j];
+        raw[drive*2+row]=port[drive*2+row]=shift(exact_sum(nodal[endpoints[row]*width+endpoints[drive]],reaction),exponent);
+    }
+    if(pads){
+        const Complex first(c,pads),cross(c,pads+2),second(c,pads+2*(1+pad_stride));
+        port[0]=exact_sum(port[0],exact_sum(second,cross),true);port[3]=exact_sum(port[3],exact_sum(first,cross),true);
+        port[1]=exact_sum(port[1],cross);port[2]=exact_sum(port[2],cross);
+    }
+    const auto valid=[](Values& values){for(int i=0;i<values.count;++i)if(!__builtin_isfinite(values[i].real.rounded())||!__builtin_isfinite(values[i].imag.rounded()))return false;return true;};
+    if(!valid(port)||(node_cap&&!valid(capacitive))||(with_pads&&!valid(raw))||
+       (c.status&(BF_ST_MEM_ERROR|BF_ST_INVALID_OP|BF_ST_DIVIDE_ZERO|BF_ST_OVERFLOW)))return false;
+    for(int i=0;i<4;++i){ports[2*i]=port[i].real.rounded();ports[2*i+1]=port[i].imag.rounded();if(with_pads){with_pads[2*i]=raw[i].real.rounded();with_pads[2*i+1]=raw[i].imag.rounded();}}
+    if(node_cap)for(int j=0;j<n;++j)for(int i=0;i<n;++i){node_cap[2*(i+j*n)]=capacitive[i*n+j].real.rounded();node_cap[2*(i+j*n)+1]=capacitive[i*n+j].imag.rounded();}
+    return true;
+}
 bool extended_port_network(const double* cap,const double* impedance,int n,
                            int cap_stride,int ind_stride,double* ports,
                            double* currents,double* voltages){
