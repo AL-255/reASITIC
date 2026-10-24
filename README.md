@@ -26,7 +26,9 @@ conductor estimates; the original LMAT filament solver is available in the workb
 with disabled eddy currents, native shape selection, or segment folding.
 The original layered CAP solver is also available, with substrate conductivity
 and permittivity. The original eddy Green kernels, QUADPACK integration and
-matrix stamping are integrated. Combined circuit/network simulation remains outstanding. GDSII uses native ribbon boundaries, real via cuts and
+matrix stamping are integrated. PI2 combines the original capacitance, inductance
+and node-equation solvers into a two-port admittance matrix and pi model.
+Coupled-winding and multiport simulation remain outstanding. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
 ```sh
@@ -47,6 +49,10 @@ node tests/eddy.mjs
 node tests/eddy-runtime.mjs
 node tests/eddy-lifecycle.mjs
 node tests/worker-eddy.mjs
+node tests/network.mjs
+node tests/network-lifecycle.mjs
+node tests/worker-network.mjs
+node tests/network-data.mjs
 node tests/eddy-math-diagnostics.mjs        # records 3 unresolved finite differences
 # Completion gate; currently fails on those known differences:
 # node tests/eddy-math-diagnostics.mjs --strict
@@ -92,6 +98,12 @@ Current measured evidence:
   is consistently rejected. All 2,554 native numeric fields and 39,089 Green
   evaluation samples/values match exactly through trace fingerprints, including
   the original nonconvergence diagnostics and finite partial results.
+- Twelve whole-program PI2 cases match 1,322 native numeric fields and 912
+  original printed fields: capacitance/inductance/node-stamping matrices, pi
+  components, port Q, input impedance, shunt resistance and pi resonance estimates.
+  Original raw Green-table fingerprints also match. Cases cover native default,
+  explicit same-device and distinct grounds, refined longitudinal/cross-section
+  meshes, rotation, square coils, both eddy kernels and low/high frequencies.
 - All 2,118 i386 libm sin/cos probes match both binary64 and raw binary80 return
   words. Pinned glibc 2.36 scalar numerical sources supply these callbacks; the
   recovered Green runtime calls libm, rather than the x87 FSIN instruction.
@@ -150,7 +162,7 @@ and native fault cases are rejected before matrix indexing. There is no
 persistent browser table cache yet; fine grids can take tens of seconds. The
 original nonsquare indexing is preserved with sufficient zero backing storage;
 original-executable parity is currently measured on square FFT grids only.
-Combined network/port metrics remain outstanding.
+Coupled-winding and multiport models remain outstanding.
 
 The worker protocol is tested with actual WASM startup, original wire matrices,
 streamed frequency samples, cancellation and error recovery. Scientific export
@@ -181,6 +193,28 @@ failure. Matrix/sweep CSVs retain model, layers, evaluation counts and diagnosti
 counts. Worker and scalar-probe checks cover recovery, immutable geometry and
 bounded repeated allocations.
 
+The combined network panel runs original PI2 with the CAP device/ground/frequency
+and FFT/contact settings, plus LMAT filament cells, budgets and eddy settings.
+It exposes native two-port admittance, pi L/R/C/Rs, all three Q values, single-ended
+and differential input/shunt impedances, and the original pi resonance estimate.
+This estimate is the original local pi formula, rather than a resonance search.
+Undefined derived metrics export as empty CSV values and display as Undefined.
+Two-port Y exports use siemens; pi CSV headers retain H/F/ohm/Hz units.
+
+`simulate_network(winding, ground, frequency_hz, length_cell, width_cell,
+thickness_cell, contact_length, contact_width, chip_x, chip_y, fft_x, fft_y,
+contact_limit, filament_limit, eddy_mode, layer_count, first_layer, second_layer,
+evaluation_limit)` calls the original `solve_combined_network` entry. The native
+private clone, folded capacitance, reduced inductance admittance, node stamping,
+general LU solve and pi extraction retain their original sequence and arithmetic.
+Preflight clones run the same original count routines before admitting matrix
+allocations. Ground type-8 acquisition preserves its native -1/-1 mesh behavior,
+including explicit self-ground. Stage matrices are copied at original snapshot
+boundaries for comparison; all private state is released after every solve.
+Worker and lifecycle checks cover budget recovery, alternating CAP/LMAT/network
+requests, immutable source geometry and bounded repeated allocations. The full
+extended, deembedded, coupled-winding and three-port paths remain to be exposed.
+
 The portable glibc callbacks preserve the numerical C sources unchanged and adapt
 runtime headers only. They do not expose errno or floating exception flags.
 LGPL notices and licenses are available under `dist/licenses/glibc-math`; source
@@ -194,6 +228,7 @@ python3 tools/capture_lmat.py --reference ~/github/asitic-re
 python3 tools/capture_creators.py --reference ~/github/asitic-re
 python3 tools/capture_capacitance.py --reference ~/github/asitic-re
 python3 tools/capture_eddy.py --reference ~/github/asitic-re
+python3 tools/capture_network.py --reference ~/github/asitic-re
 ```
 
 These test-only commands require the original executable's legacy runtime DSOs;
@@ -201,6 +236,7 @@ These test-only commands require the original executable's legacy runtime DSOs;
 matrices are retained under `build/original-lmat`, `build/original-creators` and
 `build/original-capacitance`; eddy logs and matrices are under
 `build/original-eddy` with the original executable and libm hashes pinned.
+PI2 stage matrices, Green caches and reports are under `build/original-network`.
 
 Creator input is bounded to native fixed buffers, 64 turns, 256 sides/via rows
 or columns, and a 32 MiB creation allocation budget. Invalid commands recover
@@ -210,7 +246,7 @@ unwritten parser/history and mesh words use explicit zero initial state, rather
 than claiming process-independent parity for uninitialized bytes.
 
 Next required work includes resolving the measured hardware rounding differences,
-broader original-executable creator/input coverage, combined circuit/network
+broader original-executable creator/input coverage, extended/deembedded network
 solvers, coupled-winding and multiport metrics, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.

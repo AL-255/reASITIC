@@ -14,6 +14,7 @@ struct EngineView {
 };
 EngineView engine_view();
 void clear_diagnostics();
+bool bounded_solver_clone(const asitic::GeometryShape&,double,double,int);
 void release_simulation_result();
 void release_capacitance_result();
 }

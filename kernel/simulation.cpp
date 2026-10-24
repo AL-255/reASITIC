@@ -61,6 +61,7 @@ bool bounded_clone(const GeometryShape& shape,double cell,double trigger,int max
 }
 }
 namespace reasitic {
+bool bounded_solver_clone(const GeometryShape& shape,double cell,double trigger,int maximum) { return bounded_clone(shape,cell,trigger,maximum); }
 void release_simulation_result() { free(simulation_result);simulation_result=nullptr; }
 }
 static const char* simulate_impl(int winding,double frequency,double length_cell,double width_cell,

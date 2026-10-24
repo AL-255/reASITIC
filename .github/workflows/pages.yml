@@ -48,6 +48,10 @@ jobs:
           node tests/eddy-runtime.mjs
           node tests/eddy-lifecycle.mjs
           node tests/worker-eddy.mjs
+          node tests/network.mjs
+          node tests/network-lifecycle.mjs
+          node tests/worker-network.mjs
+          node tests/network-data.mjs
           node tests/lmat.mjs
           node tests/original-lmat.mjs
           node tests/lmat-lifecycle.mjs

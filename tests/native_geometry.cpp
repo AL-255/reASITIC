@@ -11,6 +11,7 @@ extern "C" double normalize_value(double,int,double,int);
 extern "C" int printf(const char*,...);
 extern "C" const char* probe_green(int,int,int,double,double,double,double,int);
 extern "C" const char* simulate_eddy(int,double,double,double,double,double,int,int,int,int,int,int);
+extern "C" const char* simulate_network(int,int,double,double,double,double,double,double,double,double,int,int,int,int,int,int,int,int,int);
 extern "C" const char* simulate(int,double,double,double,double,double,int);
 extern "C" void set_via(int,int,int,double,double,double,double,double);
 extern "C" const char* generate(int,const double*);
@@ -35,6 +36,11 @@ extern "C" int main(int argc,char** argv,char**) {
         puts(simulate_capacitance(ground?1:0,ground?0:-1,strtod(argv[6],nullptr),strtod(argv[7],nullptr),strtod(argv[8],nullptr),512,512,atoi(argv[9]),atoi(argv[10]),512,atoi(argv[11])));return 0;
     }
     if(argc==10 && argv[1][2]=='g') { puts(probe_green(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),strtod(argv[5],nullptr),strtod(argv[6],nullptr),strtod(argv[7],nullptr),strtod(argv[8],nullptr),atoi(argv[9])));return 0; }
+    if(argc==21 && argv[1][0]=='-') {
+        create_geometry(atoi(argv[2]),argv[3],"",512,512,128,128,.1,1,0);const bool self=argv[5][0]=='@',ground=*argv[5] && !self;
+        if(ground)create_geometry(atoi(argv[4]),argv[5],"",512,512,128,128,.1,1,1);
+        puts(simulate_network(ground?1:0,ground?0:self?0:-1,strtod(argv[6],nullptr),strtod(argv[7],nullptr),strtod(argv[8],nullptr),strtod(argv[9],nullptr),strtod(argv[10],nullptr),strtod(argv[11],nullptr),512,512,atoi(argv[12]),atoi(argv[13]),atoi(argv[14]),atoi(argv[15]),atoi(argv[16]),atoi(argv[17]),atoi(argv[18]),atoi(argv[19]),atoi(argv[20])));return 0;
+    }
     if(argc==14 && argv[1][0]=='-') {
         create_geometry(atoi(argv[2]),argv[3],"",512,512,128,128,.1,1,0);
         puts(simulate_eddy(0,strtod(argv[4],nullptr),strtod(argv[5],nullptr),strtod(argv[6],nullptr),strtod(argv[7],nullptr),strtod(argv[8],nullptr),1024,atoi(argv[9]),atoi(argv[10]),atoi(argv[11]),atoi(argv[12]),atoi(argv[13])));return 0;

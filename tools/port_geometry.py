@@ -7,7 +7,7 @@ from pathlib import Path
 import re,json
 from implicit_stores import expose
 ROOT=Path(__file__).resolve().parents[1]
-SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology']
+SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network']
 
 def translate(name,s):
     # Loads/stores of finite double values. Signaling NaN status is not exposed.
@@ -52,6 +52,9 @@ def translate(name,s):
     s=s.replace('asm volatile("fstpl %0" : "=m"(out) : "t"(value) : "st");','out=x87::binary64(value);')
     for output,input_ in [('result','value'),('value','fraction')]:
         s=s.replace(f'asm("fmulp" : "=t"({output}) : "0"({input_}),"u"(sign) : "st(1)");',f'{output}={input_}*sign;')
+    s=s.replace('asm volatile("fstl %0" : "=m"(slot) : "t"(value));','slot=x87::binary64(value);')
+    s=s.replace('asm volatile("fldl %1" : "=t"(out) : "m"(x));','out=x;')
+    s=s.replace('asm volatile("fmull %2" : "=t"(out) : "0"(x),"m"(y));','out=x*y;')
     s=s.replace('asm("fld1; fxch; fyl2xp1" : "=t"(logarithm) : "0"(delta) : "st(1)");','logarithm=x87::log2p1(delta);')
     s=s.replace('asm("fld1; fxch; fyl2x" : "=t"(logarithm) : "0"((long double)x) : "st(1)");','logarithm=x87::log2(static_cast<long double>(x));')
     if name=='eddy':
@@ -108,7 +111,7 @@ def generate(clang=None):
     proof={}
     for name in SOURCES:
         native=source(name)
-        if name.startswith('shape_') or name=='native_creators' or name in ('legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology'):
+        if name.startswith('shape_') or name=='native_creators' or name in ('legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network'):
             native,proof[name]=expose(name,native,clang)
         (target/(name+'.cpp')).write_text(translate(name,native))
     evidence=ROOT/'build/evidence';evidence.mkdir(exist_ok=True)
