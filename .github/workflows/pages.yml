@@ -32,7 +32,10 @@ jobs:
           pip install gdstk==1.0.2 mpmath==1.3.0 CairoSVG==2.9.1
       - run: python tools/build.py
       - name: Verify immutable browser release and stale-page recovery
-        run: node --experimental-vm-modules tests/site-package.mjs
+        run: |
+          node tests/kernel-factory.mjs
+          node tests/optimizer-startup.mjs
+          node --experimental-vm-modules tests/site-package.mjs
       - run: python tools/build_native.py
       - run: python tools/build_portable_math.py
       - name: Verify portable numerical formulation

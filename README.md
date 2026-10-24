@@ -1053,12 +1053,26 @@ unversioned root artifacts remain available for Node verification.
 If a cached page refers to a release removed by a newer deployment, startup
 shows an explicit reload link that requests fresh root HTML. The same recovery
 is available after a worker load fails, including older pages without that link.
-An incompatible old kernel is rejected before the worker reports ready. The
+An incompatible old kernel is rejected before the worker reports ready.
+The worker also retains the compiled WASM module after its initial load. A later
+optimizer creates a fresh instance from that code without fetching the old
+release again. Instances have independent memory, geometry, process data and
+solver state; the shared module contains immutable code only. Failed initial
+downloads or compilation can be retried. Tests cover concurrent creation, heap
+growth isolation and a real three-candidate original SWEEP after removing its
+release's WASM file, followed by an unchanged live-layout CAP solve.
+A separate controlled interleaving delays one private initializer until a newer
+search has completed its first candidate. The obsolete initializer cannot
+publish its instance over the active one; the remaining original candidates,
+live geometry and applied GDS stay correct. Searches and retained applications
+keep explicit references to their own private kernel. The
 integration check models two cacheable deployments, verifies the module graph
 and stale-page recovery, then runs real packaged WASM/worker CAP and byte-identical
 GDS export. It verifies packaging and loading; rendered browser QA remains
 unverified when no browser surface is available.
 
 ```sh
+node tests/kernel-factory.mjs
+node tests/optimizer-startup.mjs
 node --experimental-vm-modules tests/site-package.mjs
 ```

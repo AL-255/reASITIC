@@ -1,4 +1,4 @@
-import createKernel from './asitic.js';
+import createKernel from './kernel.mjs';
 import {resonancePlan,capacitorPortMatrix,capacitorPortResponse} from './self-resonance.mjs';
 import {optimizationPlan,createOptimizationCandidate,optimizationAccept} from './optimization.mjs';
 import {solverCells,meshResult} from './mesh-policy.mjs';
@@ -93,29 +93,34 @@ self.onmessage=async({data})=>{
     if(action==='cancel'){postMessage({id:data.id,cancelled:true});return;}
     if(action==='optimize'){
       const technology=data.technology?parseTechnology(data.technology):processTechnology;if(!technology)throw Error('Select a technology before running SWEEP.');
-      if(!optimizationKernel){optimizationKernel=await createKernel();optimizationKernel._set_potential_memo(1);}if(task!==epoch)return;
-      configureKernel(optimizationKernel,technology);
-      const planningKernel=processTechnology?.source===technology.source?kernel:optimizationKernel;
+      let target=optimizationKernel;
+      if(!target){
+        target=await createKernel();if(task!==epoch)return;
+        target._set_potential_memo(1);optimizationKernel=target;
+      }
+      if(task!==epoch)return;
+      configureKernel(target,technology);
+      const planningKernel=processTechnology?.source===technology.source?kernel:target;
       const plan=optimizationPlan(planningKernel,data.keywords,technology.domain,data.options),summary={search:plan.search??'SWEEP',name:plan.name,frequency_hz:plan.frequency_hz,inductance_min:plan.inductance_min,inductance_max:plan.inductance_max,minimum_quality:plan.minimum_quality,total:plan.candidates.length};
-      optimizationState={plan,technology,completed:new Set()};
+      const state={plan,technology,kernel:target,completed:new Set()};optimizationState=state;
       if(!plan.candidates.length){postMessage({id:data.id,optimization:{...summary,done:true}});return;}
       for(const [index,descriptor]of plan.candidates.entries()){
         if(task!==epoch)return;const sample={index,descriptor,accepted:false,frequency_hz:plan.frequency_hz};
         try{
-          const layout=createOptimizationCandidate(optimizationKernel,plan.name,descriptor);sample.geometry_valid=true;
-          const solved=solveNetwork({...data,...(plan.search==='SWEEPMM'&&plan.simulation_type===1?{automatic_cells:false}:{}),model:'PI2',winding:0,ground:-1},plan.frequency_hz,{kernel:optimizationKernel,technology,layout});
-          sample.pi=solved.pi;if(solved.automatic_cells)sample.automatic_cells=solved.automatic_cells;sample.accepted=optimizationAccept(optimizationKernel,plan,solved.pi);sample.warnings=optimizationKernel.UTF8ToString(optimizationKernel._last_warnings());
+          const layout=createOptimizationCandidate(target,plan.name,descriptor);sample.geometry_valid=true;
+          const solved=solveNetwork({...data,...(plan.search==='SWEEPMM'&&plan.simulation_type===1?{automatic_cells:false}:{}),model:'PI2',winding:0,ground:-1},plan.frequency_hz,{kernel:target,technology,layout});
+          sample.pi=solved.pi;if(solved.automatic_cells)sample.automatic_cells=solved.automatic_cells;sample.accepted=optimizationAccept(target,plan,solved.pi);sample.warnings=target.UTF8ToString(target._last_warnings());
         }catch(error){sample.error=error.message;}
-        optimizationState.completed.add(index);const done=index===plan.candidates.length-1;postMessage({id:data.id,optimization:{...summary,sample,done}});if(!done)await new Promise(resolve=>setTimeout(resolve,0));
+        state.completed.add(index);const done=index===plan.candidates.length-1;postMessage({id:data.id,optimization:{...summary,sample,done}});if(!done)await new Promise(resolve=>setTimeout(resolve,0));
       }return;
     }
     if(action==='optimization-apply'){
       if(!optimizationState||!Number.isInteger(data.index)||!optimizationState.plan.candidates[data.index]||!optimizationState.completed.has(data.index))throw Error('Select a completed SWEEP candidate.');
-      const {plan,technology}=optimizationState,append=Boolean(data.options?.append);
+      const {plan,technology,kernel:target}=optimizationState,append=Boolean(data.options?.append);
       if(append&&hasLayout&&technology.source!==processTechnology?.source)throw Error('Use the same technology when adding a SWEEP candidate.');
       // Admit and construct privately before replacing the live process/layout.
-      configureKernel(optimizationKernel,technology);
-      createOptimizationCandidate(optimizationKernel,plan.name,plan.candidates[data.index]);
+      configureKernel(target,technology);
+      createOptimizationCandidate(target,plan.name,plan.candidates[data.index]);
       if(processTechnology?.source!==technology.source)configureKernel(kernel,technology);
       const layout=createOptimizationCandidate(kernel,plan.name,plan.candidates[data.index],append);processTechnology=technology;currentLayout=layout;hasLayout=true;
       postMessage({id:data.id,layout,technology,optimization_candidate:{index:data.index,descriptor:plan.candidates[data.index]}});return;
