@@ -1,4 +1,4 @@
-name: Build, compare and deploy
+name: Build and deploy
 on:
   push:
     branches: [main]
