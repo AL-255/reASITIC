@@ -80,6 +80,23 @@ worker paths reproduce all 164 accepted variants and byte-identical GDS files.
 `tests/creator-aliases.mjs` also checks the adapter against the pinned native
 catalog and rejects non-ASCII case folding that the original does not perform.
 
+Imported metal `SMIN` and `WMIN` values reach the original C++ symmetric-creator
+prompts. They select its transition-clearance loop and width warnings; they do
+not impose a new blanket clamp on creator dimensions. The C++ boundary keeps
+full binary64 process values without grid snapping, preserves signed zero,
+maps the original `-271` sentinel to zero and other negative minima to `0.1`.
+Worker technology metadata reports the effective values. Reconfiguring or
+resetting a process clears old minima.
+
+Twelve repeated original process-rule captures check raw normalized metal words,
+4,584 physical fields and the exact clearance/width/turn-retry diagnostics. In
+one captured case, `SMIN=4` makes the original retry a 10 µm transition and accept
+24 µm; the previous import silently discarded that rule and generated 10 µm.
+Native C++, WASM and actual worker geometry now agree with the executable.
+An independent GDS reader checks all resulting ribbons, via cuts and landing
+pads. Non-grid minima, negative/default/signed-zero rules, keyword behavior and
+request/reset recovery are covered separately.
+
 The original numerical `SELFRES` search is available separately from the
 pi-model resonance estimate. It repeatedly analyzes the selected device and
 ground with the original PI2 SLOW driver and searches single-ended or
@@ -250,6 +267,8 @@ node tests/three-port-sweep.mjs
 node tests/worker-three-port-sweep.mjs
 node tests/native-creators.mjs
 node tests/creator-aliases.mjs
+node tests/metal-rules.mjs
+python tests/gds_metal_rules_reader.py
 node tests/geometry-edits.mjs
 node tests/worker-geometry-edits.mjs
 python3 tests/gds_edits_reader.py
@@ -682,6 +701,7 @@ python3 tools/capture_maxnw_ports.py --reference ~/github/asitic-re
 python3 tools/capture_automatic_cells.py --reference ~/github/asitic-re # requires GDB
 python3 tools/capture_creators.py --reference ~/github/asitic-re
 python3 tools/capture_creator_aliases.py --reference ~/github/asitic-re
+python3 tools/capture_metal_rules.py --reference ~/github/asitic-re # requires GDB
 python3 tools/capture_geometry_edits.py --reference ~/github/asitic-re
 python3 tools/capture_capacitance.py --reference ~/github/asitic-re
 python3 tools/capture_eddy.py --reference ~/github/asitic-re

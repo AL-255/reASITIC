@@ -14,7 +14,7 @@ export function parseTechnology(text) {
   if(!blocks.metal.length || blocks.metal.length>32 || blocks.via.length>32)throw Error('Technology needs 1–32 metals and at most 32 vias');
   const metals=blocks.metal.map((m,i)=>{
     if(!(m.t>0 && m.rsh>0 && m.d>=0 && blocks.layer[m.layer] && m.d<=blocks.layer[m.layer].t))throw Error('Invalid metal '+i);
-    return {name:(m.name||`M${i+1}`).toUpperCase(),height:m.d,thickness:m.t,sheet_milliohms:m.rsh,layer:m.layer};
+    return {name:(m.name||`M${i+1}`).toUpperCase(),height:m.d,thickness:m.t,sheet_milliohms:m.rsh,layer:m.layer,minimum_spacing:m.smin??0,minimum_width:m.wmin??0};
   });
   const vias=blocks.via.map((v,i)=>{
     if(!Number.isInteger(v.bottom) || !Number.isInteger(v.top) || !metals[v.bottom] || !metals[v.top] || v.bottom===v.top || !(v.width>0 && v.space>=0 && v.r>=0 && v.overplot1>=0 && v.overplot2>=0))throw Error('Invalid via '+i);
@@ -34,6 +34,11 @@ export function configureKernel(kernel,technology) {
   if(kernel._set_substrate_material)technology.dielectric?.forEach((layer,i)=>kernel._set_substrate_material(i,layer.permittivity,layer.resistivity));
   kernel._finalize_technology();
   technology.metals.forEach((m,i)=>kernel._set_metal(i,m.height,m.thickness,m.sheet_milliohms,m.layer));
+  technology.metals.forEach((m,i)=>{
+    const spacing=m.minimum_spacing??0,width=m.minimum_width??0;
+    if(kernel._set_metal_rules){const rules=JSON.parse(kernel.UTF8ToString(kernel._set_metal_rules(i,spacing,width)));if(rules.error)throw Error(rules.error);Object.assign(m,rules);}
+    else if(spacing!==0||width!==0)throw Error('This kernel cannot apply SMIN/WMIN process rules.');
+  });
   technology.vias.forEach((v,i)=>kernel._set_via(i,v.bottom,v.top,v.width,v.spacing,v.over1,v.over2,v.resistance));
   if(kernel._set_layer_name)for(const [via,layers] of [[0,technology.metals],[1,technology.vias]])layers.forEach((layer,i)=>withString(kernel,layer.name,p=>kernel._set_layer_name(via,i,p)));
 

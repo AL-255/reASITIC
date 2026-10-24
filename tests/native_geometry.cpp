@@ -1,6 +1,7 @@
 extern "C" const char* port_frequency_schedule(double,double,double,int);
 extern "C" void reset_technology();
 extern "C" void set_metal(int,double,double,double,int);
+extern "C" const char* set_metal_rules(int,double,double);
 extern "C" void set_substrate(int,double);
 extern "C" void set_substrate_material(int,double,double);
 extern "C" const char* simulate_capacitance(int,int,double,double,double,double,double,int,int,int,int);
@@ -54,6 +55,10 @@ extern "C" int main(int argc,char** argv,char**) {
     for(int i=0;i<5;++i)set_metal(i,height[i],i==4?1.:.5,sheet[i],1);
     for(int i=0;i<4;++i)set_via(i,i,i+1,i==0?.5:.4,i==3?1.2:1.1,.2,.2,4);
     if(const char* maximum=getenv("REASITIC_MAXNW"))if(!set_max_width_cells(atoi(maximum)))return 2;
+    if(const char* metal=getenv("REASITIC_RULE_METAL")){
+        const auto* spacing=getenv("REASITIC_SMIN");const auto* width=getenv("REASITIC_WMIN");if(!spacing||!width)return 2;
+        const auto* rules=set_metal_rules(atoi(metal),strtod(spacing,nullptr),strtod(width,nullptr));if(__builtin_strncmp(rules,"{\"error\":",9)==0){puts(rules);return 2;}
+    }
     if(argc==7 && argv[1][2]=='e') { create_geometry(atoi(argv[2]),argv[3],"",512,512,128,128,.1,1,0);puts(edit_geometry(argv[4],512,512,strtod(argv[5],nullptr),atoi(argv[6])));return 0; }
     if(argc==8 && argv[1][2]=='m') { create_geometry(2,argv[2],"",512,512,128,128,.1,1,0);if(!set_max_width_cells(atoi(argv[7])))return 2;puts(simulate(0,strtod(argv[3],nullptr),strtod(argv[4],nullptr),strtod(argv[5],nullptr),strtod(argv[6],nullptr),strtod(argv[4],nullptr),1024));return 0; }
     if((argc==5 || argc==7) && argv[1][2]=='a') { if(argc==7)set_metal(4,6.,strtod(argv[5],nullptr),strtod(argv[6],nullptr),1);puts(automatic_cell_limits(strtod(argv[2],nullptr),strtod(argv[3],nullptr),strtod(argv[4],nullptr)));return 0; }

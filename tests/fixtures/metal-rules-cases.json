@@ -1,0 +1,136 @@
+{
+  "cases": [
+    {
+      "name": "default",
+      "metal": 3,
+      "smin": 0,
+      "wmin": 0,
+      "creator": {
+        "id": 16,
+        "keywords": "",
+        "answers": "A\n200\n8\nM4\nM3\n6\n10\n24\n2\n100 100\n"
+      }
+    },
+    {
+      "name": "clearance-retry",
+      "metal": 3,
+      "smin": 4,
+      "wmin": 0,
+      "creator": {
+        "id": 16,
+        "keywords": "",
+        "answers": "A\n200\n8\nM4\nM3\n6\n10\n24\n2\n100 100\n"
+      }
+    },
+    {
+      "name": "transition-width-warning",
+      "metal": 3,
+      "smin": 4,
+      "wmin": 12,
+      "creator": {
+        "id": 16,
+        "keywords": "",
+        "answers": "A\n200\n8\nM4\nM3\n6\n10\n24\n2\n100 100\n"
+      }
+    },
+    {
+      "name": "at-spacing-minimum",
+      "metal": 3,
+      "smin": 6,
+      "wmin": 12,
+      "creator": {
+        "id": 16,
+        "keywords": "",
+        "answers": "A\n200\n8\nM4\nM3\n6\n10\n24\n2\n100 100\n"
+      }
+    },
+    {
+      "name": "below-spacing-minimum",
+      "metal": 3,
+      "smin": 8,
+      "wmin": 12,
+      "creator": {
+        "id": 16,
+        "keywords": "",
+        "answers": "A\n200\n8\nM4\nM3\n6\n10\n24\n2\n100 100\n"
+      }
+    },
+    {
+      "name": "negative-defaults",
+      "metal": 3,
+      "smin": -1,
+      "wmin": -2,
+      "creator": {
+        "id": 16,
+        "keywords": "",
+        "answers": "A\n200\n8\nM4\nM3\n6\n10\n24\n2\n100 100\n"
+      }
+    },
+    {
+      "name": "unset-sentinels",
+      "metal": 3,
+      "smin": -271,
+      "wmin": -271,
+      "creator": {
+        "id": 16,
+        "keywords": "",
+        "answers": "A\n200\n8\nM4\nM3\n6\n10\n24\n2\n100 100\n"
+      }
+    },
+    {
+      "name": "width-only",
+      "metal": 3,
+      "smin": 0,
+      "wmin": 12,
+      "creator": {
+        "id": 16,
+        "keywords": "",
+        "answers": "A\n200\n8\nM4\nM3\n6\n10\n24\n2\n100 100\n"
+      }
+    },
+    {
+      "name": "signed-zero",
+      "metal": 3,
+      "smin": -0.0,
+      "wmin": -0.0,
+      "creator": {
+        "id": 16,
+        "keywords": "",
+        "answers": "A\n200\n8\nM4\nM3\n6\n10\n24\n2\n100 100\n"
+      }
+    },
+    {
+      "name": "keyword-path",
+      "metal": 3,
+      "smin": 4,
+      "wmin": 12,
+      "creator": {
+        "id": 16,
+        "keywords": "NAME=A:LEN=200:ILEN=24:W=8:S=6:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100",
+        "answers": ""
+      }
+    },
+    {
+      "name": "unsnapped-double",
+      "metal": 3,
+      "smin": 4.123456789012345,
+      "wmin": 12.987654321098764,
+      "creator": {
+        "id": 16,
+        "keywords": "",
+        "answers": "A\n200\n8\nM4\nM3\n6\n10\n24\n2\n100 100\n"
+      }
+    },
+    {
+      "name": "sub-grid-minima",
+      "metal": 3,
+      "smin": 1e-12,
+      "wmin": 1e-15,
+      "creator": {
+        "id": 16,
+        "keywords": "",
+        "answers": "A\n200\n8\nM4\nM3\n6\n10\n24\n2\n100 100\n"
+      }
+    }
+  ]
+}

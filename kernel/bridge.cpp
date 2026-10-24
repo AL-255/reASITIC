@@ -163,7 +163,11 @@ void clear_diagnostics() { warning_length=0;warnings[0]=0; }
 extern "C" {
 int shape_kind(int index) { if(index<0)return -1;auto* shape=head;while(shape && index--)shape=shape->next;return shape?integer(*shape,0x50):-1; }
 int set_max_width_cells(int value) { if(value<=0)return 0;max_width_cells=value;return 1; }
-void reset_technology() { clear();max_width_cells=500;metal_count=via_count=substrate_count=0;origin_x=origin_y=0;winding_phase=1; }
+void reset_technology() {
+    clear();const double rules[2]={0,0};
+    for(auto& metal:metals)__builtin_memcpy(reinterpret_cast<unsigned char*>(&metal)+0xc0,rules,sizeof(rules));
+    max_width_cells=500;metal_count=via_count=substrate_count=0;origin_x=origin_y=0;winding_phase=1;
+}
 void set_geometry_options(double x,double y,int phase) { origin_x=x;origin_y=y;winding_phase=phase?phase:1;has_parsed_gap=false; }
 void set_ring_gap_radians(double gap) { parsed_ring_gap=gap;has_parsed_gap=true; }
 void set_substrate(int i,double thickness) { if(i<0 || i>=32)return;substrate[i]=thickness;dielectric[i]={};dielectric[i].thickness=thickness;if(i>=substrate_count)substrate_count=i+1; }
@@ -178,6 +182,15 @@ void set_metal(int i,double height,double thickness,double resistance,int layer)
     __builtin_memcpy(metals[i].prefix+0xa0,&layer,4);__builtin_memcpy(metals[i].prefix+0xa4,&i,4);__builtin_memcpy(metals[i].prefix+0xa8,&z,8);
     heights[i]=x87::binary64(Real(substrate[layer])-z);metals[i].thickness=thickness;metals[i].resistance=x87::binary64(Real(resistance)*Real(0.001));
     sprintf(reinterpret_cast<char*>(&metals[i]),"M%d",i+1);if(i>=metal_count)metal_count=i+1;
+}
+const char* set_metal_rules(int i,double spacing,double width) {
+    if(i<0 || i>=metal_count || !__builtin_isfinite(spacing) || !__builtin_isfinite(width))return "{\"error\":\"Use finite SMIN/WMIN values and a configured metal\"}";
+    // Original validate_technology_metals: unset sentinel -> zero; other
+    // negative minima -> binary64 0.1. Preserve signed zero and input units.
+    if(spacing==-271.)spacing=0.;else if(spacing<0.)spacing=.1;
+    if(width==-271.)width=0.;else if(width<0.)width=.1;
+    auto* record=reinterpret_cast<unsigned char*>(&metals[i]);__builtin_memcpy(record+0xc0,&spacing,8);__builtin_memcpy(record+0xc8,&width,8);
+    static char output[256];sprintf(output,"{\"minimum_spacing\":%.17g,\"minimum_width\":%.17g}",spacing,width);return output;
 }
 void set_via(int i,int bottom,int top,double width,double spacing,double over1,double over2,double resistance) {
     if(i<0 || i>=32)return;auto* p=reinterpret_cast<unsigned char*>(&vias[i]);

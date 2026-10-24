@@ -62,6 +62,8 @@ jobs:
         run: |
           node tests/native-creators.mjs
           node tests/creator-aliases.mjs
+          node tests/metal-rules.mjs
+          python tests/gds_metal_rules_reader.py
           node tests/geometry-edits.mjs
           node tests/worker-geometry-edits.mjs
           python tests/gds_edits_reader.py

@@ -1,0 +1,35 @@
+"""Independently verify imported-process-rule GDS against original geometry."""
+import collections,json,math,re
+from pathlib import Path
+import gdstk
+
+original=json.loads(Path('tests/fixtures/original-metal-rules.json').read_text())
+technology=Path('web/technology/CMOS.tek').read_text();vias=[]
+for block in re.split(r'<via>\s*\d*',technology,flags=re.I)[1:]:
+    vias.append({k.lower():float(v) for k,v in re.findall(r'^\s*(\w+)\s*=\s*([-+\d.eE]+)',block,re.M)})
+def vertices(points):return frozenset((math.floor(x*1000+.5),math.floor(y*1000+.5)) for x,y in points)
+files=polygons=0
+for case in original['cases']:
+    library=gdstk.read_gds(Path('build/gds-metal-rules')/(case['name']+'.gds'))
+    assert library.unit==1e-6 and library.precision==1e-9
+    assert len(library.cells)==1 and not library.cells[0].references
+    actual=library.cells[0].polygons;expected=collections.Counter()
+    for shape in case['shapes']:
+        ox,oy=shape['origin']
+        for segment in shape['segments']:
+            points=segment['points'];metal=segment['metal']
+            if metal<5:
+                expected[metal+1,vertices([(points[i][0]+ox,points[i][1]+oy) for i in [2,3,5,4]])]+=1
+                continue
+            via=vias[metal-5];a,b,c=points[2:5]
+            width=math.hypot(b[0]-a[0],b[1]-a[1]);height=math.hypot(a[0]-c[0],a[1]-c[1])
+            xunit=((b[0]-a[0])/width,(b[1]-a[1])/width);yunit=((a[0]-c[0])/height,(a[1]-c[1])/height)
+            def rectangle(x0,y0,x1,y1):return vertices([(c[0]+x*xunit[0]+y*yunit[0]+ox,c[1]+x*xunit[1]+y*yunit[1]+oy) for x,y in [(x0,y0),(x1,y0),(x1,y1),(x0,y1)]])
+            for layer,over in [(int(via['bottom']),via['overplot1']),(int(via['top']),via['overplot2'])]:expected[layer+1,rectangle(-over,-over,width+over,height+over)]+=1
+            pitch=via['width']+via['space']
+            for x in range(segment['nx']):
+                for y in range(segment['ny']):expected[100+metal-5,rectangle(x*pitch,y*pitch,x*pitch+via['width'],y*pitch+via['width'])]+=1
+    assert collections.Counter((p.layer,vertices(p.points)) for p in actual)==expected,case['name']
+    assert all(p.area()>0 and p.datatype==0 for p in actual),case['name']
+    files+=1;polygons+=len(actual)
+print(f'Independent process-rule GDS reader: {files} libraries, {polygons} polygons; original ribbons, every via cut/pad, units and nonzero boundaries pass')
