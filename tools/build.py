@@ -10,7 +10,8 @@ def main():
         manifest=json.loads((ROOT/'vendor'/vendor/'provenance.json').read_text())
         for name,digest in manifest['files'].items():
             if hashlib.sha256((ROOT/'vendor'/vendor/name).read_bytes()).hexdigest()!=digest:raise RuntimeError('Reference snapshot changed: '+vendor+'/'+name)
-    port=generate();dist=ROOT/'dist';shutil.copytree(ROOT/'web',dist,dirs_exist_ok=True)
+    clang=Path(shutil.which(args.emxx) or args.emxx).resolve().parent.parent/'bin/clang++'
+    port=generate(clang=clang);dist=ROOT/'dist';shutil.copytree(ROOT/'web',dist,dirs_exist_ok=True)
     inc=['-I'+str(port),'-I'+str(ROOT/'kernel'),'-I'+str(ROOT/'vendor/softfloat/include'),'-I'+str(ROOT/'vendor/softfloat/8086')]
     flags=['-O2','-fno-fast-math','-ffp-contract=off','-DSOFTFLOAT_FAST_INT64','-DINLINE_LEVEL=5','-DSOFTFLOAT_ROUND_ODD']
     version=subprocess.check_output([args.emxx,'--version'],text=True)
@@ -24,7 +25,7 @@ def main():
     cmd=[args.emxx,'-std=c++17',*flags,*inc,'-include',str(ROOT/'kernel/soft_real.hpp'),'-fpack-struct=4',
          *[str(port/(n+'.cpp')) for n in SOURCES],str(ROOT/'kernel/bridge.cpp'),str(ROOT/'kernel/simulation.cpp'),str(ROOT/'kernel/transcendentals.cpp'),str(ROOT/'kernel/math_probe.cpp'),str(ROOT/'kernel/command_input.cpp'),*objects,
          '-sMODULARIZE=1','-sEXPORT_ES6=1','-sENVIRONMENT=web,worker,node','-sALLOW_MEMORY_GROWTH=1','-sFILESYSTEM=0',
-         '-sEXPORTED_FUNCTIONS=["_malloc","_free","_generate","_set_geometry_options","_set_ring_gap_radians","_normalize_value","_reset_technology","_set_substrate","_finalize_technology","_set_metal","_set_via","_last_warnings","_analyze","_simulate","_probe_math"]',
+         '-sEXPORTED_FUNCTIONS=["_malloc","_free","_generate","_create_geometry","_set_layer_name","_set_geometry_options","_set_ring_gap_radians","_normalize_value","_reset_technology","_set_substrate","_finalize_technology","_set_metal","_set_via","_last_warnings","_analyze","_simulate","_probe_math"]',
          '-sEXPORTED_RUNTIME_METHODS=["UTF8ToString","HEAPF64"]','-o',str(dist/'asitic.js')]
     subprocess.run(cmd,check=True)
     print('Built',dist/'asitic.wasm')

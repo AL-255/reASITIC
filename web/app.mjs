@@ -1,5 +1,6 @@
 import {polygons,writeGDS} from './gds.mjs';
 import {parseTechnology} from './technology.mjs';
+import {creatorRecipe,parseCreatorCommand} from './creators.mjs';
 import {frequencySweep,matrixCSV,sweepCSV,plotSeries} from './simulation.mjs';
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
 const colors=['#d8ba69','#8ab9df','#b89bde','#b4e887','#e1b486','#cf83a6','#80c9c3','#ece7bb'];
@@ -8,7 +9,7 @@ let samples=[],selectedSimulation=null,sampleRequest=null,sampleKey='';
 const worker=new Worker(new URL('./worker.mjs',import.meta.url),{type:'module'});
 const simulationControls=['simulate','sweep','sim-winding','cell-length','cell-width','cell-thickness','cell-trigger','filament-limit','sweep-start','sweep-stop','sweep-count','frequency-scale','frequency'];
 function setBusy(value,stoppable=false){
-  busy=value;for(const element of $('controls').elements)element.disabled=!ready||value;
+  busy=value;for(const element of $('controls').elements)element.disabled=!ready||value||Boolean(element.closest('label')?.hidden)||Boolean(element.closest('.fields') && $('native-command').value.trim());
   for(const id of simulationControls)$(id).disabled=!ready||!layout||value;
   $('analyze').disabled=!ready||!layout||value;$('stop').disabled=!value||!stoppable;
   $('matrix-csv').disabled=value||!selectedSimulation?.matrix;$('results-csv').disabled=value||!samples.length;
@@ -38,16 +39,25 @@ worker.onmessage=({data})=>{
   $('status').textContent=layout.warnings||'Layout generated. GDS export uses a 1 nm grid.';
 };
 function parameters(){return ['length','height','width','spacing','turns','radius','sides','metal','exit','angle','inner','secondary'].map(id=>Number($(id).value));}
-function options(){return {nativeInput:true,x:Number($('origin-x').value),y:Number($('origin-y').value),phase:Number($('phase').value),grid:Number($('snap-grid').value),snap:$('snap').checked};}
+function options(){return {nativeInput:true,x:Number($('origin-x').value),y:Number($('origin-y').value),phase:Number($('phase').value),grid:Number($('snap-grid').value),snap:$('snap').checked,name:$('shape-name').value,secondaryName:$('secondary-name').value,secondaryWidth:Number($('secondary-width').value),nx:Number($('via-nx').value),ny:Number($('via-ny').value),via:Number($('via-layer').value)};}
 function frequency(){const value=Number($('frequency').value);if(!Number.isFinite(value)||value<=0)throw Error('Enter a positive frequency.');return value;}
 function send(data,stoppable=false){setBusy(true,stoppable);worker.postMessage({id:++request,...data});}
 $('analyze').onclick=()=>{try{if(layout){$('status').textContent='Calculating original conductor estimates…';send({action:'analyze',frequency_ghz:frequency()});}}catch(e){failure(e.message);}};
-function generate(){if(!ready||!technologyText)return;$('download').disabled=true;$('loading').textContent='Generating geometry…';send({kind:Number($('kind').value),parameters:parameters(),options:options(),technology:technologyText});}
-function updateMetals(text){const t=parseTechnology(text);for(const id of ['metal','exit']){$(id).replaceChildren();t.metals.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.name;$(id).append(o);});}const none=document.createElement('option');none.value=-1;none.textContent='None';$('exit').append(none);$('metal').value=Math.min(3,t.metals.length-1);$('exit').value=Math.min(2,t.metals.length-2);}
+function generate(){if(!ready||!technologyText)return;try{const o=options(),creator=$('native-command').value.trim()?parseCreatorCommand($('native-command').value,$('native-answers').value):creatorRecipe(Number($('kind').value),parameters(),o);$('download').disabled=true;$('loading').textContent='Generating geometry…';send({creator,options:o,technology:technologyText});}catch(e){failure(e.message);}}
+function updateMetals(text){const t=parseTechnology(text);for(const id of ['metal','exit']){$(id).replaceChildren();t.metals.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.name;$(id).append(o);});}const none=document.createElement('option');none.value=-1;none.textContent='None';$('exit').append(none);$('metal').value=Math.min(3,t.metals.length-1);$('exit').value=Math.min(2,t.metals.length-2);$('via-layer').replaceChildren();t.vias.forEach((v,i)=>{const option=document.createElement('option');option.value=i;option.textContent=v.name;$('via-layer').append(option);});}
 async function loadProcess(){try{if($('process').value==='custom'){updateMetals(importedText);technologyText=importedText;generate();return;}const response=await fetch(`technology/${$('process').value}.tek`);if(!response.ok)throw Error('Unable to load technology');const text=await response.text();updateMetals(text);technologyText=text;generate();}catch(e){failure(e.message);}}
 $('process').onchange=loadProcess;
 $('technology-file').onchange=async event=>{try{const file=event.target.files[0];if(!file)return;const text=await file.text();updateMetals(text);technologyText=importedText=text;let option=$('process').querySelector('[value="custom"]');if(!option){option=document.createElement('option');option.value='custom';$('process').append(option);}option.textContent=file.name;$('process').value='custom';generate();}catch(e){failure(e.message);}};
-$('kind').onchange=()=>{const ring=$('kind').value==='5';$('spacing-label').firstChild.textContent=ring?'Gap · degrees':'Spacing';$('spacing').value=ring?20:2;};
+function updateCreatorFields(){
+  const kind=Number($('kind').value),fields={0:['length','height','width','spacing','turns','metal','exit'],1:['radius','sides','width','spacing','turns','metal'],2:['length','width','metal'],3:['length','inner','width','spacing','turns','metal','exit'],4:['radius','sides','inner','width','spacing','turns','metal','exit'],5:['radius','sides','width','spacing','metal'],6:['length','height','width','spacing','turns','secondary','secondary-name','metal','exit'],7:['length','height','width','spacing','turns','secondary-name','metal','exit'],8:['length','height','width','spacing','turns','metal','exit'],9:['via-nx','via-ny','via-layer'],10:['length','height','metal','exit'],11:['length','width','secondary-width','spacing','turns','metal','exit']};
+  const active=new Set(['shape-name','origin-x','origin-y','phase','snap-grid','snap',...fields[kind]]);
+  for(const element of document.querySelectorAll('.fields input,.fields select')){element.closest('label').hidden=!active.has(element.id);element.disabled=!active.has(element.id)||!ready||busy||Boolean($('native-command').value.trim());}
+  $('spacing-label').firstChild.textContent=kind===5?'Gap · degrees':'Spacing';
+}
+$('kind').onchange=()=>{$('spacing').value=$('kind').value==='5'?20:$('kind').value==='7'?8:2;updateCreatorFields();};
+updateCreatorFields();
+$('native-command').oninput=updateCreatorFields;
+$('fill-command').onclick=()=>{const r=creatorRecipe(Number($('kind').value),parameters(),options());const names={0:'SQUARE',1:'SPIRAL',2:'WIRE',3:'TRANS',4:'CAPACITOR',5:'BALUN',10:'3DMIRRORTRANS',14:'VIA',16:'SYMSQ',17:'SYMPOLY',18:'MMSQUARE',22:'RING'};$('native-command').value=names[r.id]+(r.keywords?' '+r.keywords:'');$('native-answers').value=r.answers;updateCreatorFields();};
 $('controls').onsubmit=e=>{e.preventDefault();generate();};
 function setView(){if(view)$('preview').setAttribute('viewBox',view.join(' '));}
 $('fit').onclick=()=>{if(initialView){view=[...initialView];setView();}};
@@ -57,7 +67,7 @@ function render(){
   const w=Math.max(1,x1-x0),h=Math.max(1,y1-y0),padding=Math.max(w,h)*.15;
   initialView=[x0-padding,-y1-padding,w+padding*2,h+padding*2];view=[...initialView];$('preview').replaceChildren();
   for(const polygon of list){const p=document.createElementNS(svgNS,'polygon');p.setAttribute('points',polygon.points.map(([x,y])=>`${x},${-y}`).join(' '));p.setAttribute('fill',colors[(polygon.layer-1)%colors.length]);p.setAttribute('fill-opacity','.77');p.setAttribute('stroke',colors[(polygon.layer-1)%colors.length]);p.setAttribute('stroke-width','.15');$('preview').append(p);}setView();
-  $('layout-title').textContent=$('kind').selectedOptions[0].textContent.toUpperCase();$('footprint').textContent=`${w.toFixed(1)} × ${h.toFixed(1)} µm`;$('segments').textContent=layout.shapes.reduce((n,s)=>n+s.segments.length,0);$('resistance').textContent=layout.shapes.map(s=>`${s.name}: ${s.resistance_dc.toFixed(3)} Ω`).join(' · ');
+  $('layout-title').textContent=$('native-command').value.trim()?$('native-command').value.trim().split(/\s+/)[0].toUpperCase():$('kind').selectedOptions[0].textContent.toUpperCase();$('footprint').textContent=`${w.toFixed(1)} × ${h.toFixed(1)} µm`;$('segments').textContent=layout.shapes.reduce((n,s)=>n+s.segments.length,0);$('resistance').textContent=layout.shapes.map(s=>`${s.name}: ${s.resistance_dc.toFixed(3)} Ω`).join(' · ');
   $('legend').replaceChildren();for(const layer of [...new Set(list.map(p=>p.layer))].sort((a,b)=>a-b)){const el=document.createElement('span');el.style.setProperty('--color',colors[(layer-1)%colors.length]);el.textContent=layer>=100?technology.vias[layer-100].name:technology.metals[layer-1].name;$('legend').append(el);}
 }
 function clearSimulation(){samples=[];selectedSimulation=null;sampleRequest=null;sampleKey='';for(const id of ['sim-l','sim-r','sim-q'])$(id).textContent='—';$('sim-details').textContent='Choose a winding and mesh, then run the original filament solver.';renderPlot();}

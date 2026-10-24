@@ -14,8 +14,10 @@ No original executable is needed by the deployed application. The C++ sources ar
 the math kernel. JavaScript handles the interface and GDSII serialization.
 
 The browser workbench includes square/polygon/symmetric/multi-metal
-windings, planar and 3D transformer builders, rings, wires and a 2×2 via-array
-example. Parameters use micrometres. The original `RESIS` DC resistance, `INDUCTANCE` conductor estimate and `RESISHF`
+windings, planar and 3D mirror transformers, baluns, stacked capacitor plates,
+rings, wires and configurable via arrays. The original keyword parsers and
+interactive creator dispatch run in C++. The advanced command editor supports
+all twelve creator commands and native dimensions such as ILEN / IWID. Parameters use micrometres. The original `RESIS` DC resistance, `INDUCTANCE` conductor estimate and `RESISHF`
 high-frequency resistance paths run inside the C++ kernel. These are the original
 conductor estimates; the original no-eddy LMAT filament solver is available in the workbench.
 Substrate and distributed-network simulation are still being integrated. GDSII uses native ribbon boundaries, real via cuts and
@@ -25,6 +27,8 @@ landing pads, with 1 µm user units and a 1 nm database grid.
 # Emscripten 6.0.6, Python 3, Node 24
 python3 tools/build.py                    # or --emxx /path/to/em++
 python3 tools/build_native.py             # GCC i386 + libc.so.6 comparison
+node tests/native-creators.mjs
+node tests/original-creator-binary.mjs
 node tests/parity.mjs
 node tests/original-geometry.mjs
 node tests/estimates.mjs
@@ -48,6 +52,10 @@ WebAssembly, without Python, the native executable, or a remote simulation API.
 
 Current measured evidence:
 
+- All twelve original creator families match 3,320 raw physical binary64
+  fields from repeated fresh original-executable sessions, pass 1,995 original SAVE printed-field
+  checks, and 4,125 numeric fields match the i386 build exactly. Capacitor join,
+  balun reflection/phase and mirror-transformer prompt composition are retained.
 - All 6,972 numeric fields in 20 i386/WASM construction cases match exactly.
 - All 120 conductor-estimate fields across 50 frequency cases match exactly.
 - All 33,836 LMAT fields across 33 native/WASM cases match exactly, including
@@ -64,11 +72,13 @@ Current measured evidence:
   including the original negative-angle normalization behavior.
 - Both transformer windings match the unchanged i386 solver. Rejected meshes
   recover, simulation does not mutate source geometry, and 100 repeated solves
-  retain a bounded heap. An independent gdstk reader validates 20 GDS exports.
+  retain a bounded heap. An independent gdstk reader validates 32 GDS exports.
 
 These are bounded tests, not universal parity claims. All listed exact
 comparisons are required CI gates. The source translator rejects unknown
-assembly. Arithmetic and square root use Berkeley SoftFloat binary80;
+assembly. Native Clang AST ranges expose implicit long-double-to-double stores
+in creator units; the build retains an expression/offset report. This preserves
+original narrowing boundaries without changing vendor sources. Arithmetic and square root use Berkeley SoftFloat binary80;
 logarithms, trig and exponent fractions use binary128 guard evaluation with
 native x87 constants, followed by the original binary80 stores. This avoids
 Emscripten's binary64 `logl` fallback. The SoftFloat license ships with the site.
@@ -103,14 +113,21 @@ Regenerate the independent original executable fixtures with:
 
 ```sh
 python3 tools/capture_lmat.py --reference ~/github/asitic-re
+python3 tools/capture_creators.py --reference ~/github/asitic-re
 ```
 
 This test-only command requires the original executable's legacy runtime DSOs;
 `--library-path` selects them. Its executable hash is pinned. Raw paired logs,
 BSAVE files and LMAT outputs are retained under `build/original-lmat`.
 
-Next required work includes capacitor/balun command composition, arbitrary via
-arrays, remaining creator validation and turn normalization, original eddy and
+Creator input is bounded to native fixed buffers, 64 turns, 256 sides/via rows
+or columns, and a 32 MiB creation allocation budget. Invalid commands recover
+without terminating the worker. Admission guards reject native fault cases;
+valid descriptor values are passed unchanged to the original builders. Native
+unwritten parser/history and mesh words use explicit zero initial state, rather
+than claiming process-independent parity for uninitialized bytes.
+
+Next required work includes broader original-executable creator/input coverage, original eddy and
 CAP/network solvers, coupled-winding and multiport metrics, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.

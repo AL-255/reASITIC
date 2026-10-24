@@ -14,5 +14,8 @@ try{
   const bicmos=readFileSync(new URL('../web/technology/BiCMOS.tek',import.meta.url),'utf8');
   response=next();worker.postMessage({id:4,kind:0,parameters:[100,90,3,2,2,50,8,2,1,0,15,1.5],technology:bicmos});assert.equal((await response).layout.shapes.length,1);
   response=next();worker.postMessage({id:5,kind:0,parameters:[100,90,3,2,2,50,8,2,2,0,15,1.5],technology:bicmos});assert.match((await response).error,/must differ/);
+  response=next();worker.postMessage({id:6,creator:{id:4,keywords:'NAME=PLATE:LEN=40:WID=5:METAL1=M2:METAL2=M1'},technology});const plate=await response;assert.equal(plate.layout.shapes[0].segments.length,2);
+  response=next();worker.postMessage({id:7,creator:{id:10,answers:'P\nS\n80 80\n3\n8\n2\nM4\nM3\n100 100\n0\n'},technology});assert.match((await response).error,/another line/);
+  response=next();worker.postMessage({id:8,creator:{id:14,keywords:'NAME=V:NX=5:NY=7:VIA=VIA2'},technology});const via=await response;assert.equal(via.layout.shapes[0].segments[0].nx,5);assert.equal(via.layout.shapes[0].segments[0].ny,7);
   console.log('Module worker: WASM startup, technology configuration, geometry response and validation errors pass');
 }finally{await worker.terminate();}

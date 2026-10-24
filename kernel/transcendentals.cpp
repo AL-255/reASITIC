@@ -40,12 +40,12 @@ Q atan_positive(Q value,bool reciprocal) {
     if(shifted)result=f128_add(f128_div(pi,integer(4)),result);
     return reciprocal?sub(f128_div(pi,integer(2)),result):result;
 }
-R trig(R input,bool cosine) {
+Q trig(R input,bool cosine) {
     const int exponent=input.value.signExp&0x7fff;
-    if(exponent==0x7fff)return invalid();
+    if(exponent==0x7fff)return wide(invalid());
     // FSIN/FCOS leave ST(0) unchanged and set C2 outside their native range.
-    if(asitic::x87::abs(input)>=R(0x1p63L))return input;
-    if(!input.value.signif)return cosine?R(1):input;
+    if(asitic::x87::abs(input)>=R(0x1p63L))return wide(input);
+    if(!input.value.signif)return wide(cosine?R(1):input);
     const bool negative=input.value.signExp&0x8000;
     const Q magnitude=wide(asitic::x87::abs(input)),half=f128_div(trig_pi,integer(2));
     const R quotient=retain(f128_div(magnitude,half));
@@ -62,7 +62,7 @@ R trig(R input,bool cosine) {
     }
     const bool negate_result=cosine?(quarter==1 || quarter==2):(quarter==2 || quarter==3);
     if(negate_result!=(!cosine && negative))sum=neg(sum);
-    return retain(sum);
+    return sum;
 }
 }
 namespace asitic::x87 {
@@ -101,8 +101,9 @@ SoftReal atan2(SoftReal y,SoftReal x) {
     }
     if(negative_y)angle=neg(angle);return retain(angle);
 }
-SoftReal sin(SoftReal x) { return trig(x,false); }
-SoftReal cos(SoftReal x) { return trig(x,true); }
+SoftReal sin(SoftReal x) { return retain(trig(x,false)); }
+SoftReal cos(SoftReal x) { return retain(trig(x,true)); }
+SoftReal tan(SoftReal x) { return retain(f128_div(trig(x,false),trig(x,true))); }
 SoftReal pow2m1(SoftReal input) {
     if(is_nan(input) || !input.value.signif)return input;
     // Original exponent reduction passes [-0.5,0.5], within F2XM1's [-1,1].

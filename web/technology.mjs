@@ -19,7 +19,10 @@ export function parseTechnology(text) {
     if(!Number.isInteger(v.bottom) || !Number.isInteger(v.top) || !metals[v.bottom] || !metals[v.top] || v.bottom===v.top || !(v.width>0 && v.space>=0 && v.r>=0 && v.overplot1>=0 && v.overplot2>=0))throw Error('Invalid via '+i);
     return {name:(v.name||`VIA${i+1}`).toUpperCase(),bottom:v.bottom,top:v.top,width:v.width,spacing:v.space,over1:v.overplot1,over2:v.overplot2,resistance:v.r};
   });
-  return {metals,vias,substrate:blocks.layer.map(layer=>layer.t),source:text};
+  const chip=blocks.chip[0]??{};
+  const domain={x:chip.chipx??512,y:chip.chipy??512,cells_x:chip.fftx??128,cells_y:chip.ffty??128};
+  if(!(domain.x>0 && domain.y>0 && Number.isInteger(domain.cells_x) && Number.isInteger(domain.cells_y) && domain.cells_x>0 && domain.cells_y>0))throw Error('Invalid chip dimensions or FFT cells');
+  return {metals,vias,domain,substrate:blocks.layer.map(layer=>layer.t),source:text};
 }
 export function configureKernel(kernel,technology) {
   kernel._reset_technology();
@@ -27,6 +30,8 @@ export function configureKernel(kernel,technology) {
   kernel._finalize_technology();
   technology.metals.forEach((m,i)=>kernel._set_metal(i,m.height,m.thickness,m.sheet_milliohms,m.layer));
   technology.vias.forEach((v,i)=>kernel._set_via(i,v.bottom,v.top,v.width,v.spacing,v.over1,v.over2,v.resistance));
+  if(kernel._set_layer_name)for(const [via,layers] of [[0,technology.metals],[1,technology.vias]])layers.forEach((layer,i)=>withString(kernel,layer.name,p=>kernel._set_layer_name(via,i,p)));
+
 }
 export function generateGeometry(kernel,kind,parameters,options={}) {
   let values=[...parameters],x=options.x??0,y=options.y??0;
@@ -42,4 +47,17 @@ export function generateGeometry(kernel,kind,parameters,options={}) {
   const p=kernel._malloc(12*8);
   try{kernel.HEAPF64.set(values,p/8);const result=JSON.parse(kernel.UTF8ToString(kernel._generate(kind,p)));if(result.error)throw Error(result.error);result.warnings=kernel.UTF8ToString(kernel._last_warnings());return result;}
   finally{kernel._free(p);}
+}
+
+export function withString(kernel,value,callback) {
+  const bytes=new TextEncoder().encode(value+'\0'),p=kernel._malloc(bytes.length);
+  try { new Uint8Array(kernel.HEAPF64.buffer,p,bytes.length).set(bytes);return callback(p); }
+  finally { kernel._free(p); }
+}
+export function createGeometry(kernel,id,keywords='',answers='',options={}) {
+  const domain=options.domain??{x:512,y:512,cells_x:128,cells_y:128};
+  return withString(kernel,keywords,line=>withString(kernel,answers,input=>{
+    const result=JSON.parse(kernel.UTF8ToString(kernel._create_geometry(id,line,input,domain.x,domain.y,domain.cells_x,domain.cells_y,options.grid??.1,options.snap===false?0:1,options.append?1:0)));
+    if(result.error)throw Error(result.error);result.warnings=kernel.UTF8ToString(kernel._last_warnings());return result;
+  }));
 }

@@ -9,6 +9,9 @@ SoftReal log(SoftReal);
 SoftReal log1p(SoftReal);
 SoftReal log2(SoftReal);
 SoftReal pow2m1(SoftReal);
+SoftReal tan(SoftReal);
+inline SoftReal load_float_word(unsigned word) { float value;__builtin_memcpy(&value,&word,4);return SoftReal(value); }
+inline unsigned comparison(SoftReal a,SoftReal b) { return a!=a || b!=b ? 0x45 : a<b ? 1 : a==b ? 0x40 : 0; }
 inline SoftReal round(SoftReal x) { return SoftReal(extF80_roundToInt(x.value,softfloat_round_near_even,false)); }
 inline SoftReal floor(SoftReal x) { return SoftReal(extF80_roundToInt(x.value,softfloat_round_min,false)); }
 inline SoftReal ceil(SoftReal x) { return SoftReal(extF80_roundToInt(x.value,softfloat_round_max,false)); }

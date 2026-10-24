@@ -9,6 +9,7 @@ extern "C" int printf(const char*,...);
 extern "C" const char* simulate(int,double,double,double,double,double,int);
 extern "C" void set_via(int,int,int,double,double,double,double,double);
 extern "C" const char* generate(int,const double*);
+extern "C" const char* create_geometry(int,const char*,const char*,double,double,int,int,double,int,int);
 extern "C" void set_geometry_options(double,double,int);
 extern "C" double strtod(const char*,char**);
 extern "C" int puts(const char*);
@@ -16,11 +17,12 @@ extern "C" int atoi(const char*);
 extern "C" int main(int argc,char** argv,char**) {
     if(argc==6 && argv[1][0]=='-' && argv[1][2]=='i') { printf("%.17g\n",normalize_value(strtod(argv[2],nullptr),atoi(argv[3]),strtod(argv[4],nullptr),atoi(argv[5])));return 0; }
     if(argc==6 && argv[1][0]=='-') { puts(probe_math(atoi(argv[2]),strtod(argv[3],nullptr),strtod(argv[4],nullptr),strtod(argv[5],nullptr)));return 0; }
-    if(argc!=14 && argc!=15 && argc!=19 && argc!=20 && argc!=21 && argc!=23)return 2;
+    if(argc!=7 && argc!=14 && argc!=15 && argc!=19 && argc!=20 && argc!=21 && argc!=23)return 2;
     reset_technology();set_substrate(0,700.);set_substrate(1,50.);finalize_technology();
     double height[]={1.3,2.4,3.5,4.5,6},sheet[]={65,55,55,55,30};
     for(int i=0;i<5;++i)set_metal(i,height[i],i==4?1.:.5,sheet[i],1);
     for(int i=0;i<4;++i)set_via(i,i,i+1,i==0?.5:.4,i==3?1.2:1.1,.2,.2,4);
+    if(argc==7 && argv[1][2]=='c') { puts(create_geometry(atoi(argv[2]),argv[3],argv[4],512,512,128,128,strtod(argv[5],nullptr),atoi(argv[6]),0));return 0; }
     double p[12];for(int i=0;i<12;++i)p[i]=strtod(argv[i+2],nullptr);
     if(argc>=21)set_geometry_options(argc==23?strtod(argv[21],nullptr):0.,argc==23?strtod(argv[22],nullptr):0.,atoi(argv[20]));
     const char* layout=generate(atoi(argv[1]),p);if(argc>=19)puts(simulate(argc>=20?atoi(argv[19]):0,strtod(argv[14],nullptr),strtod(argv[15],nullptr),strtod(argv[16],nullptr),strtod(argv[17],nullptr),strtod(argv[18],nullptr),1024));

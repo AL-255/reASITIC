@@ -1,5 +1,5 @@
 import createKernel from './asitic.js';
-import {parseTechnology,configureKernel,generateGeometry} from './technology.mjs';
+import {parseTechnology,configureKernel,generateGeometry,createGeometry} from './technology.mjs';
 const kernel=await createKernel();let epoch=0;
 function frequency(data,value=data.frequency_ghz) {
   const result=value===undefined?data.frequency:kernel._normalize_value(Number(value),5,.1,0);
@@ -41,7 +41,7 @@ self.onmessage=async({data})=>{
     }
     if(action!=='generate')throw Error('Unknown workbench action.');
     const technology=parseTechnology(data.technology);configureKernel(kernel,technology);
-    const layout=generateGeometry(kernel,data.kind,data.parameters,data.options);postMessage({id:data.id,layout,technology});
+    const layout=data.creator?createGeometry(kernel,data.creator.id,data.creator.keywords,data.creator.answers,{...data.options,domain:technology.domain}):generateGeometry(kernel,data.kind,data.parameters,data.options);postMessage({id:data.id,layout,technology});
   }catch(error){postMessage({id:data.id,error:error.message,action});}
 };
 postMessage({ready:true});

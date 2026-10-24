@@ -34,6 +34,8 @@ jobs:
       - run: python tools/build_native.py
       - name: Compare original geometry fixtures and unchanged i386 C++
         run: |
+          node tests/native-creators.mjs
+          node tests/original-creator-binary.mjs
           node tests/original-geometry.mjs
           node tests/parity.mjs
           node tests/estimates.mjs

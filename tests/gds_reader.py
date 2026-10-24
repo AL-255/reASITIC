@@ -14,6 +14,11 @@ for p in sorted(Path('build/evidence').glob('*.gds')):
     if p.name.startswith('via'):
         assert len([poly for poly in polygons if poly.layer==100])==4
         assert {poly.layer for poly in polygons}=={1,2,100}
+    if p.name=='creator-via.gds':
+        assert len([poly for poly in polygons if poly.layer==100])==6
+        assert {poly.layer for poly in polygons}=={1,2,100}
+    if p.name=='creator-capacitor.gds':
+        assert {poly.layer for poly in polygons}=={1,2}
     count+=1
 assert count>=20
 print(f'Independent GDS reader: {count} complete libraries; units, nonzero boundaries, via cuts and pads verified')

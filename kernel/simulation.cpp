@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include "json.hpp"
 #include "asitic/shape_construction.hpp"
 #include "asitic/numerics.hpp"
 #ifdef __EMSCRIPTEN__
@@ -113,7 +114,8 @@ extern "C" const char* simulate(int winding,double frequency,double length_cell,
     const unsigned capacity=64u*matrix.rows*matrix.columns+16384u;
     simulation_result=static_cast<char*>(calloc(1,capacity));if(!simulation_result)return "{\"error\":\"Could not allocate matrix output\"}";
     char* out=simulation_result;
-    out+=sprintf(out,"{\"name\":\"%s\",\"frequency_hz\":%.17g,\"conductors\":%d,\"filaments\":%d,\"resistance\":%.17g,\"reactance\":%.17g,\"inductance_h\":%.17g,\"series_q\":",shape->filaments.prefix,frequency,context.group_count,context.filament_count,real,imag,inductance);
+    out+=sprintf(out,"{\"name\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(shape->filaments.prefix));
+    out+=sprintf(out,",\"frequency_hz\":%.17g,\"conductors\":%d,\"filaments\":%d,\"resistance\":%.17g,\"reactance\":%.17g,\"inductance_h\":%.17g,\"series_q\":",frequency,context.group_count,context.filament_count,real,imag,inductance);
     const double q=x87::binary64(Real(imag)/real);
     out+=__builtin_isfinite(q)?sprintf(out,"%.17g",q):sprintf(out,"null");
     out+=sprintf(out,",\"mesh\":{\"length\":%.17g,\"width\":%.17g,\"thickness\":%.17g,\"subdivision_trigger\":%.17g},\"matrix\":[",length_cell,width_cell,thickness_cell,subdivision_trigger);

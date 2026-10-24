@@ -4,9 +4,10 @@ Only enumerated x87 instruction patterns are translated. Unknown assembly is a
 hard error. Each long double arithmetic operation uses software binary80.
 """
 from pathlib import Path
-import re
+import re,json
+from implicit_stores import expose
 ROOT=Path(__file__).resolve().parents[1]
-SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver_no_eddy','argument_value','input_normalization']
+SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver_no_eddy','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators']
 
 def translate(name,s):
     # Loads/stores of finite double values. Signaling NaN status is not exposed.
@@ -23,12 +24,25 @@ def translate(name,s):
         s=s.replace(f'asm volatile("fldl %1; {instruction} %2" : "=t"(result) : "m"(segment.endpoints[index]),"m"(origin[index%3]));',f'result=static_cast<long double>(segment.endpoints[index]){op}origin[index%3];')
     s=s.replace('asm volatile("fstpl %0" : "=m"(destination) : "t"(value) : "st");','destination=x87::binary64(value);')
     s=s.replace('asm volatile("fldl %1; fstpt %0":"=m"(out):"m"(n):"st");','out=n;')
+    # Creator load/compare helpers preserve x87 width and status-word tests.
+    for output,input_ in [(out,inp) for out in ('out','result','r','y') for inp in ('n','value','d','x','in')]:
+        s=s.replace(f'asm volatile("fldl %1; fstpt %0":"=m"({output}):"m"({input_}):"st");',f'{output}={input_};')
+    for output,input_ in [('out','a.value'),('y','a.value'),('result','value.value'),('out','value')]:
+        s=s.replace(f'asm volatile("flds %1; fstpt %0":"=m"({output}):"m"({input_}):"st");',f'{output}=x87::load_float_word({input_});')
+    s=s.replace('asm volatile("fldl %1; fsubl %2; fstpt %0":"=m"(result):"m"(upper),"m"(lower):"st");','result=static_cast<long double>(upper)-lower;')
+    s=s.replace('asm volatile("fldl %1; fsubl %2; fstpl %0":"=m"(result):"m"(upper),"m"(lower):"st");','result=x87::binary64(static_cast<long double>(upper)-lower);')
+    for flag in ['status']:
+        s=s.replace(f'asm volatile("fldt %2; fldt %1; fcompp; fnstsw %%ax":"=a"({flag}):"m"(a),"m"(b):"st","st(1)");',f'{flag}=x87::comparison(a,b)<<8;')
+    s=s.replace('asm volatile("fptan; fstp %%st(0)":"=t"(tangent):"0"(half));','tangent=x87::tan(half);')
+    s=s.replace('asm volatile("fldt %1; fstl %0; fstp %%st(0)":"=m"(discarded):"m"(product):"st");','discarded=x87::binary64(product);')
+    for value in ['n','value']:
+        s=s.replace(f'asm volatile("fldt %1; fcos; fstpt %0":"=m"(out):"m"({value}):"st");',f'out=x87::cos({value});')
     # Whole helpers containing control-word changes, whose intended rounding
     # mode is explicit in the recovered source.
-    helper={'ceiling':'ceil','floor_binary64':'floor','floor_spill':'floor','truncate64':'truncate64'}
+    helper={'ceiling':'ceil','floor_binary64':'floor','floor_spill':'floor','truncate64':'truncate64','floor64':'floor','down':'floor','integer':'truncate_int','truncate_integer':'truncate_int'}
     for func,op in helper.items():
-        pattern=r'((?:long double|double|long long) '+func+r'\((?:long double|double) (\w+)\) \{)[^{}]*?asm[^{}]*?\n\}'
-        s=re.sub(pattern,lambda m:m[1]+f' return '+('x87::binary64(' if func in ('floor_binary64','floor_spill') else '')+f'x87::{op}({m[2]})'+(')' if func in ('floor_binary64','floor_spill') else '')+';\n}',s)
+        pattern=r'((?:long double|double|long long|int) '+func+r'\((?:long double|double) (\w+)\) \{)[^{}]*?asm[^{}]*?\n\}'
+        s=re.sub(pattern,lambda m:m[1]+f' return '+('x87::binary64(' if func in ('floor_binary64','floor_spill','floor64','down') else '')+f'x87::{op}({m[2]})'+(')' if func in ('floor_binary64','floor_spill','floor64','down') else '')+';\n}',s)
     s=s.replace('asm volatile("fldl %1; fsubl %2; fstpl %0" : "=m"(direction[i]) : "m"(s.endpoints[i+3]),"m"(s.endpoints[i]) : "st","memory");','direction[i]=binary64(static_cast<long double>(s.endpoints[i+3])-s.endpoints[i]);')
     s=s.replace('asm volatile("fptan; fstp %%st(0); fstp %%st(0)" :: "t"(half) : "st","st(1)","memory");','(void)half; // discarded tangent; FP status is not yet exposed')
     s=s.replace('asm volatile("fldz; fsubrl %1; fstpt %0" : "=m"(rounded_height) : "m"(height) : "st","memory");','rounded_height=static_cast<long double>(height)-0.L;')
@@ -41,7 +55,7 @@ def translate(name,s):
     # Preserve all literal bits using a binary128 host literal before conversion.
     s=re.sub(r'(?<![\w.])(?:0x[\da-f]+(?:\.[\da-f]*)?p[+-]?\d+|\d+(?:\.\d*)?(?:e[+-]?\d+)?)L\b',lambda m:'SoftReal('+m[0]+')',s,flags=re.I)
     s=s.replace('long double','SoftReal').replace('constexpr SoftReal','const SoftReal').replace('volatile SoftReal','SoftReal')
-    return '// Generated by tools/port_geometry.py; do not edit.\n'+s
+    return '// Generated by tools/port_geometry.py; do not edit.\n#include \"x87_port.hpp\"\n'+s
 
 def source(name):
     if name=='estimate':
@@ -49,6 +63,14 @@ def source(name):
         # Exclude unrelated command dispatch to avoid pulling in the whole host.
         s=(ROOT/'vendor/asitic/src/analysis_commands.cpp').read_text()
         return s[:s.index('long double shape_coupling_estimate(')]+'}\n'
+    if name=='native_creators':
+        s=(ROOT/'vendor/asitic/src/console_geometry.cpp').read_text()
+        s=s[:s.index('void initialize_console_geometry(')]
+        # Admission guards reject native fault/resource cases before allocation;
+        # descriptor values and the original construction bodies are untouched.
+        s=s.replace('namespace asitic {','namespace asitic {\nvoid guard_native_creation(int,const ConsoleGeometryState&);',1)
+        s=re.sub(r'(build_\w+\(s.head)',r'guard_native_creation(id,s);\1',s)
+        return s+'bool create_native_geometry(int id,CommandArguments& a,ConsoleGeometryState& state,bool& suppressed) { return create(id,a,state,suppressed); }\n}\n'
     if name=='argument_value':
         s=(ROOT/'vendor/asitic/src/command_runtime.cpp').read_text()
         helpers=s[s.index('bool equal('):s.index('const CommandDefinition* native_command_catalog()')]
@@ -65,13 +87,19 @@ def source(name):
         return s[:s.index('bool solve_inductance(const ShapeFilamentList&')]+'}\n'
     return (ROOT/'vendor/asitic/src'/(name+'.cpp')).read_text()
 
-def generate():
+def generate(clang=None):
     target=ROOT/'build/port';target.mkdir(parents=True,exist_ok=True)
     # Public interfaces must use the same retained type as their bodies.
     for p in (ROOT/'vendor/asitic/include/asitic').glob('*.hpp'):
         out=target/'asitic'/p.name;out.parent.mkdir(exist_ok=True)
         out.write_text(p.read_text().replace('long double','SoftReal').replace('static_assert(__LDBL_MANT_DIG__ == 64,', 'static_assert(sizeof(SoftReal) == 16,'))
+    proof={}
     for name in SOURCES:
-        (target/(name+'.cpp')).write_text(translate(name,source(name)))
+        native=source(name)
+        if name.startswith('shape_') or name=='native_creators':
+            native,proof[name]=expose(name,native,clang)
+        (target/(name+'.cpp')).write_text(translate(name,native))
+    evidence=ROOT/'build/evidence';evidence.mkdir(exist_ok=True)
+    (evidence/'implicit-stores.json').write_text(json.dumps(proof,indent=2)+'\n')
     return target
 if __name__=='__main__':generate()
