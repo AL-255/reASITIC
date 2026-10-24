@@ -39,6 +39,7 @@ jobs:
           node tests/portable-error-power.mjs
           node tests/portable-simulation.mjs
           node tests/portable-pad.mjs
+          node tests/two-port-output.mjs
       - name: Audit recovered arithmetic and production solver behavior
         run: |
           node tests/native-creators.mjs

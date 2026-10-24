@@ -3,6 +3,7 @@
 #include "eddy_runtime.hpp"
 #include "three_history.hpp"
 #include "numerical_policy.hpp"
+#include "two_port_records.hpp"
 #include "asitic/combined_network.hpp"
 #include "asitic/extended_twoport.hpp"
 #include "asitic/extended_analysis.hpp"
@@ -368,6 +369,10 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         out+=sprintf(out,",\"capacitance_matrix\":");out=matrix_json(out,intermediate.capacitance);out+=sprintf(out,network->extended?",\"inductance_impedance_matrix\":":",\"inductance_admittance_matrix\":");out=matrix_json(out,intermediate.inductance);
         if(network->extended){out+=sprintf(out,",\"model\":\"PIX\",\"currents\":");out=matrix_json(out,intermediate.currents);out+=sprintf(out,",\"voltages\":");out=matrix_json(out,intermediate.voltages);}else {out+=sprintf(out,",\"node_capacitance_matrix\":");out=matrix_json(out,intermediate.node_capacitance);}
         if(padbed){out+=sprintf(out,",\"pad_capacitance_matrix\":");out=matrix_json(out,intermediate.pads);out+=sprintf(out,",\"with_pad_admittance_matrix\":");out=matrix_json(out,intermediate.with_pads);}
+        double bank[9]{};
+        if(transformer){const auto& m=coupled.model;bank[0]=m.first_inductance;bank[1]=m.second_inductance;bank[2]=m.coupling;bank[3]=m.ground_resistance;bank[4]=m.first_resistance;bank[5]=m.second_resistance;bank[8]=m.mutual;}
+        else __builtin_memcpy(bank,&combined.pi.inductance,sizeof(bank));
+        out+=sprintf(out,",\"two_port\":");out=reasitic::two_port_json(out,y,bank,transformer,frequency);
         sprintf(out,",\"green_table_hash\":\"%016llx\"}",table_hash(transformer?coupled.capacitance.cache:combined.capacitance.cache,nx,ny,pairs));return output;
     }
     ComplexMatrix matrix{};total_capacitance=total_resistance=__builtin_nan("");

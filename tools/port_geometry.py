@@ -7,7 +7,7 @@ from pathlib import Path
 import re,json
 from implicit_stores import expose
 ROOT=Path(__file__).resolve().parents[1]
-SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','port_records','extended_node','extended_driver','extended_analysis']
+SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','two_port_output','port_records','extended_node','extended_driver','extended_analysis']
 
 def translate(name,s):
     # Loads/stores of finite double values. Signaling NaN status is not exposed.
@@ -75,6 +75,9 @@ def translate(name,s):
         s=s.replace(f'asm("fldl %1; {instruction} %2":"=t"(value):"m"(a),"m"(b));',f'value=static_cast<long double>(a){op}b;')
     s=s.replace('asm("fldl %2; fsubrl %1":"=t"(value):"m"(a),"m"(b));','value=static_cast<long double>(a)-b;')
     s=s.replace('asm("fldl %1; fchs":"=t"(value):"m"(a));','value=-static_cast<long double>(a);')
+    if name=='two_port_output':
+        s=s.replace('asm volatile("fstpl %0":"=m"(destination):"t"(value):"st");','destination=x87::binary64(value);')
+        s=s.replace('asm volatile("fldl %1; fabs; fldl %2; fabs; fcompp; fnstsw %0" : "=a"(status) : "m"(denominator.real),"m"(denominator.imag) : "st","st(1)");','status=x87::comparison(x87::abs(static_cast<long double>(denominator.imag)),x87::abs(static_cast<long double>(denominator.real)))<<8;')
     if re.search(r'\basm\s*(?:volatile)?\s*\(',s):raise ValueError(f'Untranslated assembly in {name}')
     s=s.replace('#include "x87.hpp"','#include "x87_port.hpp"')
     # Preserve all literal bits using a binary128 host literal before conversion.
@@ -182,7 +185,7 @@ def generate(clang=None):
     proof={}
     for name in SOURCES:
         native=source(name)
-        if name.startswith('shape_') or name=='native_creators' or name in ('legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','port_records','extended_node','extended_driver','extended_analysis'):
+        if name.startswith('shape_') or name=='native_creators' or name in ('legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','two_port_output','port_records','extended_node','extended_driver','extended_analysis'):
             native,proof[name]=expose(name,native,clang)
         (target/(name+'.cpp')).write_text(translate(name,native))
     evidence=ROOT/'build/evidence';evidence.mkdir(exist_ok=True)

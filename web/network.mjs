@@ -16,3 +16,14 @@ export function networkVectorsCSV(result){
   if(!result?.currents || !result?.voltages)throw Error('Run PIX before exporting current and voltage vectors.');
   return ['frequency_hz,node,current_real_ampere,current_imag_ampere,voltage_real_volt,voltage_imag_volt',...result.currents.map((row,i)=>[result.frequency_hz,i,...row[0],...result.voltages[i][0]].map(number).join(','))].join('\n')+'\n';
 }
+
+export function twoPortRecord(result,parameter='s',polar=false){
+  const output=result?.two_port,records=polar?output?.polar_records:output?.records,headers=polar?output?.polar_headers:output?.headers;
+  if(!records || typeof records[parameter]!=='string' || typeof headers?.[parameter]!=='string')throw Error('Solve the selected two-port model before exporting this native record.');
+  return headers[parameter]+records[parameter]+'\n';
+}
+export function twoPortScatteringCSV(result){
+  const matrix=result?.two_port?.scattering_matrix;
+  if(!matrix)throw Error('Run a two-port solve before exporting scattering parameters.');
+  return ['frequency_hz,row,column,reference_ohm,real,imag',...matrix.flatMap((row,i)=>row.map((z,j)=>[result.frequency_hz,i,j,result.two_port.reference_ohm,...z].map(number).join(',')))].join('\n')+'\n';
+}

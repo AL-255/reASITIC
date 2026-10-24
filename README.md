@@ -30,7 +30,10 @@ matrix stamping are integrated. PI2 combines the original capacitance, inductanc
 and node-equation solvers into a two-port admittance matrix and pi model.
 CALCTRANS adds original coupled-winding narrowband simulation. PIX adds the
 original extended two-port node system. PI4 pad deembedding retains original
-reported model precision with the stable formulation; broader validation continues. Two-port S-parameter/sweep integration remains outstanding.
+reported model precision with the stable formulation; broader validation continues.
+PI2, PIX, PI4 and CALCTRANS export the recovered C++ two-port S conversion,
+native rectangular/polar S/Y/model records, and raw scattering CSVs.
+Native port frequency-sweep integration remains outstanding.
 Original 3PORT provides three-winding models and S/Y/Z conversion. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
@@ -67,6 +70,7 @@ node tests/portable-gmd.mjs
 node tests/portable-error-power.mjs
 node tests/portable-simulation.mjs
 node tests/portable-pad.mjs
+node tests/two-port-output.mjs
 node tests/native-creators.mjs
 node tests/original-creator-binary.mjs
 node tests/parity.mjs
@@ -229,7 +233,19 @@ and native fault cases are rejected before matrix indexing. There is no
 persistent browser table cache yet; fine grids can take tens of seconds. The
 original nonsquare indexing is preserved with sufficient zero backing storage;
 original-executable parity is currently measured on square FFT grids only.
-Extended/deembedded models and two-port S-parameter/sweep integration remain outstanding.
+PI2/PIX/PI4 and CALCTRANS now include the native two-port numerical writer.
+The original fixed 50-ohm conversion, diagonal formulas, reciprocal Y output,
+S entry order, GHz frequency stores and truncated column headers are preserved.
+These historical records are labelled as native ASITIC output; raw S CSVs expose
+every computed matrix entry. Verification compares 36 finite numerical rows and
+their headers byte for byte, plus 48 original binary64 S fields, from unmodified
+port commands in two fresh processes each. One original command's nonfinite
+admittance is rejected instead of exported as a finite result. Another 128
+isolated native/WASM comparisons cover nonsymmetric inputs, singular matrices,
+signed zero and extreme scales. `tools/capture_two_port.py` reproduces the
+read-only writer observations. Six complete reference-mode solves also reproduce
+all six record modes directly; the stable production formulation retains eight
+significant digits of the S entries in these cases. Port frequency sweeps remain outstanding.
 
 The worker protocol is tested with actual WASM startup, original wire matrices,
 streamed frequency samples, cancellation and error recovery. Scientific export
@@ -445,7 +461,7 @@ than claiming process-independent parity for uninitialized bytes.
 
 Next recreation work includes broader original-executable creator/input coverage,
 additional validation of stable full-network metrics,
-native two-port S-parameter conversion and port sweeps, and original-executable end-to-end
+native port sweeps, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.
 

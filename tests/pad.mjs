@@ -9,6 +9,7 @@ const known=new Set(['wire-self-ground','wire-subdivision','offset-pads-two-laye
 function compare(a,b,path,disagreements){
  if(typeof a==='number'){fields++;if(!Object.is(a,b))disagreements.push({path,actual:a,native:b});}
  else if(a&&typeof a==='object'){assert.deepEqual(Object.keys(a),Object.keys(b),path);for(const key of Object.keys(a))compare(a[key],b[key],path+'.'+key,disagreements);}
+ else if(typeof a==='string'&&/\.two_port\.(records|polar_records)\./.test(path)){if(a!==b)disagreements.push({path,actual:a,native:b});}
  else assert.equal(a,b,path);
 }
 function rawValues(result,key){return key==='pi'?Object.values(result.pi):['capacitance_matrix','inductance_admittance_matrix','pad_capacitance_matrix'].includes(key)?result[key][0].flatMap((_,j)=>result[key].flatMap(row=>row[j])):result[key].flat(2);}
@@ -24,7 +25,7 @@ for(const item of cases){
   const matrix=Buffer.from(reference.raw_hex.matrix,'hex'),nonfinite=Array.from({length:8},(_,i)=>matrix.readDoubleLE(i*8)).some(v=>!Number.isFinite(v));
   if(nonfinite){assert.match(actual.error,/nonfinite|finite stage/);assert.equal(actual.error,native.error);nativeNonfinite.push(item.name);console.log(item.name+': original raw admittance is nonfinite; WASM and x87 reject without publishing a finite model');continue;}
   assert.ok(!actual.error,actual.error);assert.ok(!native.error,native.error);const comparisons=[];compare(actual,native,item.name,comparisons);const disagreements=referenceHardware?comparisons:[];
-  if(!referenceHardware){const permitted=/\.(matrix|pi|resonance_hz|input_impedance|inductance_admittance_matrix|with_pad_admittance_matrix)(\.|$)/;assert.ok(comparisons.every(c=>permitted.test(c.path)),'Unexpected non-instruction-stage native difference');}
+  if(!referenceHardware){const permitted=/\.(matrix|pi|resonance_hz|input_impedance|inductance_admittance_matrix|with_pad_admittance_matrix|two_port\.(scattering_matrix|records|polar_records))(\.|$)/;assert.ok(comparisons.every(c=>permitted.test(c.path)),'Unexpected non-instruction-stage native difference');}
   assert.equal(actual.green_table_hash,reference.green_table_hash);rawCacheBytes+=reference.raw_cache_bytes;
   const rawDisagreements=[],hostRaw=[];
   for(const [key,hex]of Object.entries(reference.raw_hex)){

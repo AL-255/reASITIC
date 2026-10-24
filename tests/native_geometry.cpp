@@ -8,6 +8,7 @@ extern "C" const char* analyze(double);
 extern "C" const char* probe_runtime_trig(int,double);
 extern "C" const char* probe_retained_math(int,unsigned,unsigned,int);
 extern "C" const char* probe_math(int,double,double,double);
+extern "C" const char* probe_two_port_output(const double*,const double*,int,double);
 extern "C" double normalize_value(double,int,double,int);
 extern "C" int printf(const char*,...);
 extern "C" const char* probe_green(int,int,int,double,double,double,double,int);
@@ -32,6 +33,7 @@ extern "C" double strtod(const char*,char**);
 extern "C" int puts(const char*);
 extern "C" int atoi(const char*);
 extern "C" int main(int argc,char** argv,char**) {
+    if(argc==21 && argv[1][0]=='-' && argv[1][1]=='-' && argv[1][2]=='o'){double values[17];for(int i=0;i<17;++i)values[i]=strtod(argv[i+4],nullptr);puts(probe_two_port_output(values,values+8,atoi(argv[3]),strtod(argv[2],nullptr)));return 0;}
     if(argc==4 && argv[1][2]=='t'){puts(probe_runtime_trig(atoi(argv[2]),strtod(argv[3],nullptr)));return 0;}
     if(argc==6 && argv[1][2]=='x'){puts(probe_retained_math(atoi(argv[2]),static_cast<unsigned>(strtod(argv[3],nullptr)),static_cast<unsigned>(strtod(argv[4],nullptr)),atoi(argv[5])));return 0;}
     if(argc==6 && argv[1][0]=='-' && argv[1][2]=='i') { printf("%.17g\n",normalize_value(strtod(argv[2],nullptr),atoi(argv[3]),strtod(argv[4],nullptr),atoi(argv[5])));return 0; }
