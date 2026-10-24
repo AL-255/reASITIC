@@ -17,7 +17,13 @@ The browser workbench includes square/polygon/symmetric/multi-metal
 windings, planar and 3D mirror transformers, baluns, stacked capacitor plates,
 rings, wires and configurable via arrays. The original keyword parsers and
 interactive creator dispatch run in C++. The advanced command editor supports
-all twelve creator commands and native dimensions such as ILEN / IWID. Add devices
+all twelve creator commands, 41 original creator spellings and native dimensions
+such as ILEN / IWID. Aliases include SQ/SQR/RECT, SP/SPI/S, W, CONTACT/V,
+TRANSFORMER/TR/T, CAPTOR/CCAP, BALSQ/CENTERSQ, BALPOLY/CENTERPOLY,
+MMSQ/SQMM/RECTMM and HALO/CIRCLE/CIRC. Command matching uses ASCII case
+normalization and native comma/tab delimiters. The original catalog's mixed-case
+3DTrans/Trans3D/TransMIM entries cannot be reached after its own normalization;
+use 3DMIRRORTRANS for that creator. Add devices
 to a shared layout to construct independent ground conductors and coil assemblies;
 new devices require unique names and the same technology. Rejected additions,
 including late export failures, preserve the previous layout and solver state. Parameters use micrometres. The original `RESIS` DC resistance, `INDUCTANCE` conductor estimate and `RESISHF`
@@ -65,6 +71,14 @@ GDS generation and independent GDS-reader checks for 291 polygons. Transaction
 checks include partial edits, export-buffer exhaustion, lifetime recovery,
 selection, paired movements, parallel branches, empty layouts and subsequent
 simulation. Browser visual QA remains unverified.
+
+Creator alias verification uses 176 fresh unmodified original processes: four
+case/delimiter variants for each of 44 catalog entries. All 41 accepted aliases
+match the canonical original physical binary64 fields; the three unreachable
+entries retain their original unknown-command rejection. The actual WASM and
+worker paths reproduce all 164 accepted variants and byte-identical GDS files.
+`tests/creator-aliases.mjs` also checks the adapter against the pinned native
+catalog and rejects non-ASCII case folding that the original does not perform.
 
 The original numerical `SELFRES` search is available separately from the
 pi-model resonance estimate. It repeatedly analyzes the selected device and
@@ -235,6 +249,7 @@ node tests/portable-three-port.mjs
 node tests/three-port-sweep.mjs
 node tests/worker-three-port-sweep.mjs
 node tests/native-creators.mjs
+node tests/creator-aliases.mjs
 node tests/geometry-edits.mjs
 node tests/worker-geometry-edits.mjs
 python3 tests/gds_edits_reader.py
@@ -666,6 +681,7 @@ python3 tools/capture_maxnw.py --reference ~/github/asitic-re
 python3 tools/capture_maxnw_ports.py --reference ~/github/asitic-re
 python3 tools/capture_automatic_cells.py --reference ~/github/asitic-re # requires GDB
 python3 tools/capture_creators.py --reference ~/github/asitic-re
+python3 tools/capture_creator_aliases.py --reference ~/github/asitic-re
 python3 tools/capture_geometry_edits.py --reference ~/github/asitic-re
 python3 tools/capture_capacitance.py --reference ~/github/asitic-re
 python3 tools/capture_eddy.py --reference ~/github/asitic-re

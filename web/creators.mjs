@@ -1,10 +1,20 @@
 // Original command ids. This adapter formats inputs; all parsing, snapping,
 // turn normalization and geometry calculations stay in the C++ kernel.
-export const creatorIds={SQUARE:0,SPIRAL:1,WIRE:2,TRANS:3,CAPACITOR:4,BALUN:5,'3DMIRRORTRANS':10,VIA:14,SYMSQ:16,SYMPOLY:17,MMSQUARE:18,RING:22};
+export const creatorIds=Object.freeze({SQUARE:0,SPIRAL:1,WIRE:2,TRANS:3,CAPACITOR:4,BALUN:5,'3DMIRRORTRANS':10,VIA:14,SYMSQ:16,SYMPOLY:17,MMSQUARE:18,RING:22});
+export const creatorAliases=Object.freeze({...creatorIds,
+  SQ:0,SQR:0,RECT:0,SP:1,SPI:1,S:1,W:2,T:3,TRANSFORMER:3,TR:3,
+  CAPTOR:4,CCAP:4,B:5,BALUNT:5,SYMT:5,V:14,CONTACT:14,
+  BALSQ:16,CENTERSQ:16,SYMSQUARE:16,BALPOLY:17,CENTERPOLY:17,SYMSP:17,
+  MMSQ:18,SQMM:18,RECTMM:18,HALO:22,CIRCLE:22,CIRC:22});
+// Native token normalization uppercases ASCII before its case-sensitive
+// catalog lookup. The catalog's mixed-case 3DTrans/Trans3D/TransMIM entries
+// consequently cannot be reached by an original command line.
+const asciiUpper=text=>text.replace(/[a-z]/g,c=>c.toUpperCase());
 export function parseCreatorCommand(command,answers='') {
-  const match=command.trim().match(/^(\S+)(?:\s+([\s\S]*))?$/);
-  if(!match || !(match[1].toUpperCase() in creatorIds))throw Error('Use SQUARE, SPIRAL, WIRE, TRANS, CAPACITOR, BALUN, 3DMIRRORTRANS, VIA, SYMSQ, SYMPOLY, MMSQUARE or RING.');
-  return {id:creatorIds[match[1].toUpperCase()],keywords:match[2]??'',answers};
+  const match=typeof command==='string'&&command.match(/^[ \t\r\n\f\v,]*([^ \t\r\n\f\v,]+)(?:[ \t\r\n\f\v,]+([\s\S]*?))?[ \t\r\n\f\v]*$/);
+  const name=match&&asciiUpper(match[1]);
+  if(!match || !Object.hasOwn(creatorAliases,name))throw Error('Use SQUARE, SPIRAL, WIRE, TRANS, CAPACITOR, BALUN, 3DMIRRORTRANS, VIA, SYMSQ, SYMPOLY, MMSQUARE or RING (or an original creator alias).');
+  return {id:creatorAliases[name],keywords:match[2]??'',answers};
 }
 export function creatorRecipe(kind,p,o={}) {
   const [length,height,width,spacing,turns,radius,sides,metal,exit,angle,inner,secondary]=p;

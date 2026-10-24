@@ -61,6 +61,7 @@ jobs:
       - name: Audit recovered arithmetic and production solver behavior
         run: |
           node tests/native-creators.mjs
+          node tests/creator-aliases.mjs
           node tests/geometry-edits.mjs
           node tests/worker-geometry-edits.mjs
           python tests/gds_edits_reader.py

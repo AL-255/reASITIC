@@ -1,0 +1,586 @@
+{
+  "reference": "Unmodified original commands in four fresh processes per catalog alias; original/lower/mixed command case and native comma/tab delimiters; raw BSAVE defined physical fields",
+  "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+  "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+  "case_definition_sha256": "6ac7e386b4b256d7da93759e31f8cb8d4b0285ad04b087818863d018862d4602",
+  "canonical_geometry_sha256": "00dc4132ccaea396b474d02deef91ee550e2b5f14d0240e196bf079fd39ed028",
+  "catalog_sha256": "ff9842bc5adeaf13a029c933ce43123148e7cda4d2b1b44f9a2daf481d1eb477",
+  "physical_encoding": "LE shape count; sorted ASCII name+NUL, origin doubles, segment count; each segment: metal int32, width double, thickness double or nx/ny int32, 18 point doubles",
+  "cases": [
+    {
+      "family": "square",
+      "alias": "SQUARE",
+      "id": 0,
+      "accepted": true,
+      "variants": [
+        "SQUARE",
+        "square",
+        "SqUaRe"
+      ],
+      "delimiter_command": " ,\tSQUARE,\tNAME=A:LEN=80:WID=70:W=3:S=2:N=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "91e2d8689da7e3fc69977a76e09f3a65fa666bd10ac4f88b66d193b90875c0b9"
+    },
+    {
+      "family": "square",
+      "alias": "SQ",
+      "id": 0,
+      "accepted": true,
+      "variants": [
+        "SQ",
+        "sq",
+        "Sq"
+      ],
+      "delimiter_command": " ,\tSQ,\tNAME=A:LEN=80:WID=70:W=3:S=2:N=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "91e2d8689da7e3fc69977a76e09f3a65fa666bd10ac4f88b66d193b90875c0b9"
+    },
+    {
+      "family": "square",
+      "alias": "SQR",
+      "id": 0,
+      "accepted": true,
+      "variants": [
+        "SQR",
+        "sqr",
+        "SqR"
+      ],
+      "delimiter_command": " ,\tSQR,\tNAME=A:LEN=80:WID=70:W=3:S=2:N=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "91e2d8689da7e3fc69977a76e09f3a65fa666bd10ac4f88b66d193b90875c0b9"
+    },
+    {
+      "family": "square",
+      "alias": "RECT",
+      "id": 0,
+      "accepted": true,
+      "variants": [
+        "RECT",
+        "rect",
+        "ReCt"
+      ],
+      "delimiter_command": " ,\tRECT,\tNAME=A:LEN=80:WID=70:W=3:S=2:N=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "91e2d8689da7e3fc69977a76e09f3a65fa666bd10ac4f88b66d193b90875c0b9"
+    },
+    {
+      "family": "polygon",
+      "alias": "SPIRAL",
+      "id": 1,
+      "accepted": true,
+      "variants": [
+        "SPIRAL",
+        "spiral",
+        "SpIrAl"
+      ],
+      "delimiter_command": " ,\tSPIRAL,\tNAME=A:RAD=50:SIDES=6:W=3:S=2:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "f8a6731cc901cb69cd60481dae3311f8ef5db65d32ec3aee807b12b765f80769"
+    },
+    {
+      "family": "polygon",
+      "alias": "SP",
+      "id": 1,
+      "accepted": true,
+      "variants": [
+        "SP",
+        "sp",
+        "Sp"
+      ],
+      "delimiter_command": " ,\tSP,\tNAME=A:RAD=50:SIDES=6:W=3:S=2:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "f8a6731cc901cb69cd60481dae3311f8ef5db65d32ec3aee807b12b765f80769"
+    },
+    {
+      "family": "polygon",
+      "alias": "SPI",
+      "id": 1,
+      "accepted": true,
+      "variants": [
+        "SPI",
+        "spi",
+        "SpI"
+      ],
+      "delimiter_command": " ,\tSPI,\tNAME=A:RAD=50:SIDES=6:W=3:S=2:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "f8a6731cc901cb69cd60481dae3311f8ef5db65d32ec3aee807b12b765f80769"
+    },
+    {
+      "family": "polygon",
+      "alias": "S",
+      "id": 1,
+      "accepted": true,
+      "variants": [
+        "S",
+        "s",
+        "S"
+      ],
+      "delimiter_command": " ,\tS,\tNAME=A:RAD=50:SIDES=6:W=3:S=2:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "f8a6731cc901cb69cd60481dae3311f8ef5db65d32ec3aee807b12b765f80769"
+    },
+    {
+      "family": "wire",
+      "alias": "WIRE",
+      "id": 2,
+      "accepted": true,
+      "variants": [
+        "WIRE",
+        "wire",
+        "WiRe"
+      ],
+      "delimiter_command": " ,\tWIRE,\tNAME=A:LEN=40:WID=5:METAL=M1:XORG=10:YORG=20:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "cb568a57fdc6b712ef6f3f30f81e129fee2f9290a7f6faf02807a87bce4d69fe"
+    },
+    {
+      "family": "wire",
+      "alias": "W",
+      "id": 2,
+      "accepted": true,
+      "variants": [
+        "W",
+        "w",
+        "W"
+      ],
+      "delimiter_command": " ,\tW,\tNAME=A:LEN=40:WID=5:METAL=M1:XORG=10:YORG=20:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "cb568a57fdc6b712ef6f3f30f81e129fee2f9290a7f6faf02807a87bce4d69fe"
+    },
+    {
+      "family": "via",
+      "alias": "VIA",
+      "id": 14,
+      "accepted": true,
+      "variants": [
+        "VIA",
+        "via",
+        "ViA"
+      ],
+      "delimiter_command": " ,\tVIA \t",
+      "geometry_sha256": "458ed2aa2f3bb9e7e1c7d28a86da09d75b7e8b7b4a4279c5868ac356fb0d1098"
+    },
+    {
+      "family": "via",
+      "alias": "V",
+      "id": 14,
+      "accepted": true,
+      "variants": [
+        "V",
+        "v",
+        "V"
+      ],
+      "delimiter_command": " ,\tV \t",
+      "geometry_sha256": "458ed2aa2f3bb9e7e1c7d28a86da09d75b7e8b7b4a4279c5868ac356fb0d1098"
+    },
+    {
+      "family": "via",
+      "alias": "CONTACT",
+      "id": 14,
+      "accepted": true,
+      "variants": [
+        "CONTACT",
+        "contact",
+        "CoNtAcT"
+      ],
+      "delimiter_command": " ,\tCONTACT \t",
+      "geometry_sha256": "458ed2aa2f3bb9e7e1c7d28a86da09d75b7e8b7b4a4279c5868ac356fb0d1098"
+    },
+    {
+      "family": "transformer",
+      "alias": "TRANS",
+      "id": 3,
+      "accepted": true,
+      "variants": [
+        "TRANS",
+        "trans",
+        "TrAnS"
+      ],
+      "delimiter_command": " ,\tTRANS,\tPNAME=P:SNAME=S:LEN=100:WID=90:W=3:S=2:NP=1.5:NS=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "3840891f17638f01c7b6b81f08d2c7c0550e0918d0aabc990c0af8c17aa4ec50"
+    },
+    {
+      "family": "transformer",
+      "alias": "T",
+      "id": 3,
+      "accepted": true,
+      "variants": [
+        "T",
+        "t",
+        "T"
+      ],
+      "delimiter_command": " ,\tT,\tPNAME=P:SNAME=S:LEN=100:WID=90:W=3:S=2:NP=1.5:NS=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "3840891f17638f01c7b6b81f08d2c7c0550e0918d0aabc990c0af8c17aa4ec50"
+    },
+    {
+      "family": "transformer",
+      "alias": "TRANSFORMER",
+      "id": 3,
+      "accepted": true,
+      "variants": [
+        "TRANSFORMER",
+        "transformer",
+        "TrAnSfOrMeR"
+      ],
+      "delimiter_command": " ,\tTRANSFORMER,\tPNAME=P:SNAME=S:LEN=100:WID=90:W=3:S=2:NP=1.5:NS=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "3840891f17638f01c7b6b81f08d2c7c0550e0918d0aabc990c0af8c17aa4ec50"
+    },
+    {
+      "family": "transformer",
+      "alias": "TR",
+      "id": 3,
+      "accepted": true,
+      "variants": [
+        "TR",
+        "tr",
+        "Tr"
+      ],
+      "delimiter_command": " ,\tTR,\tPNAME=P:SNAME=S:LEN=100:WID=90:W=3:S=2:NP=1.5:NS=1.25:METAL=M4:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "3840891f17638f01c7b6b81f08d2c7c0550e0918d0aabc990c0af8c17aa4ec50"
+    },
+    {
+      "family": "capacitor",
+      "alias": "CAPACITOR",
+      "id": 4,
+      "accepted": true,
+      "variants": [
+        "CAPACITOR",
+        "capacitor",
+        "CaPaCiToR"
+      ],
+      "delimiter_command": " ,\tCAPACITOR,\tNAME=A:LEN=40:WID=5:METAL1=M2:METAL2=M1:XORG=100:YORG=100:ORIENT=0 \t",
+      "geometry_sha256": "4de72bf4db7debc46e513ac791cc79507152cc4bd62c7dbe572fbdbc7334bdc8"
+    },
+    {
+      "family": "capacitor",
+      "alias": "CAPTOR",
+      "id": 4,
+      "accepted": true,
+      "variants": [
+        "CAPTOR",
+        "captor",
+        "CaPtOr"
+      ],
+      "delimiter_command": " ,\tCAPTOR,\tNAME=A:LEN=40:WID=5:METAL1=M2:METAL2=M1:XORG=100:YORG=100:ORIENT=0 \t",
+      "geometry_sha256": "4de72bf4db7debc46e513ac791cc79507152cc4bd62c7dbe572fbdbc7334bdc8"
+    },
+    {
+      "family": "capacitor",
+      "alias": "CCAP",
+      "id": 4,
+      "accepted": true,
+      "variants": [
+        "CCAP",
+        "ccap",
+        "CcAp"
+      ],
+      "delimiter_command": " ,\tCCAP,\tNAME=A:LEN=40:WID=5:METAL1=M2:METAL2=M1:XORG=100:YORG=100:ORIENT=0 \t",
+      "geometry_sha256": "4de72bf4db7debc46e513ac791cc79507152cc4bd62c7dbe572fbdbc7334bdc8"
+    },
+    {
+      "family": "mirror_3d_transformer",
+      "alias": "3DMIRRORTRANS",
+      "id": 10,
+      "accepted": true,
+      "variants": [
+        "3DMIRRORTRANS",
+        "3dmirrortrans",
+        "3dMiRrOrTrAnS"
+      ],
+      "delimiter_command": " ,\t3DMIRRORTRANS \t",
+      "geometry_sha256": "45a2f554706083a004c5b304313bf53cf2d8ad7eeb4c3c4820d790c005c7ff59"
+    },
+    {
+      "family": "mirror_3d_transformer",
+      "alias": "3DTrans",
+      "id": null,
+      "accepted": false,
+      "variants": [
+        "3DTrans",
+        "3dtrans",
+        "3dTrAnS"
+      ],
+      "delimiter_command": " ,\t3DTrans \t",
+      "geometry_sha256": null,
+      "diagnostic": "Unknown or Mistyped Commnd"
+    },
+    {
+      "family": "mirror_3d_transformer",
+      "alias": "Trans3D",
+      "id": null,
+      "accepted": false,
+      "variants": [
+        "Trans3D",
+        "trans3d",
+        "TrAnS3D"
+      ],
+      "delimiter_command": " ,\tTrans3D \t",
+      "geometry_sha256": null,
+      "diagnostic": "Unknown or Mistyped Commnd"
+    },
+    {
+      "family": "mirror_3d_transformer",
+      "alias": "TransMIM",
+      "id": null,
+      "accepted": false,
+      "variants": [
+        "TransMIM",
+        "transmim",
+        "TrAnSmIm"
+      ],
+      "delimiter_command": " ,\tTransMIM \t",
+      "geometry_sha256": null,
+      "diagnostic": "Unknown or Mistyped Commnd"
+    },
+    {
+      "family": "symmetric_square",
+      "alias": "SYMSQ",
+      "id": 16,
+      "accepted": true,
+      "variants": [
+        "SYMSQ",
+        "symsq",
+        "SyMsQ"
+      ],
+      "delimiter_command": " ,\tSYMSQ,\tNAME=A:LEN=100:ILEN=15:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "807b8426ade6551a3ab6bc4d0a1588dc3f9954ce7957bed3e9cfdb3343ee9a6a"
+    },
+    {
+      "family": "symmetric_square",
+      "alias": "BALSQ",
+      "id": 16,
+      "accepted": true,
+      "variants": [
+        "BALSQ",
+        "balsq",
+        "BaLsQ"
+      ],
+      "delimiter_command": " ,\tBALSQ,\tNAME=A:LEN=100:ILEN=15:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "807b8426ade6551a3ab6bc4d0a1588dc3f9954ce7957bed3e9cfdb3343ee9a6a"
+    },
+    {
+      "family": "symmetric_square",
+      "alias": "CENTERSQ",
+      "id": 16,
+      "accepted": true,
+      "variants": [
+        "CENTERSQ",
+        "centersq",
+        "CeNtErSq"
+      ],
+      "delimiter_command": " ,\tCENTERSQ,\tNAME=A:LEN=100:ILEN=15:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "807b8426ade6551a3ab6bc4d0a1588dc3f9954ce7957bed3e9cfdb3343ee9a6a"
+    },
+    {
+      "family": "symmetric_square",
+      "alias": "SYMSQUARE",
+      "id": 16,
+      "accepted": true,
+      "variants": [
+        "SYMSQUARE",
+        "symsquare",
+        "SyMsQuArE"
+      ],
+      "delimiter_command": " ,\tSYMSQUARE,\tNAME=A:LEN=100:ILEN=15:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "807b8426ade6551a3ab6bc4d0a1588dc3f9954ce7957bed3e9cfdb3343ee9a6a"
+    },
+    {
+      "family": "symmetric_polygon",
+      "alias": "SYMPOLY",
+      "id": 17,
+      "accepted": true,
+      "variants": [
+        "SYMPOLY",
+        "sympoly",
+        "SyMpOlY"
+      ],
+      "delimiter_command": " ,\tSYMPOLY,\tNAME=A:RAD=50:ILEN=15:SIDES=6:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "1ef8ee3e977c2db0750b587b6f36dc7a0e6ea42d1d4623adc3912fbe939eb403"
+    },
+    {
+      "family": "symmetric_polygon",
+      "alias": "BALPOLY",
+      "id": 17,
+      "accepted": true,
+      "variants": [
+        "BALPOLY",
+        "balpoly",
+        "BaLpOlY"
+      ],
+      "delimiter_command": " ,\tBALPOLY,\tNAME=A:RAD=50:ILEN=15:SIDES=6:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "1ef8ee3e977c2db0750b587b6f36dc7a0e6ea42d1d4623adc3912fbe939eb403"
+    },
+    {
+      "family": "symmetric_polygon",
+      "alias": "CENTERPOLY",
+      "id": 17,
+      "accepted": true,
+      "variants": [
+        "CENTERPOLY",
+        "centerpoly",
+        "CeNtErPoLy"
+      ],
+      "delimiter_command": " ,\tCENTERPOLY,\tNAME=A:RAD=50:ILEN=15:SIDES=6:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "1ef8ee3e977c2db0750b587b6f36dc7a0e6ea42d1d4623adc3912fbe939eb403"
+    },
+    {
+      "family": "symmetric_polygon",
+      "alias": "SYMSP",
+      "id": 17,
+      "accepted": true,
+      "variants": [
+        "SYMSP",
+        "symsp",
+        "SyMsP"
+      ],
+      "delimiter_command": " ,\tSYMSP,\tNAME=A:RAD=50:ILEN=15:SIDES=6:W=3:S=2:N=2:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "1ef8ee3e977c2db0750b587b6f36dc7a0e6ea42d1d4623adc3912fbe939eb403"
+    },
+    {
+      "family": "balun",
+      "alias": "BALUN",
+      "id": 5,
+      "accepted": true,
+      "variants": [
+        "BALUN",
+        "balun",
+        "BaLuN"
+      ],
+      "delimiter_command": " ,\tBALUN,\tNAME=B:LEN=120:W1=3:W2=4:S=2:N=3:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0 \t",
+      "geometry_sha256": "b20061546ff3943826360887ea633531420bffeddeae271de0e87d65abc59a7d"
+    },
+    {
+      "family": "balun",
+      "alias": "B",
+      "id": 5,
+      "accepted": true,
+      "variants": [
+        "B",
+        "b",
+        "B"
+      ],
+      "delimiter_command": " ,\tB,\tNAME=B:LEN=120:W1=3:W2=4:S=2:N=3:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0 \t",
+      "geometry_sha256": "b20061546ff3943826360887ea633531420bffeddeae271de0e87d65abc59a7d"
+    },
+    {
+      "family": "balun",
+      "alias": "BALUNT",
+      "id": 5,
+      "accepted": true,
+      "variants": [
+        "BALUNT",
+        "balunt",
+        "BaLuNt"
+      ],
+      "delimiter_command": " ,\tBALUNT,\tNAME=B:LEN=120:W1=3:W2=4:S=2:N=3:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0 \t",
+      "geometry_sha256": "b20061546ff3943826360887ea633531420bffeddeae271de0e87d65abc59a7d"
+    },
+    {
+      "family": "balun",
+      "alias": "SYMT",
+      "id": 5,
+      "accepted": true,
+      "variants": [
+        "SYMT",
+        "symt",
+        "SyMt"
+      ],
+      "delimiter_command": " ,\tSYMT,\tNAME=B:LEN=120:W1=3:W2=4:S=2:N=3:METAL=M4:METAL2=M3:XORG=100:YORG=100:ORIENT=0 \t",
+      "geometry_sha256": "b20061546ff3943826360887ea633531420bffeddeae271de0e87d65abc59a7d"
+    },
+    {
+      "family": "multimetal_square",
+      "alias": "MMSQUARE",
+      "id": 18,
+      "accepted": true,
+      "variants": [
+        "MMSQUARE",
+        "mmsquare",
+        "MmSqUaRe"
+      ],
+      "delimiter_command": " ,\tMMSQUARE,\tNAME=A:LEN=80:WID=70:W=3:S=2:N=1:METAL=M5:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "f205e94fa49f71e26c012afcc074fb93129290ecfeec4ff914c100a0e479c2ea"
+    },
+    {
+      "family": "multimetal_square",
+      "alias": "MMSQ",
+      "id": 18,
+      "accepted": true,
+      "variants": [
+        "MMSQ",
+        "mmsq",
+        "MmSq"
+      ],
+      "delimiter_command": " ,\tMMSQ,\tNAME=A:LEN=80:WID=70:W=3:S=2:N=1:METAL=M5:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "f205e94fa49f71e26c012afcc074fb93129290ecfeec4ff914c100a0e479c2ea"
+    },
+    {
+      "family": "multimetal_square",
+      "alias": "SQMM",
+      "id": 18,
+      "accepted": true,
+      "variants": [
+        "SQMM",
+        "sqmm",
+        "SqMm"
+      ],
+      "delimiter_command": " ,\tSQMM,\tNAME=A:LEN=80:WID=70:W=3:S=2:N=1:METAL=M5:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "f205e94fa49f71e26c012afcc074fb93129290ecfeec4ff914c100a0e479c2ea"
+    },
+    {
+      "family": "multimetal_square",
+      "alias": "RECTMM",
+      "id": 18,
+      "accepted": true,
+      "variants": [
+        "RECTMM",
+        "rectmm",
+        "ReCtMm"
+      ],
+      "delimiter_command": " ,\tRECTMM,\tNAME=A:LEN=80:WID=70:W=3:S=2:N=1:METAL=M5:EXIT=M3:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "f205e94fa49f71e26c012afcc074fb93129290ecfeec4ff914c100a0e479c2ea"
+    },
+    {
+      "family": "ring",
+      "alias": "RING",
+      "id": 22,
+      "accepted": true,
+      "variants": [
+        "RING",
+        "ring",
+        "RiNg"
+      ],
+      "delimiter_command": " ,\tRING,\tNAME=A:RAD=40:W=3:GAP=20:SIDES=16:METAL=M4:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "1d2165a368cc6473adc1454d7a86f0980ddb195cc4b8ce59d5c64abcf9dcc817"
+    },
+    {
+      "family": "ring",
+      "alias": "HALO",
+      "id": 22,
+      "accepted": true,
+      "variants": [
+        "HALO",
+        "halo",
+        "HaLo"
+      ],
+      "delimiter_command": " ,\tHALO,\tNAME=A:RAD=40:W=3:GAP=20:SIDES=16:METAL=M4:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "1d2165a368cc6473adc1454d7a86f0980ddb195cc4b8ce59d5c64abcf9dcc817"
+    },
+    {
+      "family": "ring",
+      "alias": "CIRCLE",
+      "id": 22,
+      "accepted": true,
+      "variants": [
+        "CIRCLE",
+        "circle",
+        "CiRcLe"
+      ],
+      "delimiter_command": " ,\tCIRCLE,\tNAME=A:RAD=40:W=3:GAP=20:SIDES=16:METAL=M4:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "1d2165a368cc6473adc1454d7a86f0980ddb195cc4b8ce59d5c64abcf9dcc817"
+    },
+    {
+      "family": "ring",
+      "alias": "CIRC",
+      "id": 22,
+      "accepted": true,
+      "variants": [
+        "CIRC",
+        "circ",
+        "CiRc"
+      ],
+      "delimiter_command": " ,\tCIRC,\tNAME=A:RAD=40:W=3:GAP=20:SIDES=16:METAL=M4:XORG=100:YORG=100:ORIENT=0:PHASE=1 \t",
+      "geometry_sha256": "1d2165a368cc6473adc1454d7a86f0980ddb195cc4b8ce59d5c64abcf9dcc817"
+    }
+  ]
+}
