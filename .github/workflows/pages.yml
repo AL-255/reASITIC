@@ -40,6 +40,9 @@ jobs:
           node tests/portable-simulation.mjs
           node tests/portable-pad.mjs
           node tests/two-port-output.mjs
+          node tests/port-schedule.mjs
+          node tests/port-sweep.mjs
+          node tests/worker-port-sweep.mjs
       - name: Audit recovered arithmetic and production solver behavior
         run: |
           node tests/native-creators.mjs

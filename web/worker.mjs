@@ -1,4 +1,5 @@
 import createKernel from './asitic.js';
+import {portSampleSummary} from './port-sweep.mjs';
 import {validateThreePortBacking,allocateThreePortBacking} from './three-port.mjs';
 import {parseTechnology,configureKernel,generateGeometry,createGeometry} from './technology.mjs';
 const kernel=await createKernel();let epoch=0,processTechnology=null,hasLayout=false,currentLayout=null;
@@ -18,6 +19,30 @@ function solve(data,hz) {
   }else pointer=kernel._simulate(data.winding??0,hz,...parsed,data.filament_limit??256);
   const result=JSON.parse(kernel.UTF8ToString(pointer));
   if(result.error)throw Error(result.error);return result;
+}
+function solveTransformer(data,hz){
+      if(!processTechnology || !hasLayout)throw Error('Generate two windings before running CALCTRANS.');
+      const domain=processTechnology.domain,mesh=data.mesh??{},contact=data.contact_mesh??{},e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[],termination=Number(data.termination_ohm??0);
+      if(!Array.isArray(layers) || layers.length>2 || layers.some(i=>!Number.isInteger(i) || i<0))throw Error('Select up to two substrate layers.');
+      if(!Number.isFinite(termination))throw Error('Use a finite transformer termination.');
+      if(termination!==0 && (data.ground??-1)<0)throw Error('Choose an explicit ground for a nonzero CALCTRANS termination.');
+      const cells=[mesh.length??50,mesh.width??1.5,mesh.thickness??.5,contact.length??50,contact.width??20];
+      const parsed=data.nativeInput?cells.map(value=>kernel._normalize_value(Number(value),7,data.grid??.1,data.snap===false?0:1)):cells;
+      const resistance=data.nativeInput?kernel._normalize_value(termination,4,.1,0):termination;
+      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_transformer(data.primary??0,data.secondary??1,data.ground??-1,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,resistance,e.evaluation_limit??250000)));
+      if(result.error)throw Error(result.error);return result;
+}
+function solveNetwork(data,hz){
+      const model=data.model??'PI2';if(!['PI2','PIX','PI4'].includes(model))throw Error('Select PI2, PIX or PI4.');
+      const solver=model==='PI4'?kernel._simulate_pad_network:model==='PIX'?kernel._simulate_extended_network:kernel._simulate_network;
+      if(!processTechnology || !hasLayout)throw Error('Generate a layout before running the combined network.');
+      const pads=model==='PI4'?(data.pads??[]):[];if(model==='PI4'&&(!Array.isArray(pads)||pads.length!==2||pads.some(i=>!Number.isInteger(i)||i<0||!currentLayout.shapes[i])))throw Error('Select valid first and second PI4 pad records.');
+      const domain=processTechnology.domain,mesh=data.mesh??{},contact=data.contact_mesh??{},e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[];
+      if(!Array.isArray(layers) || layers.length>2 || layers.some(i=>!Number.isInteger(i) || i<0))throw Error('Select up to two substrate layers.');
+      const cells=[mesh.length??50,mesh.width??1.5,mesh.thickness??.5,contact.length??50,contact.width??20];
+      const parsed=data.nativeInput?cells.map(value=>kernel._normalize_value(Number(value),7,data.grid??.1,data.snap===false?0:1)):cells;
+      const result=JSON.parse(kernel.UTF8ToString(solver(data.winding??0,...pads,data.ground??-1,hz,...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000)));
+      if(result.error)throw Error(result.error);return result;
 }
 self.onmessage=async({data})=>{
   const task=++epoch;const action=data.action??'generate';
@@ -43,29 +68,24 @@ self.onmessage=async({data})=>{
       }else result=JSON.parse(kernel.UTF8ToString(kernel._simulate_three_port(...args)));
       if(result.error)throw Error(result.error);postMessage({id:data.id,three_port:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
     }
-    if(action==='transformer'){
-      if(!processTechnology || !hasLayout)throw Error('Generate two windings before running CALCTRANS.');
-      const domain=processTechnology.domain,mesh=data.mesh??{},contact=data.contact_mesh??{},e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[],termination=Number(data.termination_ohm??0);
-      if(!Array.isArray(layers) || layers.length>2 || layers.some(i=>!Number.isInteger(i) || i<0))throw Error('Select up to two substrate layers.');
-      if(!Number.isFinite(termination))throw Error('Use a finite transformer termination.');
-      if(termination!==0 && (data.ground??-1)<0)throw Error('Choose an explicit ground for a nonzero CALCTRANS termination.');
-      const cells=[mesh.length??50,mesh.width??1.5,mesh.thickness??.5,contact.length??50,contact.width??20];
-      const parsed=data.nativeInput?cells.map(value=>kernel._normalize_value(Number(value),7,data.grid??.1,data.snap===false?0:1)):cells;
-      const resistance=data.nativeInput?kernel._normalize_value(termination,4,.1,0):termination;
-      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_transformer(data.primary??0,data.secondary??1,data.ground??-1,frequency(data),...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,resistance,e.evaluation_limit??250000)));
-      if(result.error)throw Error(result.error);postMessage({id:data.id,transformer:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
-    }
-    if(action==='network'){
-      const model=data.model??'PI2';if(!['PI2','PIX','PI4'].includes(model))throw Error('Select PI2, PIX or PI4.');
-      const solver=model==='PI4'?kernel._simulate_pad_network:model==='PIX'?kernel._simulate_extended_network:kernel._simulate_network;
-      if(!processTechnology || !hasLayout)throw Error('Generate a layout before running the combined network.');
-      const pads=model==='PI4'?(data.pads??[]):[];if(model==='PI4'&&(!Array.isArray(pads)||pads.length!==2||pads.some(i=>!Number.isInteger(i)||i<0||!currentLayout.shapes[i])))throw Error('Select valid first and second PI4 pad records.');
-      const domain=processTechnology.domain,mesh=data.mesh??{},contact=data.contact_mesh??{},e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[];
-      if(!Array.isArray(layers) || layers.length>2 || layers.some(i=>!Number.isInteger(i) || i<0))throw Error('Select up to two substrate layers.');
-      const cells=[mesh.length??50,mesh.width??1.5,mesh.thickness??.5,contact.length??50,contact.width??20];
-      const parsed=data.nativeInput?cells.map(value=>kernel._normalize_value(Number(value),7,data.grid??.1,data.snap===false?0:1)):cells;
-      const result=JSON.parse(kernel.UTF8ToString(solver(data.winding??0,...pads,data.ground??-1,frequency(data),...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,e.evaluation_limit??250000)));
-      if(result.error)throw Error(result.error);postMessage({id:data.id,network:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
+    if(action==='transformer'){const result=solveTransformer(data,frequency(data));postMessage({id:data.id,transformer:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
+    if(action==='network'){const result=solveNetwork(data,frequency(data));postMessage({id:data.id,network:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;}
+    if(action==='port-sweep'){
+      const target=data.port_kind??'network';if(!['network','transformer'].includes(target))throw Error('Select a network or transformer sweep.');
+      if(!processTechnology||!hasLayout)throw Error('Generate a layout before running a port sweep.');
+      const range=['start_ghz','stop_ghz','step_ghz'].map(key=>{if(typeof data[key]!=='number')throw Error('Enter start, stop and step frequencies in GHz.');return frequency(data,data[key]);});
+      const limit=data.sample_limit??101;if(!Number.isInteger(limit))throw Error('Use an integer port sample limit.');
+      const plan=JSON.parse(kernel.UTF8ToString(kernel._port_frequency_schedule(...range,limit)));if(plan.error)throw Error(plan.error);
+      const solvePort=target==='transformer'?solveTransformer:solveNetwork;
+      for(const [index,hz] of plan.frequencies_hz.entries()){
+        if(task!==epoch)return;let result;
+        try{result=solvePort(data,hz);}catch(error){throw Error(`Port sample ${index+1}/${plan.frequencies_hz.length} at ${hz} Hz: ${error.message}`);}
+        const done=index===plan.frequencies_hz.length-1;
+        const summary=portSampleSummary(result);
+        postMessage({id:data.id,[target]:done?result:summary,port_sweep:{index,total:plan.frequencies_hz.length,done,target},warnings:kernel.UTF8ToString(kernel._last_warnings())});
+        if(!done)await new Promise(resolve=>setTimeout(resolve,0));
+      }
+      return;
     }
     if(action==='capacitance'){
       if(!processTechnology)throw Error('Generate a layout before running CAP.');

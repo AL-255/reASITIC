@@ -1,3 +1,4 @@
+extern "C" const char* port_frequency_schedule(double,double,double,int);
 extern "C" void reset_technology();
 extern "C" void set_metal(int,double,double,double,int);
 extern "C" void set_substrate(int,double);
@@ -34,6 +35,7 @@ extern "C" int puts(const char*);
 extern "C" int atoi(const char*);
 extern "C" int main(int argc,char** argv,char**) {
     if(argc==21 && argv[1][0]=='-' && argv[1][1]=='-' && argv[1][2]=='o'){double values[17];for(int i=0;i<17;++i)values[i]=strtod(argv[i+4],nullptr);puts(probe_two_port_output(values,values+8,atoi(argv[3]),strtod(argv[2],nullptr)));return 0;}
+    if(argc==6 && argv[1][0]=='-' && argv[1][1]=='-' && argv[1][2]=='s'){puts(port_frequency_schedule(strtod(argv[2],nullptr),strtod(argv[3],nullptr),strtod(argv[4],nullptr),atoi(argv[5])));return 0;}
     if(argc==4 && argv[1][2]=='t'){puts(probe_runtime_trig(atoi(argv[2]),strtod(argv[3],nullptr)));return 0;}
     if(argc==6 && argv[1][2]=='x'){puts(probe_retained_math(atoi(argv[2]),static_cast<unsigned>(strtod(argv[3],nullptr)),static_cast<unsigned>(strtod(argv[4],nullptr)),atoi(argv[5])));return 0;}
     if(argc==6 && argv[1][0]=='-' && argv[1][2]=='i') { printf("%.17g\n",normalize_value(strtod(argv[2],nullptr),atoi(argv[3]),strtod(argv[4],nullptr),atoi(argv[5])));return 0; }

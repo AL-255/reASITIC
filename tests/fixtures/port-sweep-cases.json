@@ -1,0 +1,189 @@
+{
+  "cases": [
+    {
+      "name": "network-three-points",
+      "family": "network",
+      "case": {
+        "name": "wire-coarse",
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+        "grid": [
+          8,
+          8
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ]
+    },
+    {
+      "name": "extended-three-points",
+      "family": "extended",
+      "case": {
+        "name": "square-no-eddy",
+        "id": 0,
+        "keywords": "NAME=A:LEN=200:WID=220:W=32:S=16:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100",
+        "grid": [
+          32,
+          32
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ]
+    },
+    {
+      "name": "pad-three-points",
+      "family": "pad",
+      "case": {
+        "name": "wire-distinct-ground",
+        "device": {
+          "id": 2,
+          "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+        },
+        "pads": [
+          {
+            "id": 2,
+            "keywords": "NAME=P1:LEN=64:WID=64:METAL=M1:XORG=36:YORG=100"
+          },
+          {
+            "id": 2,
+            "keywords": "NAME=P2:LEN=64:WID=64:METAL=M1:XORG=200:YORG=100"
+          }
+        ],
+        "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+        "grid": [
+          16,
+          16
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ]
+    },
+    {
+      "name": "transformer-three-points",
+      "family": "transformer",
+      "case": {
+        "primary": {
+          "id": 2,
+          "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+        },
+        "secondary": {
+          "id": 2,
+          "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+        },
+        "grid": [
+          16,
+          16
+        ],
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "frequency_ghz": 1,
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ],
+        "termination": 0,
+        "name": "wires-default"
+      },
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ]
+    },
+    {
+      "name": "network-native-decimal-steps",
+      "family": "network",
+      "case": {
+        "name": "wire-coarse",
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+        "grid": [
+          8,
+          8
+        ],
+        "frequency_ghz": 1,
+        "cells": [
+          1000,
+          1000,
+          1000
+        ],
+        "contact_cells": [
+          1000,
+          1000
+        ],
+        "eddy_mode": 0,
+        "layers": [
+          0,
+          1
+        ]
+      },
+      "range_ghz": [
+        0.1,
+        0.3,
+        0.1
+      ]
+    }
+  ]
+}

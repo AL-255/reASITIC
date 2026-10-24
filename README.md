@@ -33,7 +33,8 @@ original extended two-port node system. PI4 pad deembedding retains original
 reported model precision with the stable formulation; broader validation continues.
 PI2, PIX, PI4 and CALCTRANS export the recovered C++ two-port S conversion,
 native rectangular/polar S/Y/model records, and raw scattering CSVs.
-Native port frequency-sweep integration remains outstanding.
+PI2, PIX, PI4 and CALCTRANS also support stepped port frequency sweeps, streamed
+results, cancellation, combined native records and sweep metrics/S CSV exports.
 Original 3PORT provides three-winding models and S/Y/Z conversion. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
@@ -71,6 +72,9 @@ node tests/portable-error-power.mjs
 node tests/portable-simulation.mjs
 node tests/portable-pad.mjs
 node tests/two-port-output.mjs
+node tests/port-schedule.mjs
+node tests/port-sweep.mjs
+node tests/worker-port-sweep.mjs
 node tests/native-creators.mjs
 node tests/original-creator-binary.mjs
 node tests/parity.mjs
@@ -245,7 +249,28 @@ isolated native/WASM comparisons cover nonsymmetric inputs, singular matrices,
 signed zero and extreme scales. `tools/capture_two_port.py` reproduces the
 read-only writer observations. Six complete reference-mode solves also reproduce
 all six record modes directly; the stable production formulation retains eight
-significant digits of the S entries in these cases. Port frequency sweeps remain outstanding.
+significant digits of the S entries in these cases.
+
+Port sweeps use the recovered C++ `run_port_frequency_sweep` recurrence and its
+unrounded extended-precision stop comparison. Each start/stop/step is parsed at
+the native GHz input precision, then the saved Hz values pass directly to the
+selected C++ solve. A bounded recording callback prepares the frequency list
+before running any solver; nonadvancing steps and ranges exceeding 101 samples
+are rejected. The worker streams compact completed samples, retains full stage
+matrices only for the final sample, and yields between samples for cancellation.
+A failed solve stops the sweep with its sample/frequency diagnostic; completed
+samples remain exportable. Native numerical exports concatenate the original
+header once and every completed record in frequency order. S and metrics CSVs
+include the selected model and retain SI units and undefined values.
+
+Five repeated unmodified original sweeps cover PI2, PIX, PI4, CALCTRANS and
+decimal-step input rounding: all 15 saved frequencies and 20 complete numerical
+file sections match in reference mode. Production S entries agree to eight
+significant digits in these cases. Another 259 native/WASM scheduling cases
+exercise the unrounded stop boundary and saved-double recurrence; actual worker
+tests cover all four models, streaming, exports, invalid ranges, solver failure
+and cancellation recovery. Three-port sweep integration and broader original
+command coverage remain outstanding.
 
 The worker protocol is tested with actual WASM startup, original wire matrices,
 streamed frequency samples, cancellation and error recovery. Scientific export
@@ -461,7 +486,7 @@ than claiming process-independent parity for uninitialized bytes.
 
 Next recreation work includes broader original-executable creator/input coverage,
 additional validation of stable full-network metrics,
-native port sweeps, and original-executable end-to-end
+three-port sweeps, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.
 
