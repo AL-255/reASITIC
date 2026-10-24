@@ -9,6 +9,7 @@ export function parseTechnology(text) {
     current[key]=['name','color','techfile','techpath'].includes(key)?value:Number(value);
     if(typeof current[key]==='number' && !Number.isFinite(current[key]))throw Error('Invalid technology number');
   }
+  if(!blocks.layer.length || blocks.layer.length>32 || blocks.layer.some(layer=>!Number.isFinite(layer.t) || layer.t<=0))throw Error('Technology needs 1–32 layers with positive thickness');
   if(!blocks.metal.length || blocks.metal.length>32 || blocks.via.length>32)throw Error('Technology needs 1–32 metals and at most 32 vias');
   const metals=blocks.metal.map((m,i)=>{
     if(!(m.t>0 && m.rsh>0 && m.d>=0 && blocks.layer[m.layer] && m.d<=blocks.layer[m.layer].t))throw Error('Invalid metal '+i);

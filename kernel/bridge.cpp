@@ -22,7 +22,7 @@ double substrate[32]{};int substrate_count=0;
 char result[4*1024*1024],message[1024],warnings[4096];unsigned warning_length=0;
 void* allocate(unsigned n,void*) { return calloc(1,n+16); } // pad native MMSQUARE pointer workspace overrun
 void release(void* p,void*) { free(p); }
-void warn(const char* s,void*) { while(*s && warning_length<sizeof(warnings)-2)warnings[warning_length++]=*s++;warnings[warning_length++]='\n';warnings[warning_length]=0; }
+void warn(const char* s,void*) { if(warning_length>=sizeof(warnings)-2)return;while(*s && warning_length<sizeof(warnings)-2)warnings[warning_length++]=*s++;warnings[warning_length++]='\n';warnings[warning_length]=0; }
 void terminate(int,void*) { abort(); }
 void invalid(void*) { abort(); }
 int random(void*) { return 65; }
@@ -49,6 +49,7 @@ void set_via(int i,int bottom,int top,double width,double spacing,double over1,d
     if(i>=via_count)via_count=i+1;
 }
 const char* analyze(double frequency_hz) {
+    warning_length=0;warnings[0]=0;
     if(!head || !__builtin_isfinite(frequency_hz) || frequency_hz<=0)return "{\"error\":\"Generate a layout and supply a positive frequency\"}";
     char* out=result;out+=sprintf(out,"{\"frequency_hz\":%.17g,\"windings\":[",frequency_hz);int index=0;
     for(auto* shape=head;shape;shape=shape->next,++index) {
