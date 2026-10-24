@@ -76,6 +76,7 @@ const char* generate(int kind,const double* p) {
     if((kind==0 || kind==6 || kind==8) && p[4]*4!=static_cast<int>(p[4]*4))return "{\"error\":\"Square turns must be multiples of one quarter\"}";
     if((kind==3 || kind==4) && p[4]<0.5)return "{\"error\":\"Symmetric windings need at least half a turn\"}";
     if(kind==8 && (exit<0 || metal<=exit))return "{\"error\":\"Multi-metal square needs a lower exit metal\"}";
+    if((kind==0 || kind==3 || kind==4 || kind==6 || kind==7) && exit==metal)return "{\"error\":\"Exit or second metal must differ from primary metal\"}";
     if((kind==3 || kind==4 || kind==6 || kind==7) && exit<0)return "{\"error\":\"This winding needs a second metal\"}";
     if(kind==0 || kind==1 || kind==8) {
         const double available=kind==1?p[5]:((p[0]<p[1]?p[0]:p[1])*0.5);
