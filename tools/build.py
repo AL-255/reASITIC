@@ -22,9 +22,9 @@ def main():
         if not obj.exists() or p.stat().st_mtime>obj.stat().st_mtime:
             subprocess.run([args.emxx,'-x','c',*flags,*inc,'-c',str(p),'-o',str(obj)],check=True)
     cmd=[args.emxx,'-std=c++17',*flags,*inc,'-include',str(ROOT/'kernel/soft_real.hpp'),'-fpack-struct=4',
-         *[str(port/(n+'.cpp')) for n in SOURCES],str(ROOT/'kernel/bridge.cpp'),*objects,
+         *[str(port/(n+'.cpp')) for n in SOURCES],str(ROOT/'kernel/bridge.cpp'),str(ROOT/'kernel/simulation.cpp'),str(ROOT/'kernel/transcendentals.cpp'),str(ROOT/'kernel/math_probe.cpp'),*objects,
          '-sMODULARIZE=1','-sEXPORT_ES6=1','-sENVIRONMENT=web,worker,node','-sALLOW_MEMORY_GROWTH=1','-sFILESYSTEM=0',
-         '-sEXPORTED_FUNCTIONS=["_malloc","_free","_generate","_reset_technology","_set_substrate","_finalize_technology","_set_metal","_set_via","_last_warnings","_analyze"]',
+         '-sEXPORTED_FUNCTIONS=["_malloc","_free","_generate","_set_geometry_options","_reset_technology","_set_substrate","_finalize_technology","_set_metal","_set_via","_last_warnings","_analyze","_simulate","_probe_math"]',
          '-sEXPORTED_RUNTIME_METHODS=["UTF8ToString","HEAPF64"]','-o',str(dist/'asitic.js')]
     subprocess.run(cmd,check=True)
     print('Built',dist/'asitic.wasm')

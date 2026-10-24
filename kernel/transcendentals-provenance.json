@@ -1,0 +1,7 @@
+{
+  "basis": "Software binary128 evaluation adapted from the sibling retained_math.cpp worktree snapshot, with full-quadrant trig reduction and separate LOG2/LOG1P/F2XM1 entries",
+  "source_path": "/home/yukidama/github/reASITIC/native/retained_math.cpp",
+  "source_sha256": "c3f37d2fc37c02a43256b294a782b76e050feada35f962fbd331a7903d96c112",
+  "source_was_uncommitted": true,
+  "instruction_reference": "vendor/asitic/src/x87.hpp"
+}

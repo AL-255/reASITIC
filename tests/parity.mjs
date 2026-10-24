@@ -31,9 +31,5 @@ for(const item of cases){
 }
 const summary={components,mismatches,cases:report};writeFileSync('build/evidence/parity.json',JSON.stringify(summary,null,2)+'\n');
 console.log(`${components} numeric fields; ${mismatches} mismatches. See build/evidence/parity.json.`);
-// A milestone is explicitly not the final fidelity gate. --strict is the gate
-// for declaring numerical parity; it cannot silently accept known differences.
-if(process.argv.includes('--strict'))assert.equal(mismatches,0,'Original numerical parity is incomplete');
-for(const row of report)if(row.name!=='symmetric-polygon-0')assert.ok(row.exact,`${row.name} regressed`);
-assert.ok(report.find(r=>r.name==='symmetric-polygon-0').mismatches<=24);
+assert.equal(mismatches,0,'Original numerical parity regressed');
 assert.throws(()=>generateGeometry(kernel,0,[100,90,0,2,2,50,8,3,2,0,15,1.5]));

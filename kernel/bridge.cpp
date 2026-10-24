@@ -1,3 +1,4 @@
+#include "engine.hpp"
 #include "asitic/composite_geometry.hpp"
 #include "asitic/symmetric_construction.hpp"
 #include "asitic/transformer3d.hpp"
@@ -19,6 +20,7 @@ namespace {
 GeometryShape* head=nullptr;
 MetalLayer metals[32]{};ViaLayer vias[32]{};double heights[32]{};int metal_count=0,via_count=0;
 double substrate[32]{};int substrate_count=0;
+double origin_x=0,origin_y=0;int winding_phase=1;
 char result[4*1024*1024],message[1024],warnings[4096];unsigned warning_length=0;
 void* allocate(unsigned n,void*) { return calloc(1,n+16); } // pad native MMSQUARE pointer workspace overrun
 void release(void* p,void*) { free(p); }
@@ -29,10 +31,15 @@ int random(void*) { return 65; }
 double& number(GeometryShape& s,unsigned offset) { return *reinterpret_cast<double*>(s.filaments.prefix+offset); }
 int& integer(GeometryShape& s,unsigned offset) { return *reinterpret_cast<int*>(s.filaments.prefix+offset); }
 GeometryRuntime geometry{{{allocate,nullptr},release},{warn,nullptr},terminate,nullptr};
-void clear() { if(head)release_geometry_shapes(head,geometry.memory);head=nullptr;warning_length=0;warnings[0]=0; }
+void clear() { reasitic::release_simulation_result();if(head)release_geometry_shapes(head,geometry.memory);head=nullptr;warning_length=0;warnings[0]=0; }
+}
+namespace reasitic {
+EngineView engine_view() { return {head,metals,vias,metal_count,{warn,nullptr}}; }
+void clear_diagnostics() { warning_length=0;warnings[0]=0; }
 }
 extern "C" {
-void reset_technology() { clear();metal_count=via_count=substrate_count=0; }
+void reset_technology() { clear();metal_count=via_count=substrate_count=0;origin_x=origin_y=0;winding_phase=1; }
+void set_geometry_options(double x,double y,int phase) { origin_x=x;origin_y=y;winding_phase=phase?phase:1; }
 void set_substrate(int i,double thickness) { if(i<0 || i>=32)return;substrate[i]=thickness;if(i>=substrate_count)substrate_count=i+1; }
 void finalize_technology() { for(int i=substrate_count-2;i>=0;--i)substrate[i]=x87::binary64(Real(substrate[i])+substrate[i+1]); }
 void set_metal(int i,double height,double thickness,double resistance,int layer) {
@@ -67,6 +74,7 @@ const char* generate(int kind,const double* p) {
     clear();
     for(int i=0;i<12;++i)if(!__builtin_isfinite(p[i]))return "{\"error\":\"Parameters must be finite\"}";
     if(p[7]<0 || p[7]>=metal_count || p[8]< -1 || p[8]>=metal_count)return "{\"error\":\"Invalid metal selection\"}";
+    if(!__builtin_isfinite(origin_x) || !__builtin_isfinite(origin_y))return "{\"error\":\"Origins must be finite\"}";
     const int metal=static_cast<int>(p[7]),exit=static_cast<int>(p[8]);
     if(p[7]!=metal || p[8]!=exit)return "{\"error\":\"Metal indices must be integers\"}";
     if(metal<0 || metal>=metal_count || exit < -1 || exit>=metal_count || p[2]<=0 || p[3]<0 || p[4]<0.25 || p[4]>64 || p[11]<=0 || p[11]>64 || p[6]<3 || p[6]>256 || kind<0 || kind>9)
@@ -83,9 +91,9 @@ const char* generate(int kind,const double* p) {
         if(p[4]*(p[2]+p[3])+p[2]>available)return "{\"error\":\"Turns do not fit the available winding area\"}";
     }
     GeometryShape a{};integer(a,0x50)=kind==1?1:kind==2?2:kind==3?16:kind==4?17:kind==5?22:kind==8?18:0;
-    a.filaments.prefix[0]='P';integer(a,0x64)=static_cast<int>(p[6]);integer(a,0x68)=metal;integer(a,0x6c)=exit;
+    a.filaments.prefix[0]='P';a.attributes=static_cast<unsigned>(winding_phase);number(a,0x54)=origin_x;number(a,0x5c)=origin_y;integer(a,0x64)=static_cast<int>(p[6]);integer(a,0x68)=metal;integer(a,0x6c)=exit;
     number(a,0x70)=p[0];number(a,0x78)=(kind==3 || kind==4)?p[10]:p[1];number(a,0x80)=p[5];
-    number(a,0x88)=p[2];number(a,0x90)=kind==5?p[3]*0.017453292519943295:p[3];number(a,0x98)=p[4];number(a,0xa0)=p[9];
+    number(a,0x88)=p[2];number(a,0x90)=kind==5?x87::binary64(Real(p[3])*Real(0x1.1df46a2529d39p-6)):p[3];number(a,0x98)=p[4];number(a,0xa0)=p[9];
     GeometryTechnology tech{metals,vias,heights,metal_count};
     SpiralConstructionRuntime runtime{geometry,via_count,{warn,nullptr},sprintf,message,invalid,nullptr};
     SquareConstructionHistory square{{-1,-1},{}};

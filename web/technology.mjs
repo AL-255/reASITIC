@@ -28,7 +28,8 @@ export function configureKernel(kernel,technology) {
   technology.metals.forEach((m,i)=>kernel._set_metal(i,m.height,m.thickness,m.sheet_milliohms,m.layer));
   technology.vias.forEach((v,i)=>kernel._set_via(i,v.bottom,v.top,v.width,v.spacing,v.over1,v.over2,v.resistance));
 }
-export function generateGeometry(kernel,kind,parameters) {
+export function generateGeometry(kernel,kind,parameters,options={}) {
+  kernel._set_geometry_options(options.x??0,options.y??0,options.phase??1);
   const p=kernel._malloc(12*8);
   try{kernel.HEAPF64.set(parameters,p/8);const result=JSON.parse(kernel.UTF8ToString(kernel._generate(kind,p)));if(result.error)throw Error(result.error);result.warnings=kernel.UTF8ToString(kernel._last_warnings());return result;}
   finally{kernel._free(p);}

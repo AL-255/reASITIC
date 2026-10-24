@@ -6,7 +6,7 @@ hard error. Each long double arithmetic operation uses software binary80.
 from pathlib import Path
 import re
 ROOT=Path(__file__).resolve().parents[1]
-SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate']
+SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver_no_eddy']
 
 def translate(name,s):
     # Loads/stores of finite double values. Signaling NaN status is not exposed.
@@ -21,6 +21,7 @@ def translate(name,s):
     s=s.replace('asm volatile("faddl %2" : "=t"(result) : "0"(first),"m"(second));','result=first+second;')
     for op, instruction in [('-', 'fsubl'),('+','faddl')]:
         s=s.replace(f'asm volatile("fldl %1; {instruction} %2" : "=t"(result) : "m"(segment.endpoints[index]),"m"(origin[index%3]));',f'result=static_cast<long double>(segment.endpoints[index]){op}origin[index%3];')
+    s=s.replace('asm volatile("fstpl %0" : "=m"(destination) : "t"(value) : "st");','destination=x87::binary64(value);')
     # Whole helpers containing control-word changes, whose intended rounding
     # mode is explicit in the recovered source.
     helper={'ceiling':'ceil','floor_binary64':'floor','truncate64':'truncate64'}
@@ -47,6 +48,12 @@ def source(name):
         # Exclude unrelated command dispatch to avoid pulling in the whole host.
         s=(ROOT/'vendor/asitic/src/analysis_commands.cpp').read_text()
         return s[:s.index('long double shape_coupling_estimate(')]+'}\n'
+    if name=='solver_no_eddy':
+        # Retain the original no-eddy entry and its complete driver. Removing
+        # the unused eddy entry makes the null eddy argument constant, so the
+        # compiler eliminates the as-yet-unbound substrate branch.
+        s=(ROOT/'vendor/asitic/src/solver.cpp').read_text()
+        return s[:s.index('bool solve_inductance(const ShapeFilamentList&')]+'}\n'
     return (ROOT/'vendor/asitic/src'/(name+'.cpp')).read_text()
 
 def generate():

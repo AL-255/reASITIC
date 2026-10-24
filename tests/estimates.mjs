@@ -16,4 +16,4 @@ for(const [name,kind] of [['square',0],['polygon',1],['wire',2],['symmetric-squa
 }
 writeFileSync('build/evidence/estimates.json',JSON.stringify({fields,differences,maxRelative,cases:report},null,2)+'\n');
 console.log(`Original INDUCTANCE / RESISHF: ${fields} fields over 50 cases; ${differences} differing fields; maximum relative difference ${maxRelative}`);
-if(process.argv.includes('--strict'))assert.equal(differences,0);
+assert.equal(differences,0,'Original conductor-estimate parity regressed');

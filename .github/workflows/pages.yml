@@ -38,6 +38,9 @@ jobs:
           node tests/parity.mjs
           node tests/estimates.mjs
           node tests/connected-analysis.mjs
+          node tests/lmat.mjs
+          node tests/original-lmat.mjs
+          node tests/lmat-lifecycle.mjs
           node tests/worker.mjs
           python tests/gds_reader.py
       - name: Retain fidelity evidence, including known x87 differences
