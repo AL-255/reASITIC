@@ -1,6 +1,12 @@
 #pragma once
 namespace reasitic {
 struct PiShunts { double first_real,first_imag,second_real,second_imag; };
+// Reciprocal Pi circuit: grounded endpoint impedances and differential
+// impedance, in the original port order. Evaluate from the physical branches
+// rather than a determinant of rounded Y cells. Open circuits may publish
+// nonfinite impedances/quality; nonfinite inputs and allocation failure reject.
+bool pi_branch_impedances(const double* series,const PiShunts& shunts,
+                          double* impedances,double& differential_quality);
 // Folded chain: stamp C + D^T*Y*D, fix both endpoint voltages and eliminate
 // interior nodes. Optional PI4 pads are subtracted before binary64 rounding.
 // Inputs and outputs are column-major interleaved complex values; node_cap is

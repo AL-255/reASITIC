@@ -31,6 +31,14 @@ for(const c of cases){
     assert.deepEqual(software,native,c.name+' native/WASM shunts');assert.deepEqual(actual.pi_shunts,software,c.name+' production shunts');
     assert.deepEqual(softwarePorts,nativePorts,c.name+' native/WASM port solve');
     for(const key of ['matrix','currents','voltages'])assert.deepEqual(actual[key],softwarePorts[key],c.name+' production '+key);
+    const branches=[...actual.matrix[1][0].map(v=>-v),...software.first,...software.second],branchBytes=Buffer.alloc(48);
+    branches.forEach((v,i)=>branchBytes.writeDoubleLE(v,i*8));writeFileSync('build/portable-two-port/extended-impedance.bin',branchBytes);
+    const nativeImpedance=JSON.parse(execFileSync('build/portable-math/gmd-native',['--pi-impedance','build/portable-two-port/extended-impedance.bin'],{encoding:'utf8'}));
+    const branchPointer=math._malloc(48);let branchImpedance;
+    try{math.HEAPF64.set(branches,branchPointer/8);branchImpedance=JSON.parse(math.UTF8ToString(math._probe_pi_impedance(branchPointer)));}finally{math._free(branchPointer);}
+    assert.deepEqual(branchImpedance,nativeImpedance,c.name+' native/WASM branch impedance');
+    assert.deepEqual(actual.input_impedance,branchImpedance.input_impedance,c.name+' production branch impedance');
+    assert.equal(actual.pi.quality_differential,branchImpedance.quality_differential,c.name+' production branch Q');
     for(const key of ['first','second'])software[key].forEach((v,i)=>assert.ok(relative(v,expected.circuit_shunts[key][i])<=1e-10,c.name+' independent '+key+' shunt '+i));
     const stageErrors={};for(const key of ['matrix','currents','voltages']){stageErrors[key]=matrixError(actual[key],expected[key],c.name+' '+key);assert.ok(stageErrors[key]<=1e-14,c.name+' reduced '+key+' error '+stageErrors[key]);}
     const metricErrors={};for(const [key,value]of Object.entries(expected.circuit_metrics.pi)){
@@ -38,9 +46,9 @@ for(const c of cases){
       if(value!==null)metricErrors[key]=relative(actual.pi[key],value);
     }
     const maximumMetricError=Math.max(...Object.values(metricErrors));reports.push({name:c.name,groups:actual.groups,stageErrors,metricErrors,maximumMetricError});
-    assert.ok(maximumMetricError<=1e-10,c.name+' circuit metrics '+maximumMetricError);
+    assert.ok(maximumMetricError<=1e-14,c.name+' circuit metrics '+maximumMetricError);
     assert.equal(actual.resonance_hz===null,expected.circuit_metrics.resonance_hz===null,c.name+' resonance classification');if(actual.resonance_hz!==null)assert.ok(relative(actual.resonance_hz,expected.circuit_metrics.resonance_hz)<=1e-10,c.name+' resonance');
-    matrixError(actual.input_impedance,expected.circuit_metrics.input_impedance,c.name+' input impedance');
+    assert.ok(matrixError(actual.input_impedance,expected.circuit_metrics.input_impedance,c.name+' input impedance')<=1e-14,c.name+' branch impedance circuit error');
     console.log(c.name+': independent PIX reduction and full-precision metrics pass');
   }catch(error){failures.push({name:c.name,message:error.message,actual});console.log(c.name+': '+error.message);}
 }

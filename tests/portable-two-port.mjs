@@ -50,6 +50,14 @@ for(const {model,item:c} of cases){
     assert.deepEqual(native,software,name+' native/WASM common-mode shunts');assert.deepEqual(software,actual.pi_shunts,name+' production common-mode integration');
     assert.deepEqual(nativePorts,softwarePorts,name+' native/WASM endpoint solve');
     for(const [key,value]of Object.entries(softwarePorts))assert.deepEqual(actual[key],value,name+' production '+key);
+    const branches=[...actual.matrix[1][0].map(v=>-v),...software.first,...software.second],branchBytes=Buffer.alloc(48);
+    branches.forEach((v,i)=>branchBytes.writeDoubleLE(v,i*8));writeFileSync('build/portable-two-port/folded-impedance.bin',branchBytes);
+    const nativeImpedance=JSON.parse(execFileSync('build/portable-math/gmd-native',['--pi-impedance','build/portable-two-port/folded-impedance.bin'],{encoding:'utf8'}));
+    const branchPointer=math._malloc(48);let branchImpedance;
+    try{math.HEAPF64.set(branches,branchPointer/8);branchImpedance=JSON.parse(math.UTF8ToString(math._probe_pi_impedance(branchPointer)));}finally{math._free(branchPointer);}
+    assert.deepEqual(branchImpedance,nativeImpedance,name+' native/WASM branch impedance');
+    assert.deepEqual(actual.input_impedance,branchImpedance.input_impedance,name+' production branch impedance');
+    assert.equal(actual.pi.quality_differential,branchImpedance.quality_differential,name+' production branch Q');
     for(const key of ['first','second'])software[key].forEach((v,i)=>{const expected=reference.circuit_shunts[key][i];assert.ok(relative(v,expected)<=1e-10,name+' independent '+key+' shunt '+i);assert.equal(bits(v),bits(native[key][i]));});
     const stages={};for(const key of ['node_capacitance_matrix','with_pad_admittance_matrix','matrix'])if(reference[key]){stages[key]=compareMatrix(actual[key],reference[key],name+' '+key);assert.ok(stages[key]<=1e-14,name+' endpoint reduction '+key+' error '+stages[key]);}
     const metrics=reference.reported_metrics;let metricError=0,circuitMetricError=0;const circuitMetricErrors={};
@@ -58,7 +66,7 @@ for(const {model,item:c} of cases){
       else {assert.ok(actual.pi[key]!==null,name+' '+key+' finite');const error=relative(actual.pi[key],value);assert.ok(error<=1e-10,name+' '+key+' metric error '+error);metricError=Math.max(metricError,error);}
       const circuit=reference.circuit_metrics.pi[key];
       assert.equal(circuit===null,actual.pi[key]===null,name+' circuit '+key+' classification');
-      if(circuit!==null&&actual.pi[key]!==null){circuitMetricErrors[key]=relative(actual.pi[key],circuit);assert.ok(circuitMetricErrors[key]<=1e-10,name+' circuit '+key+' error '+circuitMetricErrors[key]);circuitMetricError=Math.max(circuitMetricError,circuitMetricErrors[key]);}
+      if(circuit!==null&&actual.pi[key]!==null){circuitMetricErrors[key]=relative(actual.pi[key],circuit);assert.ok(circuitMetricErrors[key]<=1e-14,name+' circuit '+key+' error '+circuitMetricErrors[key]);circuitMetricError=Math.max(circuitMetricError,circuitMetricErrors[key]);}
     }
     if(metrics.resonance_hz===null)assert.equal(actual.resonance_hz,null,name+' resonance classification');
     else assert.ok(relative(actual.resonance_hz,metrics.resonance_hz)<=1e-10,name+' resonance');
@@ -66,6 +74,7 @@ for(const {model,item:c} of cases){
     const circuit=reference.circuit_metrics;assert.equal(circuit.resonance_hz===null,actual.resonance_hz===null,name+' circuit resonance classification');
     const circuitResonanceError=circuit.resonance_hz===null?0:relative(actual.resonance_hz,circuit.resonance_hz);assert.ok(circuitResonanceError<=1e-10,name+' circuit resonance error '+circuitResonanceError);
     const circuitImpedanceError=compareMatrix(actual.input_impedance,circuit.input_impedance,name+' circuit input impedance');
+    assert.ok(circuitImpedanceError<=1e-14,name+' branch impedance circuit error '+circuitImpedanceError);
     reports.push({name,groups:actual.groups,stages,maximumReportedMetricRelativeError:metricError,maximumCircuitMetricRelativeError:circuitMetricError,circuitMetricErrors,impedanceError,circuitResonanceError,circuitImpedanceError});
     console.log(name+': independent vertex elimination, pad subtraction and full precision metrics pass');
   }catch(error){failures.push({name,message:error.message,actual});console.log(name+': '+error.message);}

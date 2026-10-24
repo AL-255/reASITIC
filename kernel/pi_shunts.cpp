@@ -39,6 +39,13 @@ Complex operator*(const Complex& a,const Complex& b){return {a.real*b.real-a.ima
 Complex operator/(const Complex& a,const Complex& b){const auto norm=b.real*b.real+b.imag*b.imag;return {(a.real*b.real+a.imag*b.imag)/norm,(a.imag*b.real-a.real*b.imag)/norm};}
 Number exact_sum(const Number& a,const Number& b,bool subtract=false){Number r(*a.context);a.context->status|=subtract?bf_sub(&r.value,&a.value,&b.value,BF_PREC_INF,BF_RNDN):bf_add(&r.value,&a.value,&b.value,BF_PREC_INF,BF_RNDN);return r;}
 Complex exact_sum(const Complex& a,const Complex& b,bool subtract=false){return {exact_sum(a.real,b.real,subtract),exact_sum(a.imag,b.imag,subtract)};}
+Number exact_product(const Number& a,const Number& b){Number r(*a.context);a.context->status|=bf_mul(&r.value,&a.value,&b.value,BF_PREC_INF,BF_RNDN);return r;}
+Complex exact_product(const Complex& a,const Complex& b){return {exact_sum(exact_product(a.real,b.real),exact_product(a.imag,b.imag),true),exact_sum(exact_product(a.real,b.imag),exact_product(a.imag,b.real))};}
+Complex guarded_quotient(const Complex& a,const Complex& b){
+    const auto denominator=exact_sum(exact_product(b.real,b.real),exact_product(b.imag,b.imag));
+    return {exact_sum(exact_product(a.real,b.real),exact_product(a.imag,b.imag))/denominator,
+            exact_sum(exact_product(a.imag,b.real),exact_product(a.real,b.imag),true)/denominator};
+}
 Complex shift(const Complex& a,slimb_t exponent){Complex r(a);a.real.context->status|=bf_mul_2exp(&r.real.value,exponent,BF_PREC_INF,BF_RNDN);a.imag.context->status|=bf_mul_2exp(&r.imag.value,exponent,BF_PREC_INF,BF_RNDN);return r;}
 Complex negate(const Complex& a){Complex r(a);bf_neg(&r.real.value);bf_neg(&r.imag.value);return r;}
 Number norm(const Complex& a){return a.real*a.real+a.imag*a.imag;}
@@ -73,6 +80,27 @@ bool solve(Values& a,Values& rhs,Complex* solution,int m,int columns=1){
 
 }
 namespace reasitic {
+bool pi_branch_impedances(const double* series,const PiShunts& shunts,double* impedances,double& differential_quality){
+    if(!series||!impedances)return false;
+    const double values[]={series[0],series[1],shunts.first_real,shunts.first_imag,shunts.second_real,shunts.second_imag};
+    for(double value:values)if(!__builtin_isfinite(value))return false;
+    Context c;const Complex s(c,values),first(c,values+2),second(c,values+4);
+    const double unity[]={1,0};const Complex one(c,unity);
+    const auto grounded_first=guarded_quotient(one,exact_sum(s,second)),grounded_second=guarded_quotient(one,exact_sum(s,first));
+    const auto sum=exact_sum(first,second);
+    auto numerator=sum,denominator=exact_sum(exact_product(s,sum),exact_product(first,second));
+    // With no shunt path, the differential source sees the series branch.
+    // Taking this circuit limit avoids the determinant's indeterminate 0/0.
+    if(bf_is_zero(&first.real.value)&&bf_is_zero(&first.imag.value)&&bf_is_zero(&second.real.value)&&bf_is_zero(&second.imag.value)){numerator=one;denominator=s;}
+    const auto differential=guarded_quotient(numerator,denominator);
+    // Q = Im(Z)/Re(Z); the shared |denominator|^2 cancels symbolically.
+    // Exact dyadic products retain small components even at resonance.
+    const auto q=exact_sum(exact_product(numerator.imag,denominator.real),exact_product(numerator.real,denominator.imag),true)/
+                 exact_sum(exact_product(numerator.real,denominator.real),exact_product(numerator.imag,denominator.imag));
+    const double result[]={grounded_first.real.rounded(),grounded_first.imag.rounded(),grounded_second.real.rounded(),grounded_second.imag.rounded(),differential.real.rounded(),differential.imag.rounded(),q.rounded()};
+    if(c.status&BF_ST_MEM_ERROR)return false;
+    for(int i=0;i<6;++i)impedances[i]=result[i];differential_quality=result[6];return true;
+}
 bool folded_port_network(const double* cap,const double* ind,int n,int cap_stride,int ind_stride,
                          const double* pads,int pad_stride,double* ports,double* node_cap,double* with_pads){
     if(n<1||n>1024||!ports||!finite(cap,n,cap_stride)||!finite(ind,n,ind_stride)||(pads&&!finite(pads,2,pad_stride)))return false;

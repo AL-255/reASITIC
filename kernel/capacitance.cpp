@@ -368,11 +368,13 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         if(!ok || !finite_matrix(intermediate.capacitance) || !finite_matrix(intermediate.inductance))return "{\"error\":\"Original combined solver did not produce finite matrices\"}";
         for(const auto z:ports)if(!__builtin_isfinite(z.real) || !__builtin_isfinite(z.imag))return "{\"error\":\"Original node equations produced nonfinite admittance\"}";
 #ifdef __EMSCRIPTEN__
-        reasitic::PiShunts shunts{};const bool stable_shunts=!transformer&&!reasitic::reference_numerics();
+        reasitic::PiShunts shunts{};double branch_impedances[6];const bool stable_shunts=!transformer&&!reasitic::reference_numerics();
         if(stable_shunts){
             const bool calculated=network->extended?reasitic::extended_common_mode_shunts(reinterpret_cast<const double*>(intermediate.capacitance.data),reinterpret_cast<const double*>(intermediate.inductance.data),intermediate.capacitance.rows,intermediate.capacitance.stride,intermediate.inductance.stride,shunts):reasitic::common_mode_shunts(reinterpret_cast<const double*>(intermediate.capacitance.data),reinterpret_cast<const double*>(intermediate.inductance.data),intermediate.capacitance.rows,intermediate.capacitance.stride,intermediate.inductance.stride,padbed?reinterpret_cast<const double*>(intermediate.pads.data):nullptr,intermediate.pads.stride,shunts);
             if(!calculated)return "{\"error\":\"Common-mode shunt solve failed\"}";
             combined.pi=extract_pi_equivalent_with_shunts(y,frequency,{shunts.first_real,shunts.first_imag},{shunts.second_real,shunts.second_imag});
+            const double series[]={-y.y21.real,-y.y21.imag};
+            if(!reasitic::pi_branch_impedances(series,shunts,branch_impedances,combined.pi.quality_differential))return "{\"error\":\"Pi branch impedance evaluation failed\"}";
         }
 #endif
         const unsigned capacity=64u*(intermediate.capacitance.elements+intermediate.inductance.elements+intermediate.node_capacitance.elements+intermediate.currents.rows*intermediate.currents.columns+intermediate.voltages.rows*intermediate.voltages.columns+intermediate.pads.elements+intermediate.with_pads.elements)+16384u;
@@ -399,7 +401,14 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         if(stable_shunts)out+=sprintf(out,",\"pi_shunts\":{\"first\":[%.17g,%.17g],\"second\":[%.17g,%.17g],\"precision_bits\":128}",shunts.first_real,shunts.first_imag,shunts.second_real,shunts.second_imag);
 #endif
         }
-        out+=sprintf(out,",\"input_impedance\":[");out=complex_json(out,two_port_impedance(y,false,1));out+=sprintf(out,",");out=complex_json(out,two_port_impedance(y,false,2));out+=sprintf(out,",");out=complex_json(out,two_port_impedance(y,true,1));out+=sprintf(out,"],\"eddy\":");out=reasitic::eddy_metadata(out,*network->eddy);
+        out+=sprintf(out,",\"input_impedance\":[");
+        for(int i=0;i<3;++i){if(i)out+=sprintf(out,",");
+#ifdef __EMSCRIPTEN__
+            if(stable_shunts)out=complex_json(out,{branch_impedances[2*i],branch_impedances[2*i+1]});else
+#endif
+            out=complex_json(out,two_port_impedance(y,i==2,i+1));
+        }
+        out+=sprintf(out,"],\"eddy\":");out=reasitic::eddy_metadata(out,*network->eddy);
         out+=sprintf(out,",\"capacitance_matrix\":");out=matrix_json(out,intermediate.capacitance);out+=sprintf(out,network->extended?",\"inductance_impedance_matrix\":":",\"inductance_admittance_matrix\":");out=matrix_json(out,intermediate.inductance);
         if(network->extended){out+=sprintf(out,",\"model\":\"PIX\",\"currents\":");out=matrix_json(out,intermediate.currents);out+=sprintf(out,",\"voltages\":");out=matrix_json(out,intermediate.voltages);}else {out+=sprintf(out,",\"node_capacitance_matrix\":");out=matrix_json(out,intermediate.node_capacitance);}
         if(padbed){out+=sprintf(out,",\"pad_capacitance_matrix\":");out=matrix_json(out,intermediate.pads);out+=sprintf(out,",\"with_pad_admittance_matrix\":");out=matrix_json(out,intermediate.with_pads);}

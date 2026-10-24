@@ -43,8 +43,17 @@ def metrics(y, frequency, shunts=None):
         else:
             capacitances.append(mp.mpf(0))
             resistances.append(mp.mpf(1e15))
-    inverse = y**-1
-    differential = (mp.matrix([[1, -1]]) * inverse * mp.matrix([1, -1]))[0]
+    if shunts:
+        # A reciprocal Pi circuit with independently evaluated shunts. Use
+        # their series connection in parallel with the main branch; never
+        # reconstruct the small common-mode path from rounded Y entries.
+        a,b=branches
+        differential=(a+b)/(series*(a+b)+a*b) if a or b else 1/series
+        grounded=[1/(series+a),1/(series+b)]
+    else:
+        inverse = y**-1
+        differential = (mp.matrix([[1, -1]]) * inverse * mp.matrix([1, -1]))[0]
+        grounded=[1/y[1,1],1/y[0,0]]
     result = dict(frequency_hz=frequency, inductance_h=inductance,
                   resistance=resistance, capacitance_second_f=capacitances[0],
                   capacitance_first_f=capacitances[1],
@@ -73,7 +82,7 @@ def metrics(y, frequency, shunts=None):
     return dict(pi={key: scalar(value) for key, value in result.items()},
                 resonance_hz=scalar(resonance),
                 input_impedance=[[float(mp.re(z)), float(mp.im(z))]
-                                 for z in [1 / y[1, 1], 1 / y[0, 0], differential]])
+                                 for z in [*grounded, differential]])
 
 
 def reference(result, *, nodes_only=False):

@@ -38,6 +38,7 @@ jobs:
           node tests/portable-gmd.mjs
           node tests/portable-error-power.mjs
           node tests/portable-pi-shunts.mjs
+          node tests/portable-pi-impedance.mjs
           node tests/portable-extended-shunts.mjs
           node tests/portable-extended-ports.mjs
           node tests/portable-folded-ports.mjs

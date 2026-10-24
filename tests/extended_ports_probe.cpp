@@ -1,6 +1,14 @@
 #include "pi_shunts.hpp"
 #include <cstdio>
 #include <cstdlib>
+extern "C" const char* probe_pi_impedance(const double* values){
+    static char output[1024];double result[7];
+    if(!reasitic::pi_branch_impedances(values,{values[2],values[3],values[4],values[5]},result,result[6]))return "{\"error\":\"Invalid Pi branches\"}";
+    char* out=output;out+=sprintf(out,"{\"input_impedance\":[");
+    const auto number=[&](double v){out+=__builtin_isfinite(v)?sprintf(out,"%.17g",v):sprintf(out,"null");};
+    for(int i=0;i<3;++i){out+=sprintf(out,"%s[",i?",":"");number(result[2*i]);out+=sprintf(out,",");number(result[2*i+1]);out+=sprintf(out,"]");}
+    out+=sprintf(out,"],\"quality_differential\":");number(result[6]);sprintf(out,"}");return output;
+}
 extern "C" const char* probe_folded_ports(const double* cap,const double* ind,int n,const double* pads,int pad_stride){
     static char* output=nullptr;free(output);output=nullptr;
     if(n<1||n>1024)return "{\"error\":\"Invalid folded dimension\"}";

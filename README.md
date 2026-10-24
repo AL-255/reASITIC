@@ -317,6 +317,16 @@ then consume these stable branches. Returned `pi_shunts` records the values
 actually used: the rounded port matrix can lose conductances that the shunt
 calculation retains. Historical arithmetic mode keeps the original extraction.
 
+PI2, PI4 and PIX evaluate input impedances and differential Q from these
+branches too. With series admittance `s` and endpoint shunts `a,b`, the
+differential impedance is `(a+b)/(s*(a+b)+a*b)`. Exact dyadic sums and products
+precede guarded division, avoiding cancellation in the determinant of rounded
+port entries. When both shunts vanish, the circuit gives `1/s` directly.
+The grounded inputs use `1/(s+a)` and `1/(s+b)` in the original port order.
+Differential Q cancels the shared denominator magnitude before evaluation.
+This uses the reciprocal Pi model already assumed by the original extraction;
+the published port matrix and transformer impedance extraction are unchanged.
+
 PIX also computes its shunts from a common-mode drive, using its midpoint
 voltage/current averaging model. Current conservation eliminates the chain
 currents before solving for internal voltage changes and one endpoint current:
@@ -339,13 +349,19 @@ Historical audit mode retains the original node solver and pi extraction.
 `tests/portable-pi-shunts.mjs` checks an exact rational RC circuit whose shunt
 conductance disappears entirely when rounded port entries are added, plus
 one-segment and zero-capacitance limits, invalid/singular inputs and recovery.
+`tests/portable-pi-impedance.mjs` checks 14 circuits against an exact rational
+2x2 nodal inverse, including tiny shunts, an 800-bit component range, zero-shunt
+and resonance limits, subnormal inputs and an 1800-bit admittance scale range.
+Native and WASM values agree bit for bit; all four native rounding modes give
+identical raw results. Physical PI2/PI4/PIX tests also verify this same evaluator
+is used for the returned input impedances and differential Q.
 `tests/portable-two-port.mjs` checks 26 PI2/PI4 cases using an independent
 80-digit endpoint Schur complement, including pad subtraction and full-precision
 pi, impedance and resonance metrics. All 23 finite cases also compare the
 same C++ port solve, pad subtraction, node snapshot and common-mode solve in
 native and WASM builds bit for bit; three original
 nonfinite cases retain their rejection. The largest circuit-metric relative
-error in these cases fell from about `3.7e-7` to below `4.8e-12`; the final port
+error in these cases fell from about `3.7e-7` to below `7e-16`; the final port
 matrices match the rounded independent reference exactly.
 `tests/portable-folded-ports.mjs` adds 24 analytical and scaled circuits,
 including an exact rational two-branch reference, a 400-bit pad-subtraction
@@ -359,7 +375,7 @@ identity and matrix/model integration checks.
 subdivision, against an independent 80-digit current-elimination reference for
 the complete port matrix, saved currents/voltages, pi metrics, input impedance
 and resonance. Common-mode shunts match bit for bit in native and WASM builds.
-The worst metric error in these cases fell from `3.7e-7` to below `2.5e-11`.
+The worst metric error in these cases fell from `3.7e-7` to below `2.1e-16`.
 `tests/portable-extended-shunts.mjs` adds exact midpoint-circuit limits, a
 400-bit component magnitude range, impedance independence and error recovery.
 `tests/portable-extended-ports.mjs` checks an exact one-midpoint circuit and

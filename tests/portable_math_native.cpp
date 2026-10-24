@@ -9,7 +9,18 @@ extern "C" const char* probe_pi_shunts(const double*,const double*,int,const dou
 extern "C" const char* probe_extended_pi_shunts(const double*,const double*,int);
 extern "C" const char* probe_extended_ports(const double*,const double*,int);
 extern "C" const char* probe_folded_ports(const double*,const double*,int,const double*,int);
+extern "C" const char* probe_pi_impedance(const double*);
 int main(int argc,char** argv){
+    if(argc==3&&(!std::strcmp(argv[1],"--pi-impedance")||!std::strcmp(argv[1],"--pi-impedance-rounding"))){
+        auto* file=fopen(argv[2],"rb");if(!file)return 2;double values[6];const bool read=fread(values,8,6,file)==6;fclose(file);if(!read)return 2;
+        if(!std::strcmp(argv[1],"--pi-impedance")){puts(probe_pi_impedance(values));return 0;}
+        const int saved=fegetround(),modes[]={FE_TONEAREST,FE_DOWNWARD,FE_UPWARD,FE_TOWARDZERO};double baseline[7],actual[7];bool identical=true;int index=0;
+        for(int mode:modes){
+            if(fesetround(mode)||!reasitic::pi_branch_impedances(values,{values[2],values[3],values[4],values[5]},actual,actual[6])){identical=false;break;}
+            if(index++==0)memcpy(baseline,actual,sizeof(actual));else if(memcmp(baseline,actual,sizeof(actual)))identical=false;
+        }
+        fesetround(saved);puts(identical?"{\"rounding_modes\":4,\"identical\":true}":"{\"error\":\"Host rounding mode changed Pi impedance\"}");return identical?0:1;
+    }
     const bool extended=argc==3&&!std::strcmp(argv[1],"--extended-shunts");
     const bool ports=argc==3&&!std::strcmp(argv[1],"--extended-ports");
     const bool rounding=argc==3&&!std::strcmp(argv[1],"--extended-rounding");
