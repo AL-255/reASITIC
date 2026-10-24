@@ -28,7 +28,8 @@ The original layered CAP solver is also available, with substrate conductivity
 and permittivity. The original eddy Green kernels, QUADPACK integration and
 matrix stamping are integrated. PI2 combines the original capacitance, inductance
 and node-equation solvers into a two-port admittance matrix and pi model.
-Coupled-winding and multiport simulation remain outstanding. GDSII uses native ribbon boundaries, real via cuts and
+CALCTRANS adds original coupled-winding narrowband simulation. Extended,
+deembedded and three-port paths remain outstanding. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
 ```sh
@@ -53,6 +54,10 @@ node tests/network.mjs
 node tests/network-lifecycle.mjs
 node tests/worker-network.mjs
 node tests/network-data.mjs
+node tests/transformer.mjs
+node tests/transformer-lifecycle.mjs
+node tests/worker-transformer.mjs
+node tests/transformer-data.mjs
 node tests/eddy-math-diagnostics.mjs        # records 3 unresolved finite differences
 # Completion gate; currently fails on those known differences:
 # node tests/eddy-math-diagnostics.mjs --strict
@@ -104,6 +109,13 @@ Current measured evidence:
   Original raw Green-table fingerprints also match. Cases cover native default,
   explicit same-device and distinct grounds, refined longitudinal/cross-section
   meshes, rotation, square coils, both eddy kernels and low/high frequencies.
+- Sixteen coupled-winding cases match 4,019 native numeric fields, 1,420 original
+  printed fields and 2,968,320 raw Green-table bytes through payload hashes.
+  Repeated fresh CALCTRANS and 2PORTTRANS runs cover both eddy kernels, native
+  terminations (including binary32 parsing at the near-short threshold),
+  ground acquisition, phase, rotation, mesh refinement, two square spirals with
+  vias, polygons and a planar transformer. Two-port Y records retain the native
+  mixed final-column precision; native matrix/model arithmetic compares exactly.
 - All 2,118 i386 libm sin/cos probes match both binary64 and raw binary80 return
   words. Pinned glibc 2.36 scalar numerical sources supply these callbacks; the
   recovered Green runtime calls libm, rather than the x87 FSIN instruction.
@@ -126,7 +138,7 @@ These are bounded tests, not universal parity claims. All listed exact
 comparisons are required CI gates. The explicitly unresolved error-power
 measurement is uploaded separately and does not claim a passing identity check. The source translator rejects unknown
 assembly. Native Clang AST ranges expose implicit long-double-to-double stores
-in creator, layered-potential, Green, quadrature and eddy units; the build retains an expression/offset report. This preserves
+in creator, layered-potential, Green, quadrature, eddy and network units; the build retains an expression/offset report. This preserves
 original narrowing boundaries without changing vendor sources. Arithmetic and square root use Berkeley SoftFloat binary80;
 logarithms, trig and exponent fractions use binary128 guard evaluation with
 native x87 constants, followed by the original binary80 stores. This avoids
@@ -162,7 +174,7 @@ and native fault cases are rejected before matrix indexing. There is no
 persistent browser table cache yet; fine grids can take tens of seconds. The
 original nonsquare indexing is preserved with sufficient zero backing storage;
 original-executable parity is currently measured on square FFT grids only.
-Coupled-winding and multiport models remain outstanding.
+Extended/deembedded and three-port models remain outstanding.
 
 The worker protocol is tested with actual WASM startup, original wire matrices,
 streamed frequency samples, cancellation and error recovery. Scientific export
@@ -199,7 +211,9 @@ It exposes native two-port admittance, pi L/R/C/Rs, all three Q values, single-e
 and differential input/shunt impedances, and the original pi resonance estimate.
 This estimate is the original local pi formula, rather than a resonance search.
 Undefined derived metrics export as empty CSV values and display as Undefined.
-Two-port Y exports use siemens; pi CSV headers retain H/F/ohm/Hz units.
+Two-port Y exports use siemens and the original file port ordering (internal
+y22 first, reciprocal y21 off-diagonals, y11 last); pi CSV headers retain
+H/F/ohm/Hz units.
 
 `simulate_network(winding, ground, frequency_hz, length_cell, width_cell,
 thickness_cell, contact_length, contact_width, chip_x, chip_y, fft_x, fft_y,
@@ -213,7 +227,32 @@ including explicit self-ground. Stage matrices are copied at original snapshot
 boundaries for comparison; all private state is released after every solve.
 Worker and lifecycle checks cover budget recovery, alternating CAP/LMAT/network
 requests, immutable source geometry and bounded repeated allocations. The full
-extended, deembedded, coupled-winding and three-port paths remain to be exposed.
+extended, deembedded and three-port paths remain to be exposed.
+
+The coupled-winding panel runs the original CALCTRANS backend and extracts its
+narrowband transformer model: primary/secondary L and R, mutual inductance,
+coupling and ground resistance. It exports both the native two-port Y and Z
+matrices and the model in SI units. Y CSV port order is checked directly
+against original 2PORTTRANS output; Z uses the original narrowband model labels. Choose any two generated winding records,
+including the primary/secondary records of a native planar or 3D transformer.
+The panel shares CAP ground/frequency/contact/FFT controls and LMAT filament and
+eddy controls. A nonzero termination requires an explicit ground, as in native
+CALCTRANS command syntax. Native scalar input retains its binary32 boundary.
+
+`simulate_transformer(primary, secondary, ground, frequency_hz, length_cell,
+width_cell, thickness_cell, contact_length, contact_width, chip_x, chip_y,
+fft_x, fft_y, contact_limit, filament_limit, eddy_mode, layer_count, first_layer,
+second_layer, termination_ohm, evaluation_limit)` uses the original
+`solve_transformer_network`. Its geometry preparation is extracted verbatim into
+a shared helper for preflight and the real solve. The original winding copies,
+second-list reversal, join/translation, boundary index, termination stamp,
+node solve and historical reciprocal port ordering remain unchanged. Two added
+snapshot callbacks observe matrices without replacing expressions. AST-based
+narrowing also covers volatile binary64 copies while preserving the live
+extended values. Private ground clones preserve source mesh history and
+geometry; lifecycle checks alternate coupled/CAP/PI2 solves and verify recovery
+and bounded repeated allocations. Undefined derived metrics retain null/empty
+output rather than invented finite values.
 
 The portable glibc callbacks preserve the numerical C sources unchanged and adapt
 runtime headers only. They do not expose errno or floating exception flags.
@@ -229,6 +268,7 @@ python3 tools/capture_creators.py --reference ~/github/asitic-re
 python3 tools/capture_capacitance.py --reference ~/github/asitic-re
 python3 tools/capture_eddy.py --reference ~/github/asitic-re
 python3 tools/capture_network.py --reference ~/github/asitic-re
+python3 tools/capture_transformer.py --reference ~/github/asitic-re
 ```
 
 These test-only commands require the original executable's legacy runtime DSOs;
@@ -237,6 +277,8 @@ matrices are retained under `build/original-lmat`, `build/original-creators` and
 `build/original-capacitance`; eddy logs and matrices are under
 `build/original-eddy` with the original executable and libm hashes pinned.
 PI2 stage matrices, Green caches and reports are under `build/original-network`.
+CALCTRANS reports, 2PORTTRANS files and raw caches are under
+`build/original-transformer`.
 
 Creator input is bounded to native fixed buffers, 64 turns, 256 sides/via rows
 or columns, and a 32 MiB creation allocation budget. Invalid commands recover
@@ -247,7 +289,7 @@ than claiming process-independent parity for uninitialized bytes.
 
 Next required work includes resolving the measured hardware rounding differences,
 broader original-executable creator/input coverage, extended/deembedded network
-solvers, coupled-winding and multiport metrics, and original-executable end-to-end
+solvers, three-port metrics, native S-parameter conversion and port sweeps, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.
 

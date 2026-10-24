@@ -1,0 +1,500 @@
+{
+  "cases": [
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 0,
+      "name": "wires-default"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 0.1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 0,
+      "name": "wires-low-frequency"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 10,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 0,
+      "name": "wires-high-frequency"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 50,
+      "name": "wires-terminated",
+      "ground": "@1"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 25,
+      "name": "wires-distinct-ground",
+      "ground": "NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+      },
+      "grid": [
+        32,
+        32
+      ],
+      "cells": [
+        40,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        40,
+        40
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 0,
+      "name": "wires-subdivision"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        10,
+        0.25
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 0,
+      "name": "wires-cross-section"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180:PHASE=-1"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 0,
+      "name": "wires-negative-phase"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=120:WID=64:METAL=M3:XORG=200:YORG=100:ORIENT=30"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 0,
+      "name": "wires-rotated"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 1,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 0,
+      "name": "wires-two-layer"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 1,
+      "layers": [
+        0
+      ],
+      "termination": 0,
+      "name": "wires-reflection"
+    },
+    {
+      "primary": {
+        "id": 0,
+        "keywords": "NAME=A:LEN=200:WID=220:W=32:S=16:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 0,
+        "keywords": "NAME=B:LEN=180:WID=200:W=32:S=16:N=1.25:METAL=M5:EXIT=M4:XORG=110:YORG=110"
+      },
+      "grid": [
+        32,
+        32
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 0,
+      "name": "squares-with-vias"
+    },
+    {
+      "primary": {
+        "id": 1,
+        "keywords": "NAME=A:RAD=100:SIDES=8:W=32:S=16:N=.75:METAL=M4:EXIT=M3:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 1,
+        "keywords": "NAME=B:RAD=100:SIDES=8:W=32:S=16:N=.75:METAL=M5:EXIT=M4:XORG=110:YORG=110"
+      },
+      "grid": [
+        32,
+        32
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 0,
+      "name": "polygons"
+    },
+    {
+      "primary": {
+        "id": 3,
+        "keywords": "PNAME=A:SNAME=B:LEN=320:WID=300:W=16:S=8:NP=1.25:NS=1:METAL=M4:EXIT=M3:XORG=80:YORG=80"
+      },
+      "secondary": null,
+      "grid": [
+        64,
+        64
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 0,
+      "name": "planar-transformer"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 49.9,
+      "name": "wires-fractional-termination",
+      "ground": "@1"
+    },
+    {
+      "primary": {
+        "id": 2,
+        "keywords": "NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100"
+      },
+      "secondary": {
+        "id": 2,
+        "keywords": "NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180"
+      },
+      "grid": [
+        16,
+        16
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "frequency_ghz": 1,
+      "eddy_mode": 0,
+      "layers": [
+        0,
+        1
+      ],
+      "termination": 1e-10,
+      "name": "wires-threshold-termination",
+      "ground": "@1"
+    }
+  ]
+}

@@ -2,6 +2,8 @@
 #include "json.hpp"
 #include "eddy_runtime.hpp"
 #include "asitic/combined_network.hpp"
+#include "asitic/later_analysis.hpp"
+namespace asitic { GeometryShape* prepare_transformer_geometry(const GeometryShape&,const GeometryShape&,LaterAnalysisState&,const LaterAnalysisOptions&,int&); }
 #include "asitic/potential_solver.hpp"
 #include "asitic/legacy_complex.hpp"
 #ifdef __EMSCRIPTEN__
@@ -111,12 +113,15 @@ char* matrix_json(char* out,const ComplexMatrix& matrix) {
     out+=sprintf(out,"]");return out;
 }
 bool finite_matrix(const ComplexMatrix& m) { for(int j=0;j<m.columns;++j)for(int i=0;i<m.rows;++i){auto z=m.view().at(i,j);if(!__builtin_isfinite(z.real) || !__builtin_isfinite(z.imag))return false;}return true; }
-struct NetworkRequest { double length,width,thickness;int filament_limit;reasitic::EddySession* eddy; };
+struct NetworkRequest { double length,width,thickness;int filament_limit;reasitic::EddySession* eddy;int secondary=-1;double termination=0; };
+int private_name_random(void*) { return 65; }
 void network_terminate(int,void*) { abort(); }
 struct NetworkSnapshots {
     SolverMemory memory;ComplexMatrix capacitance{},inductance{},node_capacitance{};
     static void record(const char* name,const ComplexMatrix& matrix,void* user) {
-        auto& s=*static_cast<NetworkSnapshots*>(user);auto& copy=name[0]=='Z'?s.capacitance:s.inductance;
+        auto& s=*static_cast<NetworkSnapshots*>(user);
+        if(!((name[0]=='Z' && name[1]=='C') || (name[0]=='Y' && name[1]=='M')))return;
+        auto& copy=name[0]=='Z'?s.capacitance:s.inductance;
         copy=matrix;copy.stride=copy.rows;copy.vector_reference=copy.matrix_reference=0;
         copy.data=static_cast<ComplexValue*>(s.memory.arrays.get(matrix.rows*matrix.columns*16u));
         for(int j=0;j<matrix.columns;++j)for(int i=0;i<matrix.rows;++i)copy.view().at(i,j)=matrix.view().at(i,j);
@@ -147,6 +152,11 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         return "{\"error\":\"Use positive frequency, cells and chip dimensions, power-of-two FFT sizes from 1 to 256, and 1–512 contacts\"}";
     auto* source=engine.shapes;for(int i=0;source && i<winding;++i)source=source->next;
     auto* reference=engine.shapes;for(int i=0;reference && i<ground;++i)reference=reference->next;if(ground<0)reference=source;
+    GeometryShape* secondary=nullptr;const bool transformer=network && network->secondary>=0;
+    if(transformer) {
+        secondary=engine.shapes;for(int i=0;secondary && i<network->secondary;++i)secondary=secondary->next;
+        if(!secondary || secondary==source || !__builtin_isfinite(network->termination))return "{\"error\":\"Select two distinct windings and a finite transformer termination\"}";
+    }
     if(!source || !reference)return "{\"error\":\"Select a valid device and ground winding\"}";
     if(engine.substrate_count<2)return "{\"error\":\"The layered potential solve requires a substrate stack\"}";
     for(int i=0;i<engine.substrate_count;++i) { double eps;__builtin_memcpy(&eps,engine.substrate[i].prefix+4,8);
@@ -161,8 +171,11 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
     // CAP's third argument uses native parser type 8, which resets the ground's
     // main mesh counts to -1/-1. Apply that exact acquisition step to a private
     // clone, so repeated solves leave the user's source geometry intact.
-    if(ground>=0) { const bool identical=source==reference;reference=clone_for_ground(*reference,memory);if(identical)source=reference; }
-    const auto* original_source=source;GeometryShape* preview_head=nullptr;int network_filaments=0;
+    if(ground>=0) { const bool identical=source==reference,second_identical=secondary==reference;reference=clone_for_ground(*reference,memory);if(identical)source=reference;if(second_identical)secondary=reference; }
+    const auto* original_source=source;const auto* original_secondary=secondary;const auto* original_reference=reference;GeometryShape* preview_head=nullptr;int network_filaments=0,boundary=0;
+    char composition_message[1024];const GeometryRuntime private_geometry{memory,engine.warnings,network_terminate,nullptr};
+    const GeometryTechnology composition_technology{engine.metals,engine.vias,engine.metal_heights,engine.metal_count};
+    const GeometryCommandRuntime commands{{private_geometry,0,engine.warnings,sprintf,composition_message,nullptr,nullptr},nullptr,memory,private_name_random,nullptr};
     if(network) {
         if(!__builtin_isfinite(network->length) || network->length<=0 || !__builtin_isfinite(network->width) || network->width<=0 ||
            !__builtin_isfinite(network->thickness) || network->thickness<=0 || network->filament_limit<1 || network->filament_limit>1024)
@@ -170,7 +183,12 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
         if(!source->filaments.first || !reasitic::bounded_solver_clone(*source,network->length,length_cell,network->filament_limit))
             return "{\"error\":\"Network longitudinal mesh exceeds the selected filament budget\"}";
         const GeometryRuntime geometry{memory,engine.warnings,network_terminate,nullptr};
-        source=clone_geometry_shape(preview_head,*source,{network->length,length_cell},geometry);
+        if(transformer) {
+            if(!secondary->filaments.first || !reasitic::bounded_solver_clone(*secondary,network->length,length_cell,network->filament_limit))return "{\"error\":\"Secondary longitudinal mesh exceeds the selected filament budget\"}";
+            LaterAnalysisState preview{};LaterAnalysisOptions preparation{};preparation.discretization={network->length,length_cell};preparation.technology=composition_technology;preparation.commands=commands;
+            source=prepare_transformer_geometry(*source,*secondary,preview,preparation,boundary);
+            if(same_name(*original_source,*original_reference))reference=source;
+        }else source=clone_geometry_shape(preview_head,*source,{network->length,length_cell},geometry);
         InductanceContext context{};context.shape=&source->filaments;
         for(auto* s=source->filaments.first;s;s=next(s))for(auto* b=s;b;b=reinterpret_cast<const ConductorSegment*>(b->group_next_address))
             if(b->metal<engine.metal_count && (Real(b->thickness)/network->thickness+Real(.5)>network->filament_limit || Real(b->width)/network->width+Real(.5)>2147483647.L))
@@ -201,30 +219,46 @@ static const char* simulate_capacitance_impl(int winding,int ground,double frequ
     if(network) {
         const auto expected_groups=count_geometry_metals(*source,engine.metal_count);
         if(groups-ground_segments!=expected_groups)return "{\"error\":\"Native network capacitance and inductance dimensions do not agree\"}";
-        CombinedNetworkState combined{};combined.capacitance=state;
+        CombinedNetworkState combined{};combined.capacitance=state;LaterAnalysisState coupled{};coupled.capacitance=state;
         NetworkSnapshots intermediate{memory};
         const InductanceRunOptions inductance{{network->width,500,engine.metals},network->thickness,engine.metal_count,engine.vias,false};
         const CombinedNetworkOptions network_options{{network->length,length_cell},options,inductance,reasitic::eddy_options(*network->eddy,engine),
             {true,sprintf,engine.warnings,NetworkSnapshots::record_nodes,&intermediate},engine.warnings,false,false,NetworkSnapshots::record,&intermediate,{}};
         const GeometryRuntime geometry{memory,engine.warnings,network_terminate,nullptr};
-        const bool ok=solve_combined_network(*original_source,*reference,frequency,combined,network_options,geometry);
+        bool ok;
+        if(transformer) {
+            if(boundary<1 || boundary>=expected_groups)return "{\"error\":\"Transformer ports require metal conductor groups in both windings\"}";
+            auto transformer_inductance=inductance;transformer_inductance.snapshot=NetworkSnapshots::record;transformer_inductance.snapshot_user=&intermediate;
+            const LaterAnalysisOptions coupled_options{{network->length,length_cell},composition_technology,options,transformer_inductance,network_options.eddy,network_options.nodes,commands,engine.warnings,false,nullptr,nullptr};
+            ok=solve_transformer_network(*original_source,*original_secondary,*original_reference,frequency,network->termination,coupled,coupled_options);
+        }else ok=solve_combined_network(*original_source,*reference,frequency,combined,network_options,geometry);
         if(network->eddy->exceeded)return "{\"error\":\"Network eddy evaluation budget exceeded\"}";
-        const auto& y=combined.ports;const ComplexValue ports[]={y.y11,y.y12,y.y21,y.y22};
+        const auto& y=transformer?coupled.ports:combined.ports;const ComplexValue ports[]={y.y11,y.y12,y.y21,y.y22};
         if(!ok || !finite_matrix(intermediate.capacitance) || !finite_matrix(intermediate.inductance))return "{\"error\":\"Original combined solver did not produce finite matrices\"}";
         for(const auto z:ports)if(!__builtin_isfinite(z.real) || !__builtin_isfinite(z.imag))return "{\"error\":\"Original node equations produced nonfinite admittance\"}";
         const unsigned capacity=64u*(intermediate.capacitance.elements+intermediate.inductance.elements+intermediate.node_capacitance.elements)+16384u;
         output=static_cast<char*>(calloc(1,capacity));if(!output)return "{\"error\":\"Unable to allocate network output\"}";char* out=output;
-        out+=sprintf(out,"{\"name\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_source));out+=sprintf(out,",\"ground\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(reference));
+        out+=sprintf(out,"{\"name\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_source));out+=sprintf(out,",\"ground\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_reference));
+        if(transformer){out+=sprintf(out,",\"secondary\":");out=reasitic::json_string(out,reinterpret_cast<const char*>(original_secondary));out+=sprintf(out,",\"termination_ohm\":%.17g,\"boundary\":%d",network->termination,boundary);}
         out+=sprintf(out,",\"frequency_hz\":%.17g,\"contacts\":%d,\"groups\":%d,\"filaments\":%d,\"mesh\":{\"length\":%.17g,\"width\":%.17g,\"thickness\":%.17g,\"contact_length\":%.17g,\"contact_width\":%.17g,\"chip_x\":%.17g,\"chip_y\":%.17g,\"fft_x\":%d,\"fft_y\":%d},\"matrix\":[[",frequency,snapshots.contacts,expected_groups,network_filaments,network->length,network->width,network->thickness,length_cell,width_cell,chip_x,chip_y,nx,ny);
-        out=complex_json(out,y.y11);out+=sprintf(out,",");out=complex_json(out,y.y12);out+=sprintf(out,"],[");out=complex_json(out,y.y21);out+=sprintf(out,",");out=complex_json(out,y.y22);out+=sprintf(out,"]],\"pi\":{");
+        out=complex_json(out,y.y11);out+=sprintf(out,",");out=complex_json(out,y.y12);out+=sprintf(out,"],[");out=complex_json(out,y.y21);out+=sprintf(out,",");out=complex_json(out,y.y22);out+=sprintf(out,"]]");
+        if(transformer){
+            out+=sprintf(out,",\"transformer\":{");
+            const char* names[]={"first_inductance_h","second_inductance_h","first_resistance_ohm","second_resistance_ohm","ground_resistance_ohm","mutual_inductance_h","coupling"};
+            const double values[]={coupled.model.first_inductance,coupled.model.second_inductance,coupled.model.first_resistance,coupled.model.second_resistance,coupled.model.ground_resistance,coupled.model.mutual,coupled.model.coupling};
+            for(int i=0;i<7;++i){out+=sprintf(out,"%s\"%s\":",i?",":"",names[i]);out=number_json(out,values[i]);}
+            out+=sprintf(out,"},\"impedance_matrix\":[[");out=complex_json(out,coupled.impedance.z11);out+=sprintf(out,",");out=complex_json(out,coupled.impedance.z12);out+=sprintf(out,"],[");out=complex_json(out,coupled.impedance.z21);out+=sprintf(out,",");out=complex_json(out,coupled.impedance.z22);out+=sprintf(out,"]]");
+        }else {
+        out+=sprintf(out,",\"pi\":{");
         const char* names[]={"frequency_hz","inductance_h","resistance","capacitance_second_f","capacitance_first_f","resistance_second","resistance_first","quality_first","quality_second","quality_differential","shunt_single","shunt_differential"};
         const auto* values=reinterpret_cast<const double*>(&combined.pi);
         for(int i=0;i<12;++i){out+=sprintf(out,"%s\"%s\":",i?",":"",names[i]);out=number_json(out,values[i]);}
         out+=sprintf(out,"},\"resonance_hz\":");out=number_json(out,x87::binary64(pi_resonant_frequency(combined.pi)));
+        }
         out+=sprintf(out,",\"input_impedance\":[");out=complex_json(out,two_port_impedance(y,false,1));out+=sprintf(out,",");out=complex_json(out,two_port_impedance(y,false,2));out+=sprintf(out,",");out=complex_json(out,two_port_impedance(y,true,1));out+=sprintf(out,"],\"eddy\":");out=reasitic::eddy_metadata(out,*network->eddy);
         out+=sprintf(out,",\"capacitance_matrix\":");out=matrix_json(out,intermediate.capacitance);out+=sprintf(out,",\"inductance_admittance_matrix\":");out=matrix_json(out,intermediate.inductance);
         out+=sprintf(out,",\"node_capacitance_matrix\":");out=matrix_json(out,intermediate.node_capacitance);
-        sprintf(out,",\"green_table_hash\":\"%016llx\"}",table_hash(combined.capacitance.cache,nx,ny,pairs));return output;
+        sprintf(out,",\"green_table_hash\":\"%016llx\"}",table_hash(transformer?coupled.capacitance.cache:combined.capacitance.cache,nx,ny,pairs));return output;
     }
     ComplexMatrix matrix{};total_capacitance=total_resistance=__builtin_nan("");
     const bool ok=unfolded?solve_unfolded_capacitance(source->filaments,reference->filaments,matrix,frequency,state,options,memory):solve_capacitance(source->filaments,reference->filaments,matrix,frequency,state,options,memory);
@@ -247,4 +281,14 @@ extern "C" const char* simulate_network(int winding,int ground,double frequency,
     if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid network eddy mode, layers or evaluation budget\"}";
     const NetworkRequest request{length_cell,width_cell,thickness_cell,filament_limit,session};
     return simulate_capacitance_impl(winding,ground,frequency,contact_length,contact_width,chip_x,chip_y,nx,ny,contact_limit,0,&request);
+}
+
+extern "C" const char* simulate_transformer(int primary,int secondary,int ground,double frequency,double length_cell,double width_cell,double thickness_cell,double contact_length,double contact_width,
+    double chip_x,double chip_y,int nx,int ny,int contact_limit,int filament_limit,int mode,int count,int first,int second,double termination,int budget) {
+    if(secondary<0)return "{\"error\":\"Select a valid secondary winding\"}";
+    auto* session=static_cast<reasitic::EddySession*>(calloc(1,sizeof(reasitic::EddySession)));if(!session)return "{\"error\":\"Unable to allocate transformer eddy workspace\"}";
+    reasitic::EddyScope scope(session);reasitic::clear_diagnostics();
+    if(!reasitic::configure_eddy(*session,reasitic::engine_view(),mode,count,first,second,budget))return "{\"error\":\"Invalid transformer eddy mode, layers or evaluation budget\"}";
+    const NetworkRequest request{length_cell,width_cell,thickness_cell,filament_limit,session,secondary,termination};
+    return simulate_capacitance_impl(primary,ground,frequency,contact_length,contact_width,chip_x,chip_y,nx,ny,contact_limit,0,&request);
 }

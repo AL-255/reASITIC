@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';import {Worker} from 'node:worker_threads';import {readFileSync} from 'node:fs';
+const technology=readFileSync('web/technology/CMOS.tek','utf8'),bootstrap=`import {parentPort} from 'node:worker_threads';globalThis.self=globalThis;globalThis.postMessage=m=>parentPort.postMessage(m);await import(${JSON.stringify(new URL('../dist/worker.mjs',import.meta.url).href)});parentPort.on('message',data=>self.onmessage({data}));`,worker=new Worker(new URL('data:text/javascript,'+encodeURIComponent(bootstrap)));
+function next(){return new Promise((resolve,reject)=>{const cleanup=()=>{clearTimeout(timer);worker.off('message',message);worker.off('error',error);},message=data=>{cleanup();resolve(data);},error=e=>{cleanup();reject(e);},timer=setTimeout(()=>error(Error('Transformer worker timeout')),20000);worker.once('message',message);worker.once('error',error);});}async function send(data){const pending=next();worker.postMessage(data);return pending;}
+try{
+ assert.equal((await next()).ready,true);const request={action:'transformer',primary:1,secondary:0,frequency_ghz:1,mesh:{length:1000,width:1000,thickness:1000},contact_mesh:{length:1000,width:1000},fft_x:16,fft_y:16,eddy:{mode:0,layers:[0,1]},nativeInput:true};
+ let result=await send({id:1,...request});assert.match(result.error,/windings/);
+ result=await send({id:2,technology,creator:{id:2,keywords:'NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100'}});assert.equal(result.layout.shapes.length,1);
+ result=await send({id:3,technology,creator:{id:2,keywords:'NAME=B:LEN=100:WID=40:METAL=M3:XORG=100:YORG=180'},options:{append:true}});assert.equal(result.layout.shapes.length,2);
+ result=await send({id:4,...request});assert.ok(!result.error,result.error);const expected=result.transformer;assert.equal(expected.transformer.coupling,0.2584917782063417);
+ result=await send({id:5,...request,termination_ohm:49.9});assert.match(result.error,/explicit ground/);
+ result=await send({id:6,...request,termination_ohm:49.9,ground:1});assert.ok(!result.error,result.error);assert.equal(result.transformer.termination_ohm,Math.fround(49.9));assert.equal(result.transformer.filaments,10);
+ result=await send({id:7,...request,eddy:{mode:1,layers:[0,1],evaluation_limit:1}});assert.match(result.error,/budget/);result=await send({id:8,...request});assert.deepEqual(result.transformer,expected);
+ result=await send({id:9,...request,eddy:{mode:1}});assert.equal(result.transformer.eddy.layer_count,1);assert.ok(result.transformer.eddy.quadrature_status[5]>0);assert.match(result.warnings,/did not converge/);
+ result=await send({id:10,...request,primary:0});assert.match(result.error,/distinct/);result=await send({id:11,...request});assert.deepEqual(result.transformer,expected);
+ result=await send({id:12,...request,action:'network',winding:1});assert.ok(!result.error,result.error);assert.equal(result.network.name,'A');result=await send({id:13,...request});assert.deepEqual(result.transformer,expected);
+ console.log('Transformer worker: native coupled solve, binary32 termination, explicit ground acquisition, visible nonconvergence, budget/input recovery and following PI2 solve pass');
+}finally{await worker.terminate();}

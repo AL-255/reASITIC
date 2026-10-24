@@ -12,6 +12,7 @@ extern "C" int printf(const char*,...);
 extern "C" const char* probe_green(int,int,int,double,double,double,double,int);
 extern "C" const char* simulate_eddy(int,double,double,double,double,double,int,int,int,int,int,int);
 extern "C" const char* simulate_network(int,int,double,double,double,double,double,double,double,double,int,int,int,int,int,int,int,int,int);
+extern "C" const char* simulate_transformer(int,int,int,double,double,double,double,double,double,double,double,int,int,int,int,int,int,int,int,double,int);
 extern "C" const char* simulate(int,double,double,double,double,double,int);
 extern "C" void set_via(int,int,int,double,double,double,double,double);
 extern "C" const char* generate(int,const double*);
@@ -36,6 +37,14 @@ extern "C" int main(int argc,char** argv,char**) {
         puts(simulate_capacitance(ground?1:0,ground?0:-1,strtod(argv[6],nullptr),strtod(argv[7],nullptr),strtod(argv[8],nullptr),512,512,atoi(argv[9]),atoi(argv[10]),512,atoi(argv[11])));return 0;
     }
     if(argc==10 && argv[1][2]=='g') { puts(probe_green(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),strtod(argv[5],nullptr),strtod(argv[6],nullptr),strtod(argv[7],nullptr),strtod(argv[8],nullptr),atoi(argv[9])));return 0; }
+    if(argc==23 && argv[1][0]=='-' && argv[1][2]=='c') {
+        create_geometry(atoi(argv[2]),argv[3],"",512,512,128,128,.1,1,0);
+        if(atoi(argv[4])>=0)create_geometry(atoi(argv[4]),argv[5],"",512,512,128,128,.1,1,1);
+        int primary=atoi(argv[21]),secondary=atoi(argv[22]),ground=-1;
+        if(argv[6][0]=='@')ground=argv[6][1]=='1'?primary:secondary;
+        else if(*argv[6]){create_geometry(2,argv[6],"",512,512,128,128,.1,1,1);++primary;++secondary;ground=0;}
+        puts(simulate_transformer(primary,secondary,ground,strtod(argv[7],nullptr),strtod(argv[8],nullptr),strtod(argv[9],nullptr),strtod(argv[10],nullptr),strtod(argv[11],nullptr),strtod(argv[12],nullptr),512,512,atoi(argv[13]),atoi(argv[14]),512,1024,atoi(argv[15]),atoi(argv[16]),atoi(argv[17]),atoi(argv[18]),strtod(argv[19],nullptr),atoi(argv[20])));return 0;
+    }
     if(argc==21 && argv[1][0]=='-') {
         create_geometry(atoi(argv[2]),argv[3],"",512,512,128,128,.1,1,0);const bool self=argv[5][0]=='@',ground=*argv[5] && !self;
         if(ground)create_geometry(atoi(argv[4]),argv[5],"",512,512,128,128,.1,1,1);

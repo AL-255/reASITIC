@@ -27,7 +27,7 @@ def main():
     cmd=[args.emxx,'-std=c++17',*flags,*inc,'-include',str(ROOT/'kernel/soft_real.hpp'),'-fpack-struct=4',
          *[str(port/(n+'.cpp')) for n in SOURCES],str(ROOT/'kernel/bridge.cpp'),str(ROOT/'kernel/simulation.cpp'),str(ROOT/'kernel/capacitance.cpp'),str(ROOT/'kernel/transcendentals.cpp'),str(ROOT/'kernel/math_probe.cpp'),str(ROOT/'kernel/runtime_math.cpp'),str(ROOT/'kernel/eddy_runtime.cpp'),str(ROOT/'kernel/command_input.cpp'),*objects,
          '-sMODULARIZE=1','-sEXPORT_ES6=1','-sENVIRONMENT=web,worker,node','-sALLOW_MEMORY_GROWTH=1','-sFILESYSTEM=0',
-         '-sEXPORTED_FUNCTIONS=["_malloc","_free","_generate","_create_geometry","_set_layer_name","_set_geometry_options","_set_ring_gap_radians","_normalize_value","_reset_technology","_set_substrate","_set_substrate_material","_finalize_technology","_set_metal","_set_via","_last_warnings","_analyze","_simulate","_simulate_capacitance","_probe_math","_probe_runtime_trig","_probe_green","_simulate_eddy","_simulate_network"]',
+         '-sEXPORTED_FUNCTIONS=["_malloc","_free","_generate","_create_geometry","_set_layer_name","_set_geometry_options","_set_ring_gap_radians","_normalize_value","_reset_technology","_set_substrate","_set_substrate_material","_finalize_technology","_set_metal","_set_via","_last_warnings","_analyze","_simulate","_simulate_capacitance","_probe_math","_probe_runtime_trig","_probe_green","_simulate_eddy","_simulate_network","_simulate_transformer"]',
          '-sEXPORTED_RUNTIME_METHODS=["UTF8ToString","HEAPF64"]','-o',str(dist/'asitic.js')]
     subprocess.run(cmd,check=True)
     print('Built',dist/'asitic.wasm')

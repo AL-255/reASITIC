@@ -23,7 +23,7 @@ def expose(name,text,clang=None):
     version=subprocess.check_output([clang,'--version'],text=True).splitlines()[0]
     cache=ROOT/'build/native-ast';cache.mkdir(parents=True,exist_ok=True)
     source=cache/(name+'.cpp');source.write_bytes(encoded)
-    key=hashlib.sha256((digest+version+'const-target-v2').encode()).hexdigest()
+    key=hashlib.sha256((digest+version+'cv-target-v3').encode()).hexdigest()
     artifact=cache/(name+'-'+key[:16]+'.json')
     if artifact.exists():locations=json.loads(artifact.read_text())
     else:
@@ -31,9 +31,9 @@ def expose(name,text,clang=None):
         if result.returncode:raise RuntimeError(f'Native AST analysis failed for {name}:\n{result.stderr}')
         locations=[]
         def visit(node):
-            if node.get('kind')=='ImplicitCastExpr' and node.get('castKind')=='FloatingCast' and node.get('type',{}).get('qualType','').replace('const ','')=='double':
+            if node.get('kind')=='ImplicitCastExpr' and node.get('castKind')=='FloatingCast' and node.get('type',{}).get('qualType','').replace('const ','').replace('volatile ','')=='double':
                 child=node.get('inner',[{}])[0]
-                if child.get('type',{}).get('qualType','').replace('const ','')=='long double':
+                if child.get('type',{}).get('qualType','').replace('const ','').replace('volatile ','')=='long double':
                     span=node['range'];a,b=span['begin'],span['end']
                     if 'includedFrom' not in a and 'includedFrom' not in b and 'offset' in a and 'offset' in b:
                         if all('file' not in point or Path(point['file']).resolve()==source.resolve() for point in [a,b]):

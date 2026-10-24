@@ -1,7 +1,9 @@
 const number=value=>value===null?'':Object.is(value,-0)?'-0':String(value);
 export function networkMatrixCSV(result){
   if(!result?.matrix)throw Error('Run the combined network before exporting its admittance.');
-  return ['frequency_hz,row,column,real_siemens,imag_siemens',...result.matrix.flatMap((row,i)=>row.map((z,j)=>[result.frequency_hz,i,j,...z].map(number).join(',')))].join('\n')+'\n';
+  // Original write_two_port_record labels y22 as port 1 and emits y21 twice.
+  const y=result.matrix,native=[[y[1][1],y[1][0]],[y[1][0],y[0][0]]];
+  return ['frequency_hz,row,column,real_siemens,imag_siemens',...native.flatMap((row,i)=>row.map((z,j)=>[result.frequency_hz,i,j,...z].map(number).join(',')))].join('\n')+'\n';
 }
 export function networkMetricsCSV(result){
   if(!result?.pi)throw Error('Run the combined network before exporting the pi model.');

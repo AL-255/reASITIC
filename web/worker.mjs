@@ -27,6 +27,18 @@ self.onmessage=async({data})=>{
       if(analysis.error)throw Error(analysis.error);
       postMessage({id:data.id,analysis,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
     }
+    if(action==='transformer'){
+      if(!processTechnology || !hasLayout)throw Error('Generate two windings before running CALCTRANS.');
+      const domain=processTechnology.domain,mesh=data.mesh??{},contact=data.contact_mesh??{},e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[],termination=Number(data.termination_ohm??0);
+      if(!Array.isArray(layers) || layers.length>2 || layers.some(i=>!Number.isInteger(i) || i<0))throw Error('Select up to two substrate layers.');
+      if(!Number.isFinite(termination))throw Error('Use a finite transformer termination.');
+      if(termination!==0 && (data.ground??-1)<0)throw Error('Choose an explicit ground for a nonzero CALCTRANS termination.');
+      const cells=[mesh.length??50,mesh.width??1.5,mesh.thickness??.5,contact.length??50,contact.width??20];
+      const parsed=data.nativeInput?cells.map(value=>kernel._normalize_value(Number(value),7,data.grid??.1,data.snap===false?0:1)):cells;
+      const resistance=data.nativeInput?kernel._normalize_value(termination,4,.1,0):termination;
+      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_transformer(data.primary??0,data.secondary??1,data.ground??-1,frequency(data),...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.filament_limit??256,e.mode??0,layers.length,layers[0]??0,layers[1]??0,resistance,e.evaluation_limit??250000)));
+      if(result.error)throw Error(result.error);postMessage({id:data.id,transformer:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
+    }
     if(action==='network'){
       if(!processTechnology || !hasLayout)throw Error('Generate a layout before running the combined network.');
       const domain=processTechnology.domain,mesh=data.mesh??{},contact=data.contact_mesh??{},e=data.eddy??{},layers=e.layers??processTechnology.eddy_layers??[];

@@ -52,6 +52,10 @@ jobs:
           node tests/network-lifecycle.mjs
           node tests/worker-network.mjs
           node tests/network-data.mjs
+          node tests/transformer.mjs
+          node tests/transformer-lifecycle.mjs
+          node tests/worker-transformer.mjs
+          node tests/transformer-data.mjs
           node tests/lmat.mjs
           node tests/original-lmat.mjs
           node tests/lmat-lifecycle.mjs
