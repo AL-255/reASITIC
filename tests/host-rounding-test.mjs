@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {compareTransformerHost} from './host-rounding.mjs';
+import {compareTransformerHost,compareThreePortHost} from './host-rounding.mjs';
 const compare=(a,b)=>{const report={fields:0,rounding:[]};compareTransformerHost(a,b,'case',report);return report;};
 assert.equal(compare({matrix:[1.2932120971496668]},{matrix:[1.2932120971496666]}).rounding.length,1);
 assert.equal(compare({transformer:{ground_resistance_ohm:-4.532652235288123e-6}},{transformer:{ground_resistance_ohm:-4.532652235277346e-6}}).rounding.length,1);
@@ -11,3 +11,16 @@ assert.ok(compare({two_port:{records:{s:row}}},{two_port:{records:{s:changed}}})
 assert.throws(()=>compare({two_port:{records:{s:row}}},{two_port:{records:{s:row+' '}}}));
 assert.throws(()=>compare({two_port:{headers:{s:row}}},{two_port:{headers:{s:changed}}}));
 console.log('Host audit: bounded inductive rounding is recorded; CAP, metadata, structure, classification, signed zero, headers and format-only changes remain strict');
+const three=(a,b)=>{const report={fields:0,rounding:[]};compareThreePortHost(a,b,'case',report);return report;};
+assert.ok(three({system_matrix:[[[.03,0],[5e-17,1e-17]]]},{system_matrix:[[[.03,0],[2e-17,-1e-17]]]}).rounding.length);
+const pair=(x,y)=>({inductance_impedance_matrix:[[[x,y]]]});
+assert.equal(three(pair(5e-19,.03),pair(-8e-19,.03)).rounding.length,1);
+for(const [a,b]of [[pair(5e-19,.03),pair(1e-5,.03)],[pair(-0,.03),pair(0,.03)],[pair(0,.03),pair(1e-19,.03)],[pair(1,.03),pair(Infinity,.03)]])assert.throws(()=>three(a,b));
+for(const field of ['capacitance_matrix','frequency_hz','groups','green_table_hash'])assert.throws(()=>three({[field]:1},{[field]:1+Number.EPSILON}));
+assert.throws(()=>three({system_matrix:[[[1,2]]]},{system_matrix:[[[1,2,3]]]}));
+const threeRow='\n1 '+Array(18).fill('2').join(' '),threeChanged='\n1 2.000000000000001 '+Array(17).fill('2').join(' ');
+assert.ok(three({records:{z:threeRow}},{records:{z:threeChanged}}).rounding.length);
+assert.throws(()=>three({records:{z:threeRow}},{records:{z:threeRow+' '}}));
+assert.throws(()=>three({records:{z:threeRow}},{records:{z:threeChanged.replace('\n1 ','\n1.000000000000001 ')}}));
+assert.throws(()=>three({headers:{z:threeRow}},{headers:{z:threeChanged}}));
+console.log('Three-port host audit: cancellation uses the matrix norm; original records, CAP, zeros, frequency and structure retain strict gates');

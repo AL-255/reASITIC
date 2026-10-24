@@ -29,3 +29,42 @@ export function compareTransformerHost(a,b,path,report){
   }
   assert.equal(a,b,path);
 }
+
+// A matrix inversion can leave tiny cancellation residuals, including complex
+// entries whose two components nearly vanish. Measure the matrix error in
+// its own units rather than dividing by a residual. This audits the x87 port,
+// not a production accuracy oracle or a substitute for original captures.
+const threeDerived=/^[^.]+\.(impedance_matrix|admittance_matrix|scattering_matrix|model|inductance_impedance_matrix|system_before|system_matrix)(\.|$)/;
+const cancellationMatrix=/^[^.]+\.(inductance_impedance_matrix|system_before|system_matrix)$/;
+const threeRecord=/^[^.]+\.(records|polar_records)\.(s|y|z)$/;
+export function compareThreePortHost(a,b,path,report,matrixScale){
+  if(typeof a==='number'){
+    report.fields++;
+    if(Object.is(a,b))return;
+    assert.ok(threeDerived.test(path),path+' changed outside the inductive host audit');
+    recordDifference(a,b,path,matrixScale??Math.max(Math.abs(a),Math.abs(b)),report);return;
+  }
+  if(a&&typeof a==='object'){
+    assert.deepEqual(Object.keys(a),Object.keys(b),path+' structure');
+    if(cancellationMatrix.test(path))matrixScale=[a,b].reduce((scale,matrix)=>matrix.reduce((scale,row)=>row.reduce((scale,z)=>z.reduce((scale,value)=>Math.max(scale,Math.abs(value)),scale),scale),scale),0);
+    for(const key of Object.keys(a))compareThreePortHost(a[key],b[key],path+'.'+key,report,matrixScale);return;
+  }
+  if(typeof a==='string'&&a!==b&&threeRecord.test(path)){
+    const actual=a.trim().split(/\s+/),native=b.trim().split(/\s+/);
+    assert.equal(actual.length,19,path+' numerical record size');assert.equal(native.length,19,path+' host numerical record size');let changed=false;
+    actual.forEach((token,i)=>{
+      const x=Number(token),y=Number(native[i]);assert.ok(Number.isFinite(x)&&Number.isFinite(y),path+' nonfinite record');
+      if(i===0)assert.equal(token,native[i],path+' saved frequency');
+      else if(!Object.is(x,y)){changed=true;recordDifference(x,y,path+'.'+i,Math.max(Math.abs(x),Math.abs(y)),report);}
+    });
+    assert.ok(changed,path+' formatting changed without numerical differences');
+    report.rounding.push({path,software:a,host:b});return;
+  }
+  assert.equal(a,b,path);
+}
+function recordDifference(a,b,path,scale,report){
+  assert.ok(Number.isFinite(a)&&Number.isFinite(b)&&a!==0&&b!==0,path+' changed finite classification or signed zero');
+  const relative=Math.abs(a-b)/scale;
+  assert.ok(relative<=1e-10,path+' exceeds ten-digit host agreement: '+a+' vs '+b);
+  report.rounding.push({path,software:a,host:b,relative});
+}
