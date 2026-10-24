@@ -42,6 +42,7 @@ jobs:
           node tests/connected-analysis.mjs
           node tests/capacitance.mjs
           node tests/capacitance-data.mjs
+          node tests/capacitance-grids.mjs
           node tests/worker-capacitance.mjs
           node tests/lmat.mjs
           node tests/original-lmat.mjs

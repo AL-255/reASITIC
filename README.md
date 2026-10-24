@@ -36,6 +36,7 @@ node tests/estimates.mjs
 node tests/connected-analysis.mjs
 node tests/capacitance.mjs
 node tests/capacitance-data.mjs
+node tests/capacitance-grids.mjs
 node tests/worker-capacitance.mjs
 node tests/lmat.mjs
 node tests/original-lmat.mjs
@@ -69,10 +70,10 @@ Current measured evidence:
   and 33,704 matrix components at the original LMAT 20-decimal output boundary.
 - Seven additional original SAVE fixtures pass 955 printed-precision checks;
   eleven connected command reports pass 121 L / DC / R(f) checks.
-- Ten complete CAP cases match 985 native numeric fields exactly, plus 840
-  original printed matrix/report fields. All 17,217,120 bytes of the original
+- Eleven complete CAP cases match 1,000 native numeric fields exactly, plus 846
+  original printed matrix/report fields. All 17,219,040 bytes of the original
   raw Green-table payloads match their FNV-1a-64 fingerprints. Every reference
-  case repeats the original executable with a fresh cache, including a 256×256
+  case repeats the original executable with a fresh cache, including one-cell whole-chip and 256×256
   FFT spiral, refined/distinct grounds, capacitor plates, and rotated wires.
 - All 681 hardware-x87 instruction/arithmetic cases match their consumed
   binary64 outputs. Nine raw binary80 differences are recorded separately;
@@ -116,7 +117,7 @@ observed through an added callback without replacing numerical expressions.
 
 `simulate_capacitance(winding, ground, frequency_hz, length_cell, width_cell,
 chip_x, chip_y, fft_x, fft_y, contact_limit, unfolded)` uses ground -1 for the
-default same-name reference. Power-of-two FFT sizes 2–256, a 1–512 contact limit,
+default same-name reference. Power-of-two FFT sizes 1–256, a 1–512 contact limit,
 and a 128 MiB table budget bound computation. Collapsed/out-of-bounds contacts
 and native fault cases are rejected before matrix indexing. There is no
 persistent browser table cache yet; fine grids can take tens of seconds. The

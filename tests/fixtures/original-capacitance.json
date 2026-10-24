@@ -2,9 +2,34 @@
   "reference": "Unmodified original ASITIC CAP command, two isolated fresh-cache sessions per case",
   "executable_sha256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
   "technology_sha256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
-  "case_definition_sha256": "f3fc3750112a50b09681fd429be04719a050764d250b00f6130904a24c92726f",
+  "case_definition_sha256": "7854df7de2b62ca935e5ad3df7425d52e35a3d4df469261aa750b11d74c3d5e3",
   "matrix_precision": "Native SAVEMAT %20.10lg; cache payloads are raw binary64",
   "cases": [
+    {
+      "name": "whole-chip-plane",
+      "frequency_hz": 1000000000.0,
+      "green_table_hash": "20ea4579c427f925",
+      "raw_cache_bytes": 1920,
+      "raw_cache_sha256": "155e437b946ac82ae591ff382b8d19efda9397b2282672dbabd91ec31ce8a651",
+      "potential_matrix": [
+        [
+          [
+            0.02670393436,
+            -22.85701118
+          ]
+        ]
+      ],
+      "matrix": [
+        [
+          [
+            5.111351852e-05,
+            0.04375019233
+          ]
+        ]
+      ],
+      "capacitance_ff_printed": 6963.069,
+      "resistance_printed": 0.027
+    },
     {
       "name": "wire-coarse",
       "frequency_hz": 1000000000.0,

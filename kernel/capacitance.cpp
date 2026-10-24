@@ -122,8 +122,8 @@ extern "C" const char* simulate_capacitance(int winding,int ground,double freque
     if(winding<0 || ground< -1 || !__builtin_isfinite(frequency) || frequency<=0 ||
        !__builtin_isfinite(length_cell) || length_cell<=0 || !__builtin_isfinite(width_cell) || width_cell<=0 ||
        !__builtin_isfinite(chip_x) || chip_x<=0 || !__builtin_isfinite(chip_y) || chip_y<=0 ||
-       nx<2 || nx>256 || ny<2 || ny>256 || (nx&(nx-1)) || (ny&(ny-1)) || contact_limit<1 || contact_limit>512)
-        return "{\"error\":\"Use positive frequency, cells and chip dimensions, power-of-two FFT sizes from 2 to 256, and 1–512 contacts\"}";
+       nx<1 || nx>256 || ny<1 || ny>256 || (nx&(nx-1)) || (ny&(ny-1)) || contact_limit<1 || contact_limit>512)
+        return "{\"error\":\"Use positive frequency, cells and chip dimensions, power-of-two FFT sizes from 1 to 256, and 1–512 contacts\"}";
     auto* source=engine.shapes;for(int i=0;source && i<winding;++i)source=source->next;
     auto* reference=engine.shapes;for(int i=0;reference && i<ground;++i)reference=reference->next;if(ground<0)reference=source;
     if(!source || !reference)return "{\"error\":\"Select a valid device and ground winding\"}";
