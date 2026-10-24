@@ -1,6 +1,6 @@
 import createKernel from './asitic.js';
 import {parseTechnology,configureKernel,generateGeometry,createGeometry} from './technology.mjs';
-const kernel=await createKernel();let epoch=0;
+const kernel=await createKernel();let epoch=0,processTechnology=null;
 function frequency(data,value=data.frequency_ghz) {
   const result=value===undefined?data.frequency:kernel._normalize_value(Number(value),5,.1,0);
   if(!Number.isFinite(result) || result<=0)throw Error('Enter a positive native ASITIC frequency.');return result;
@@ -21,6 +21,13 @@ self.onmessage=async({data})=>{
       if(analysis.error)throw Error(analysis.error);
       postMessage({id:data.id,analysis,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
     }
+    if(action==='capacitance'){
+      if(!processTechnology)throw Error('Generate a layout before running CAP.');
+      const domain=processTechnology.domain,mesh=data.mesh??{},cells=[mesh.length??50,mesh.width??20];
+      const parsed=data.nativeInput?cells.map(value=>kernel._normalize_value(Number(value),7,data.grid??.1,data.snap===false?0:1)):cells;
+      const result=JSON.parse(kernel.UTF8ToString(kernel._simulate_capacitance(data.winding??0,data.ground??-1,frequency(data),...parsed,domain.x,domain.y,data.fft_x??domain.cells_x,data.fft_y??domain.cells_y,data.contact_limit??128,data.unfolded?1:0)));
+      if(result.error)throw Error(result.error);postMessage({id:data.id,capacitance:result,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
+    }
     if(action==='simulate'){
       const simulation=solve(data,frequency(data));postMessage({id:data.id,simulation,warnings:kernel.UTF8ToString(kernel._last_warnings())});return;
     }
@@ -40,7 +47,7 @@ self.onmessage=async({data})=>{
       return;
     }
     if(action!=='generate')throw Error('Unknown workbench action.');
-    const technology=parseTechnology(data.technology);configureKernel(kernel,technology);
+    const technology=parseTechnology(data.technology);configureKernel(kernel,technology);processTechnology=technology;
     const layout=data.creator?createGeometry(kernel,data.creator.id,data.creator.keywords,data.creator.answers,{...data.options,domain:technology.domain}):generateGeometry(kernel,data.kind,data.parameters,data.options);postMessage({id:data.id,layout,technology});
   }catch(error){postMessage({id:data.id,error:error.message,action});}
 };

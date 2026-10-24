@@ -1,0 +1,14 @@
+{
+  "cases": [
+    {"name":"wire-coarse","id":2,"keywords":"NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100","grid":[8,8],"cells":[1000,1000],"frequency_ghz":1},
+    {"name":"wire-refined","id":2,"keywords":"NAME=A:LEN=100:WID=40:METAL=M4:XORG=100:YORG=100","grid":[16,16],"cells":[40,20],"frequency_ghz":2},
+    {"name":"wire-low-frequency","id":2,"keywords":"NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100","grid":[16,16],"cells":[1000,1000],"frequency_ghz":0.1},
+    {"name":"wire-high-frequency","id":2,"keywords":"NAME=A:LEN=100:WID=40:METAL=M5:XORG=100:YORG=100","grid":[32,32],"cells":[40,20],"frequency_ghz":10},
+    {"name":"distinct-ground","id":2,"keywords":"NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100","ground":"NAME=G:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100","grid":[16,16],"cells":[1000,1000],"frequency_ghz":1},
+    {"name":"refined-ground","id":2,"keywords":"NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100","ground":"NAME=G:LEN=100:WID=40:METAL=M3:XORG=100:YORG=100","grid":[16,16],"cells":[40,20],"frequency_ghz":2},
+    {"name":"capacitor-plates","id":4,"keywords":"NAME=A:LEN=100:WID=40:METAL1=M2:METAL2=M1:XORG=100:YORG=100","grid":[16,16],"cells":[40,20],"frequency_ghz":1},
+    {"name":"rotated-wire","id":2,"keywords":"NAME=A:LEN=120:WID=64:METAL=M3:XORG=150:YORG=150:ORIENT=30","grid":[16,16],"cells":[40,40],"frequency_ghz":2},
+    {"name":"square","id":0,"keywords":"NAME=A:LEN=200:WID=220:W=32:S=16:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100","grid":[32,32],"cells":[1000,1000],"frequency_ghz":1},
+    {"name":"square-fine","id":0,"keywords":"NAME=A:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=100:YORG=100","grid":[256,256],"cells":[1000,1000],"frequency_ghz":1}
+  ]
+}

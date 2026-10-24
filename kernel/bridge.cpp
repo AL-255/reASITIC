@@ -35,7 +35,7 @@ using namespace asitic;
 namespace {
 GeometryShape* head=nullptr;
 MetalLayer metals[32]{};ViaLayer vias[32]{};double heights[32]{};int metal_count=0,via_count=0;
-double substrate[32]{};int substrate_count=0;
+double substrate[32]{};SubstrateLayer dielectric[32]{};int substrate_count=0;
 double origin_x=0,origin_y=0,parsed_ring_gap=0;int winding_phase=1;bool has_parsed_gap=false;
 char result[4*1024*1024],message[1024],warnings[4096];unsigned warning_length=0;
 jmp_buf creator_jump;bool creator_active=false;
@@ -62,7 +62,7 @@ int random(void*) { return 65; }
 double& number(GeometryShape& s,unsigned offset) { return *reinterpret_cast<double*>(s.filaments.prefix+offset); }
 int& integer(GeometryShape& s,unsigned offset) { return *reinterpret_cast<int*>(s.filaments.prefix+offset); }
 GeometryRuntime geometry{{{allocate,nullptr},release},{warn,nullptr},terminate,nullptr};
-void clear() { reasitic::release_simulation_result();while(head) { auto* next=head->next;head->next=nullptr;if(head->filaments.first)release_geometry_shapes(head,geometry.memory);else release(head,nullptr);head=next; }warning_length=0;warnings[0]=0; }
+void clear() { reasitic::release_simulation_result();reasitic::release_capacitance_result();while(head) { auto* next=head->next;head->next=nullptr;if(head->filaments.first)release_geometry_shapes(head,geometry.memory);else release(head,nullptr);head=next; }warning_length=0;warnings[0]=0; }
 // C locale tables use the recovered glibc signed-char table layout.
 unsigned short classes[384];int upper[384],lower[384];
 CharacterTables character_tables() {
@@ -151,18 +151,23 @@ void guard_native_creation(int id,const ConsoleGeometryState& state) {
 }
 }
 namespace reasitic {
-EngineView engine_view() { return {head,metals,vias,metal_count,{warn,nullptr}}; }
+EngineView engine_view() { return {head,metals,vias,metal_count,{warn,nullptr},dielectric,substrate_count,heights}; }
 void clear_diagnostics() { warning_length=0;warnings[0]=0; }
 }
 extern "C" {
 void reset_technology() { clear();metal_count=via_count=substrate_count=0;origin_x=origin_y=0;winding_phase=1; }
 void set_geometry_options(double x,double y,int phase) { origin_x=x;origin_y=y;winding_phase=phase?phase:1;has_parsed_gap=false; }
 void set_ring_gap_radians(double gap) { parsed_ring_gap=gap;has_parsed_gap=true; }
-void set_substrate(int i,double thickness) { if(i<0 || i>=32)return;substrate[i]=thickness;if(i>=substrate_count)substrate_count=i+1; }
-void finalize_technology() { for(int i=substrate_count-2;i>=0;--i)substrate[i]=x87::binary64(Real(substrate[i])+substrate[i+1]); }
+void set_substrate(int i,double thickness) { if(i<0 || i>=32)return;substrate[i]=thickness;dielectric[i]={};dielectric[i].thickness=thickness;if(i>=substrate_count)substrate_count=i+1; }
+void set_substrate_material(int i,double eps,double rho) {
+    if(i<0 || i>=32)return;__builtin_memcpy(dielectric[i].prefix,&i,4);__builtin_memcpy(dielectric[i].prefix+4,&eps,8);
+    dielectric[i].resistivity=x87::binary64(Real(rho)*10000.L);
+}
+void finalize_technology() { for(int i=substrate_count-2;i>=0;--i)substrate[i]=x87::binary64(Real(substrate[i])+substrate[i+1]);for(int i=0;i<substrate_count;++i)dielectric[i].height=substrate[i]; }
 void set_metal(int i,double height,double thickness,double resistance,int layer) {
     if(i<0 || i>=32)return;if(layer<0 || layer>=substrate_count)return;
     const double z=x87::binary64(Real(substrate[layer])-height);
+    __builtin_memcpy(metals[i].prefix+0xa0,&layer,4);__builtin_memcpy(metals[i].prefix+0xa4,&i,4);__builtin_memcpy(metals[i].prefix+0xa8,&z,8);
     heights[i]=x87::binary64(Real(substrate[layer])-z);metals[i].thickness=thickness;metals[i].resistance=x87::binary64(Real(resistance)*Real(0.001));
     sprintf(reinterpret_cast<char*>(&metals[i]),"M%d",i+1);if(i>=metal_count)metal_count=i+1;
 }

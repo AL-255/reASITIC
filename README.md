@@ -20,7 +20,8 @@ interactive creator dispatch run in C++. The advanced command editor supports
 all twelve creator commands and native dimensions such as ILEN / IWID. Parameters use micrometres. The original `RESIS` DC resistance, `INDUCTANCE` conductor estimate and `RESISHF`
 high-frequency resistance paths run inside the C++ kernel. These are the original
 conductor estimates; the original no-eddy LMAT filament solver is available in the workbench.
-Substrate and distributed-network simulation are still being integrated. GDSII uses native ribbon boundaries, real via cuts and
+The original layered CAP solver is also available, with substrate conductivity
+and permittivity. Eddy-current and combined circuit/network simulation are still being integrated. GDSII uses native ribbon boundaries, real via cuts and
 landing pads, with 1 µm user units and a 1 nm database grid.
 
 ```sh
@@ -33,6 +34,9 @@ node tests/parity.mjs
 node tests/original-geometry.mjs
 node tests/estimates.mjs
 node tests/connected-analysis.mjs
+node tests/capacitance.mjs
+node tests/capacitance-data.mjs
+node tests/worker-capacitance.mjs
 node tests/lmat.mjs
 node tests/original-lmat.mjs
 node tests/lmat-lifecycle.mjs
@@ -65,6 +69,11 @@ Current measured evidence:
   and 33,704 matrix components at the original LMAT 20-decimal output boundary.
 - Seven additional original SAVE fixtures pass 955 printed-precision checks;
   eleven connected command reports pass 121 L / DC / R(f) checks.
+- Ten complete CAP cases match 985 native numeric fields exactly, plus 840
+  original printed matrix/report fields. All 17,217,120 bytes of the original
+  raw Green-table payloads match their FNV-1a-64 fingerprints. Every reference
+  case repeats the original executable with a fresh cache, including a 256×256
+  FFT spiral, refined/distinct grounds, capacitor plates, and rotated wires.
 - All 681 hardware-x87 instruction/arithmetic cases match their consumed
   binary64 outputs. Nine raw binary80 differences are recorded separately;
   this remains a limit on universal microcode identity.
@@ -77,7 +86,7 @@ Current measured evidence:
 These are bounded tests, not universal parity claims. All listed exact
 comparisons are required CI gates. The source translator rejects unknown
 assembly. Native Clang AST ranges expose implicit long-double-to-double stores
-in creator units; the build retains an expression/offset report. This preserves
+in creator and layered-potential units; the build retains an expression/offset report. This preserves
 original narrowing boundaries without changing vendor sources. Arithmetic and square root use Berkeley SoftFloat binary80;
 logarithms, trig and exponent fractions use binary128 guard evaluation with
 native x87 constants, followed by the original binary80 stores. This avoids
@@ -93,6 +102,27 @@ matrix only for the latest inspected sample. Cancellation stops between samples.
 Phase, origin, snap and grid controls use the recovered native input parser;
 frequency and angle conversion retain native binary32 boundaries and quirks.
 Substantive native solver warnings remain visible.
+
+The layered CAP panel exposes original contact meshing, spectral Green tables,
+FFT transforms, potential-matrix inversion, group reduction, terminal folding,
+and the unfolded internal solve. The `.tek` layer EPS/RHO values and original
+rho × 10000 conversion are retained alongside cumulative layer and metal Z
+coordinates. CAP's explicit ground argument resets its mesh words exactly as
+native parser type 8 does; a private clone preserves the source layout. Native
+CCELL minimum-pitch normalization remains visible in diagnostics. Both the
+folded admittance (siemens) and contact potential (ohms) matrices export to CSV.
+CAP totals use the native rounded values immediately before the original report,
+observed through an added callback without replacing numerical expressions.
+
+`simulate_capacitance(winding, ground, frequency_hz, length_cell, width_cell,
+chip_x, chip_y, fft_x, fft_y, contact_limit, unfolded)` uses ground -1 for the
+default same-name reference. Power-of-two FFT sizes 2–256, a 1–512 contact limit,
+and a 128 MiB table budget bound computation. Collapsed/out-of-bounds contacts
+and native fault cases are rejected before matrix indexing. There is no
+persistent browser table cache yet; fine grids can take tens of seconds. The
+original nonsquare indexing is preserved with sufficient zero backing storage;
+original-executable parity is currently measured on square FFT grids only.
+Eddy effects and combined network/port metrics remain outstanding.
 
 The worker protocol is tested with actual WASM startup, original wire matrices,
 streamed frequency samples, cancellation and error recovery. Scientific export
@@ -114,11 +144,13 @@ Regenerate the independent original executable fixtures with:
 ```sh
 python3 tools/capture_lmat.py --reference ~/github/asitic-re
 python3 tools/capture_creators.py --reference ~/github/asitic-re
+python3 tools/capture_capacitance.py --reference ~/github/asitic-re
 ```
 
-This test-only command requires the original executable's legacy runtime DSOs;
-`--library-path` selects them. Its executable hash is pinned. Raw paired logs,
-BSAVE files and LMAT outputs are retained under `build/original-lmat`.
+These test-only commands require the original executable's legacy runtime DSOs;
+`--library-path` selects them. The executable hash is pinned. Raw paired logs, BSAVE files, CAP cache files and
+matrices are retained under `build/original-lmat`, `build/original-creators` and
+`build/original-capacitance`.
 
 Creator input is bounded to native fixed buffers, 64 turns, 256 sides/via rows
 or columns, and a 32 MiB creation allocation budget. Invalid commands recover
@@ -128,7 +160,7 @@ unwritten parser/history and mesh words use explicit zero initial state, rather
 than claiming process-independent parity for uninitialized bytes.
 
 Next required work includes broader original-executable creator/input coverage, original eddy and
-CAP/network solvers, coupled-winding and multiport metrics, and original-executable end-to-end
+combined circuit/network solvers, coupled-winding and multiport metrics, and original-executable end-to-end
 parity for every supported path. All recovered source is already pinned here for
 that work. Browser visual QA remains outstanding when a browser is available.
 

@@ -22,11 +22,14 @@ export function parseTechnology(text) {
   const chip=blocks.chip[0]??{};
   const domain={x:chip.chipx??512,y:chip.chipy??512,cells_x:chip.fftx??128,cells_y:chip.ffty??128};
   if(!(domain.x>0 && domain.y>0 && Number.isInteger(domain.cells_x) && Number.isInteger(domain.cells_y) && domain.cells_x>0 && domain.cells_y>0))throw Error('Invalid chip dimensions or FFT cells');
-  return {metals,vias,domain,substrate:blocks.layer.map(layer=>layer.t),source:text};
+  const dielectric=blocks.layer.map(layer=>({permittivity:layer.eps??11.7,resistivity:layer.rho}));
+  if(dielectric.some(layer=>!(layer.permittivity>0 && layer.resistivity>0)))throw Error('Layer permittivity and resistivity must be positive');
+  return {metals,vias,domain,dielectric,substrate:blocks.layer.map(layer=>layer.t),source:text};
 }
 export function configureKernel(kernel,technology) {
   kernel._reset_technology();
   technology.substrate.forEach((t,i)=>kernel._set_substrate(i,t));
+  if(kernel._set_substrate_material)technology.dielectric?.forEach((layer,i)=>kernel._set_substrate_material(i,layer.permittivity,layer.resistivity));
   kernel._finalize_technology();
   technology.metals.forEach((m,i)=>kernel._set_metal(i,m.height,m.thickness,m.sheet_milliohms,m.layer));
   technology.vias.forEach((v,i)=>kernel._set_via(i,v.bottom,v.top,v.width,v.spacing,v.over1,v.over2,v.resistance));

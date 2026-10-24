@@ -1,17 +1,19 @@
 import {polygons,writeGDS} from './gds.mjs';
 import {parseTechnology} from './technology.mjs';
 import {creatorRecipe,parseCreatorCommand} from './creators.mjs';
+import {capacitanceMatrixCSV,capacitanceDiagnostics} from './capacitance.mjs';
 import {frequencySweep,matrixCSV,sweepCSV,plotSeries} from './simulation.mjs';
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
 const colors=['#d8ba69','#8ab9df','#b89bde','#b4e887','#e1b486','#cf83a6','#80c9c3','#ece7bb'];
 let importedText='',technologyText='',layout,technology,ready=false,busy=false,request=0,view,initialView,drag;
-let samples=[],selectedSimulation=null,sampleRequest=null,sampleKey='';
+let samples=[],selectedSimulation=null,sampleRequest=null,sampleKey='',capacitanceResult=null;
 const worker=new Worker(new URL('./worker.mjs',import.meta.url),{type:'module'});
-const simulationControls=['simulate','sweep','sim-winding','cell-length','cell-width','cell-thickness','cell-trigger','filament-limit','sweep-start','sweep-stop','sweep-count','frequency-scale','frequency'];
+const simulationControls=['simulate','sweep','sim-winding','cell-length','cell-width','cell-thickness','cell-trigger','filament-limit','sweep-start','sweep-stop','sweep-count','frequency-scale','frequency','cap-solve','cap-winding','cap-ground','cap-frequency','cap-length','cap-width','cap-fftx','cap-ffty','contact-limit','cap-mode'];
 function setBusy(value,stoppable=false){
   busy=value;for(const element of $('controls').elements)element.disabled=!ready||value||Boolean(element.closest('label')?.hidden)||Boolean(element.closest('.fields') && $('native-command').value.trim());
   for(const id of simulationControls)$(id).disabled=!ready||!layout||value;
   $('analyze').disabled=!ready||!layout||value;$('stop').disabled=!value||!stoppable;
+  $('cap-matrix-csv').disabled=value||!capacitanceResult;$('potential-matrix-csv').disabled=value||!capacitanceResult;
   $('matrix-csv').disabled=value||!selectedSimulation?.matrix;$('results-csv').disabled=value||!samples.length;
 }
 function failure(message){$('status').textContent=message;$('loading').textContent='';setBusy(false);}
@@ -20,7 +22,13 @@ worker.onmessage=({data})=>{
   if(data.ready){ready=true;$('engine').textContent='● C++ / WASM ready';setBusy(false);if(technologyText)generate();return;}
   if(data.id!==request)return;
   if(data.cancelled){setBusy(false);$('status').textContent=`Sweep stopped. ${samples.length} completed samples retained.`;return;}
-  if(data.error){if(data.action==='generate'){layout=undefined;view=initialView=undefined;$('download').disabled=true;$('preview').replaceChildren();for(const id of ['footprint','segments','resistance'])$(id).textContent='—';clearSimulation();}failure(data.error);return;}
+  if(data.error){if(data.action==='generate'){layout=undefined;view=initialView=undefined;$('download').disabled=true;$('preview').replaceChildren();for(const id of ['footprint','segments','resistance'])$(id).textContent='—';clearSimulation();clearCapacitance();}failure(data.error);return;}
+  if(data.capacitance){
+    capacitanceResult=data.capacitance;const c=capacitanceResult;setBusy(false);
+    $('cap-total').textContent=c.capacitance_f===null?'—':(c.capacitance_f*1e15).toPrecision(7)+' fF';$('cap-resistance').textContent=c.resistance===null?'—':c.resistance.toPrecision(7)+' Ω';$('cap-contacts').textContent=String(c.contacts);
+    $('cap-details').textContent=`${c.name} · ${(c.frequency_hz/1e9).toPrecision(5)} GHz · ${c.mesh.fft_x} × ${c.mesh.fft_y} FFT · ${c.matrix.length} × ${c.matrix.length} ${c.unfolded?'unfolded':'folded'} admittance matrix`+(c.unfolded?' · Unfolded CAP provides matrix values without a total-capacitance report.':'');
+    $('status').textContent='Original layered CAP solve complete.\n'+capacitanceDiagnostics(data.warnings||'');return;
+  }
   if(data.simulation){
     const result=data.simulation,summary={...result};delete summary.matrix;
     const index=samples.findIndex(s=>s.frequency_hz===result.frequency_hz);if(index<0)samples.push(summary);else samples[index]=summary;
@@ -32,9 +40,11 @@ worker.onmessage=({data})=>{
   }
   setBusy(false);$('loading').textContent='';
   if(data.analysis){$('electrical').textContent=data.analysis.windings.map(w=>`${w.name} · L = ${w.inductance_nh.toPrecision(7)} nH · R(${(data.analysis.frequency_hz/1e9).toPrecision(4)} GHz) = ${w.resistance_hf.toPrecision(7)} Ω`).join('\n');$('status').textContent=data.warnings||'Original conductor estimates calculated. These do not include the distributed substrate network.';return;}
-  layout=data.layout;technology=data.technology;$('engine').textContent='● C++ / WASM ready';render();clearSimulation();
+  layout=data.layout;technology=data.technology;$('engine').textContent='● C++ / WASM ready';render();clearSimulation();clearCapacitance();
   $('sim-winding').replaceChildren();layout.shapes.forEach((shape,i)=>{const option=document.createElement('option');option.value=i;option.textContent=shape.name;$('sim-winding').append(option);});
-  const primary=layout.shapes.findIndex(s=>s.name==='P');if(primary>=0)$('sim-winding').value=primary;
+  for(const id of ['cap-winding','cap-ground']){$(id).replaceChildren();if(id==='cap-ground'){const option=document.createElement('option');option.value=-1;option.textContent='Substrate reference';$(id).append(option);}layout.shapes.forEach((shape,i)=>{const option=document.createElement('option');option.value=i;option.textContent=shape.name;$(id).append(option);});}
+  $('cap-fftx').value=technology.domain.cells_x;$('cap-ffty').value=technology.domain.cells_y;
+  const primary=layout.shapes.findIndex(s=>s.name==='P');if(primary>=0){$('sim-winding').value=primary;$('cap-winding').value=primary;}
   $('download').disabled=false;setBusy(false);$('electrical').textContent='Choose a frequency and calculate the conductor estimates.';
   $('status').textContent=layout.warnings||'Layout generated. GDS export uses a 1 nm grid.';
 };
@@ -70,6 +80,8 @@ function render(){
   $('layout-title').textContent=$('native-command').value.trim()?$('native-command').value.trim().split(/\s+/)[0].toUpperCase():$('kind').selectedOptions[0].textContent.toUpperCase();$('footprint').textContent=`${w.toFixed(1)} × ${h.toFixed(1)} µm`;$('segments').textContent=layout.shapes.reduce((n,s)=>n+s.segments.length,0);$('resistance').textContent=layout.shapes.map(s=>`${s.name}: ${s.resistance_dc.toFixed(3)} Ω`).join(' · ');
   $('legend').replaceChildren();for(const layer of [...new Set(list.map(p=>p.layer))].sort((a,b)=>a-b)){const el=document.createElement('span');el.style.setProperty('--color',colors[(layer-1)%colors.length]);el.textContent=layer>=100?technology.vias[layer-100].name:technology.metals[layer-1].name;$('legend').append(el);}
 }
+function clearCapacitance(){capacitanceResult=null;for(const id of ['cap-total','cap-resistance','cap-contacts'])$(id).textContent='—';$('cap-details').textContent='Choose a device, optional ground and contact/FFT mesh, then run the original CAP solve.';}
+$('cap-solve').onclick=()=>{try{const o=options(),frequencyGHz=Number($('cap-frequency').value);if(!(frequencyGHz>0))throw Error('Enter a positive CAP frequency.');$('status').textContent='Generating layered Green tables and solving the original CAP matrix…';send({action:'capacitance',winding:Number($('cap-winding').value),ground:Number($('cap-ground').value),frequency_ghz:frequencyGHz,mesh:{length:Number($('cap-length').value),width:Number($('cap-width').value)},fft_x:Number($('cap-fftx').value),fft_y:Number($('cap-ffty').value),contact_limit:Number($('contact-limit').value),unfolded:$('cap-mode').value==='unfolded',nativeInput:true,grid:o.grid,snap:o.snap});}catch(e){failure(e.message);}};
 function clearSimulation(){samples=[];selectedSimulation=null;sampleRequest=null;sampleKey='';for(const id of ['sim-l','sim-r','sim-q'])$(id).textContent='—';$('sim-details').textContent='Choose a winding and mesh, then run the original filament solver.';renderPlot();}
 function simulationRequest(){const o=options();return {winding:Number($('sim-winding').value),mesh:{length:Number($('cell-length').value),width:Number($('cell-width').value),thickness:Number($('cell-thickness').value),subdivision_trigger:Number($('cell-trigger').value)},filament_limit:Number($('filament-limit').value),nativeInput:true,grid:o.grid,snap:o.snap};}
 function prepareSamples(config,clear=false){const key=JSON.stringify(config);if(clear||key!==sampleKey){samples=[];selectedSimulation=null;renderPlot();}sampleRequest=config;sampleKey=key;}
@@ -96,6 +108,8 @@ $('preview').onpointermove=e=>{if(!drag)return;const rect=$('preview').getBoundi
 $('preview').onpointerup=$('preview').onpointercancel=()=>drag=null;
 function download(data,name,type){const url=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 $('download').onclick=()=>{try{download(writeGDS(layout,technology),'reASITIC-coil.gds','application/octet-stream');}catch(e){failure(e.message);}};
+$('cap-matrix-csv').onclick=()=>{try{download(capacitanceMatrixCSV(capacitanceResult),'reASITIC-CAP-admittance.csv','text/csv');}catch(e){failure(e.message);}};
+$('potential-matrix-csv').onclick=()=>{try{download(capacitanceMatrixCSV(capacitanceResult,true),'reASITIC-CAP-potential.csv','text/csv');}catch(e){failure(e.message);}};
 $('matrix-csv').onclick=()=>{try{download(matrixCSV(selectedSimulation),`reASITIC-${selectedSimulation.name}-matrix.csv`,'text/csv');}catch(e){failure(e.message);}};
 $('results-csv').onclick=()=>{try{download(sweepCSV(samples),'reASITIC-frequency-results.csv','text/csv');}catch(e){failure(e.message);}};
 renderPlot();setBusy(false);loadProcess();

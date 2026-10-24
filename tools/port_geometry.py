@@ -7,7 +7,7 @@ from pathlib import Path
 import re,json
 from implicit_stores import expose
 ROOT=Path(__file__).resolve().parents[1]
-SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver_no_eddy','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators']
+SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver_no_eddy','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver']
 
 def translate(name,s):
     # Loads/stores of finite double values. Signaling NaN status is not exposed.
@@ -49,6 +49,9 @@ def translate(name,s):
     s=s.replace('asm volatile("fldt %1; fldt %2; fmulp; fstpt %0" : "=m"(dy) : "m"(rounded_height),"m"(sy) : "st","st(1)","memory");','dy=rounded_height*sy;')
     for instr,op in [('fadd','+'),('fsub','-'),('fmul','*'),('fdiv','/')]:
         s=s.replace(f'asm volatile("{instr} %%st(1),%%st" : "=t"(r) : "0"(a),"u"(b));',f'r=a{op}b;')
+    s=s.replace('asm volatile("fstpl %0" : "=m"(out) : "t"(value) : "st");','out=x87::binary64(value);')
+    for output,input_ in [('result','value'),('value','fraction')]:
+        s=s.replace(f'asm("fmulp" : "=t"({output}) : "0"({input_}),"u"(sign) : "st(1)");',f'{output}={input_}*sign;')
     s=s.replace('asm("fyl2x" : "=t"(logarithm) : "0"(base),"u"(1.0L) : "st(1)");','logarithm=x87::log2(base);')
     if re.search(r'\basm\s*(?:volatile)?\s*\(',s):raise ValueError(f'Untranslated assembly in {name}')
     s=s.replace('#include "x87.hpp"','#include "x87_port.hpp"')
@@ -63,6 +66,12 @@ def source(name):
         # Exclude unrelated command dispatch to avoid pulling in the whole host.
         s=(ROOT/'vendor/asitic/src/analysis_commands.cpp').read_text()
         return s[:s.index('long double shape_coupling_estimate(')]+'}\n'
+    if name=='potential_solver':
+        s=(ROOT/'vendor/asitic/src/potential_solver.cpp').read_text()
+        s=s.replace('namespace asitic {','namespace asitic {\nvoid record_capacitance_totals(double,double);',1)
+        needle='const double capacitance=binary64(-1.L/((static_cast<long double>(frequency)*0x1.921fb54442d18p+2)*z.imag));'
+        assert s.count(needle)==1
+        return s.replace(needle,needle+'\n        record_capacitance_totals(capacitance,z.real);')
     if name=='native_creators':
         s=(ROOT/'vendor/asitic/src/console_geometry.cpp').read_text()
         s=s[:s.index('void initialize_console_geometry(')]
@@ -96,7 +105,7 @@ def generate(clang=None):
     proof={}
     for name in SOURCES:
         native=source(name)
-        if name.startswith('shape_') or name=='native_creators':
+        if name.startswith('shape_') or name=='native_creators' or name in ('legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver'):
             native,proof[name]=expose(name,native,clang)
         (target/(name+'.cpp')).write_text(translate(name,native))
     evidence=ROOT/'build/evidence';evidence.mkdir(exist_ok=True)

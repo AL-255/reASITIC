@@ -40,6 +40,9 @@ jobs:
           node tests/parity.mjs
           node tests/estimates.mjs
           node tests/connected-analysis.mjs
+          node tests/capacitance.mjs
+          node tests/capacitance-data.mjs
+          node tests/worker-capacitance.mjs
           node tests/lmat.mjs
           node tests/original-lmat.mjs
           node tests/lmat-lifecycle.mjs
