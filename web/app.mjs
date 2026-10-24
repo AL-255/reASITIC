@@ -81,6 +81,13 @@ worker.onmessage=({data})=>{
     const finished=!data.port_sweep||data.port_sweep.done;if(finished)activePortSweep=null;
     $('network-sweep-state').textContent=portSamples.network.length?`${portSamples.network.length} completed port samples retained.`:'Single-frequency result.';
     networkResult=data.network;const n=networkResult,p=n.pi,show=(x,scale=1,unit='')=>x===null?'Undefined':(x*scale).toPrecision(7)+(unit?' '+unit:'');setBusy(!finished,!finished);
+    const capacitive=n.model==='CAP';for(const option of $('network-parameter').options)if(option.value==='pi')option.disabled=capacitive;
+    if(capacitive){
+      if($('network-parameter').value==='pi')$('network-parameter').value='y';
+      for(const id of ['network-l','network-r','network-q'])$(id).textContent='—';
+      $('network-details').textContent=`${n.dispatch.command} · CAP · ${n.name} · ${show(n.frequency_hz,1e-9,'GHz')} · ${n.contacts} contacts\nThe original capacitor port path provides S and Y parameters. It leaves the previous Pi model unchanged; no Pi model is exported for this solve.`+automaticMeshDetails(n);
+      $('status').textContent=finished?'Original capacitor port sweep complete.':`Solved capacitor port sample ${data.port_sweep.index+1}/${data.port_sweep.total}.`;return;
+    }
     $('network-l').textContent=show(p.inductance_h,1e9,'nH');$('network-r').textContent=show(p.resistance,1,'Ω');$('network-q').textContent=show(p.quality_differential);
     $('network-details').textContent=`${n.model??'PI2'} · ${n.name} · ${show(n.frequency_hz,1e-9,'GHz')} · ${n.contacts} contacts · ${n.groups} conductor groups · ${n.filaments} filaments
 `+
@@ -91,6 +98,7 @@ worker.onmessage=({data})=>{
       `Input impedance (single-ended / opposite port / differential): ${n.input_impedance.map(z=>z.map(v=>show(v)).join(' + j ')).join(' / ')} Ω
 `+
       `Shunt resistance (single / differential): ${show(p.shunt_single,1,'Ω')} / ${show(p.shunt_differential,1,'Ω')} · ${n.eddy.evaluations} Green evaluations`+automaticMeshDetails(n);
+    if(n.dispatch?.command==='2PORTX'&&n.dispatch.model==='PI2')$('network-details').textContent+='\n2PORTX uses PI2 for this structure in the original program.';
     if(n.model==='PI4')$('network-details').textContent+=`\nPads: ${n.pads.join(' / ')} · ${n.pad_contacts} pads-only contacts. Broader validation remains in progress.`;
     const diagnostics=capacitanceDiagnostics(data.warnings||''),quadErrors=n.eddy.quadrature_status.reduce((a,b)=>a+b,0);
     $('status').textContent=`Original ${n.model??'PI2'} solve complete${quadErrors?' with QUADPACK nonconvergence':''}.`+(diagnostics?'\n'+diagnostics:'');if(!finished)$('status').textContent=`Solved port sample ${data.port_sweep.index+1}/${data.port_sweep.total} at ${(n.frequency_hz/1e9).toPrecision(7)} GHz.`+(diagnostics?'\n'+diagnostics:'');return;

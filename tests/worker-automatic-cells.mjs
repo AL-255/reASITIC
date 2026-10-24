@@ -31,7 +31,8 @@ try{
     assert.equal(new Set(samples.map(s=>s.automatic_cells.mesh.width)).size,3,'Sweep reused a cell width');
     for(const result of samples){
       const policy=result.automatic_cells;assert.equal(policy.frequency_hz,result.frequency_hz);assert.equal(result.mesh.width,policy.mesh.width);assert.equal(result.mesh.contact_width,policy.contact_mesh.width);
-      const plain=(await checked({...manual(request,result),action:'network'})).network;assert.deepEqual(portSampleSummary(plain),withoutPolicy(portSampleSummary(result)),'Automatic limits differ from direct doubles');
+      const plain=(await checked({...manual(request,result),action:'network'})).network,{dispatch,...summary}=portSampleSummary(result);assert.deepEqual(portSampleSummary(plain),withoutPolicy(summary),'Automatic limits differ from direct doubles');
+      if(dispatch)assert.equal(dispatch.model,request.model??'PI2');
     }
   }
   let technology=source;
@@ -53,7 +54,7 @@ try{
       let maximum=0;actual.impedance_matrix.flat(2).forEach((value,i)=>{const error=Math.abs(value-oracle.impedance_matrix.flat(2)[i]);maximum=Math.max(maximum,error);assert.ok(error<=scale*1e-10,'Subdivided automatic mesh differs from independent nodal reduction');});
       independentThreePort={node_count:actual.node_count,winding_groups:actual.winding_groups,max_absolute_impedance_error:maximum};
     }
-    for(const sample of samples){const single=(await checked({...manual(request,sample),action:target}))[field];assert.deepEqual(withoutPolicy(portSampleSummary(sample)),portSampleSummary(single));}
+    for(const sample of samples){const single=(await checked({...manual(request,sample),action:target}))[field],{dispatch,...summary}=portSampleSummary(sample);assert.deepEqual(withoutPolicy(summary),portSampleSummary(single));if(target==='network')assert.equal(dispatch.model,request.model??'PI2');}
   }
   const inductance=await sweep({...base,action:'sweep',frequencies_ghz:[.5,1,1.5]},'simulation');
   for(const sample of inductance){const single=(await checked({...manual(base,sample),action:'simulate'})).simulation;const {matrix,...summary}=single;assert.deepEqual(withoutPolicy(sample),sample.matrix?single:summary);}

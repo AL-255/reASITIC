@@ -8,12 +8,14 @@ export function resonancePlan(kernel,settings,samples){
     if(result.error)throw Error(result.error);return result;
   }finally{if(pointer)kernel._free(pointer);}
 }
-export function capacitorPortMatrix(kernel,result){
+function capacitorPorts(kernel,result,records){
   if(result.matrix?.length!==2||result.matrix.some(row=>row.length!==2||row.some(z=>!Array.isArray(z)||z.length!==2||z.some(v=>!Number.isFinite(v)))))throw Error('The original capacitor model needs a folded 2x2 matrix.');
   const pointer=kernel._malloc(64);
-  try{kernel.HEAPF64.set(result.matrix.flat(2),pointer/8);const port=JSON.parse(kernel.UTF8ToString(kernel._capacitor_port_matrix(pointer)));if(port.error)throw Error(port.error);return port.matrix;}
+  try{kernel.HEAPF64.set(result.matrix.flat(2),pointer/8);const port=JSON.parse(kernel.UTF8ToString(records?kernel._capacitor_port_response(pointer,result.frequency_hz):kernel._capacitor_port_matrix(pointer)));if(port.error)throw Error(port.error);return port;}
   finally{kernel._free(pointer);}
 }
+export const capacitorPortMatrix=(kernel,result)=>capacitorPorts(kernel,result,false).matrix;
+export const capacitorPortResponse=(kernel,result)=>capacitorPorts(kernel,result,true);
 export function resonanceHistoryCSV(samples,plan){
   if(!samples.length)throw Error('Complete at least one SELFRES analysis before exporting.');
   const number=x=>x===undefined?'':Object.is(x,-0)?'-0':String(x),mode=plan?.differential?'differential':'single';

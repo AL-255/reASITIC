@@ -249,12 +249,17 @@ using namespace asitic;
         return '#ifdef __EMSCRIPTEN__\n#include "extended_network.hpp"\n#include "numerical_policy.hpp"\n#endif\n'+s[:begin]+guard+s[begin:]
     if name=='extended_driver':
         s=(ROOT/'vendor/asitic/src/extended_twoport.cpp').read_text()
+        predicate=re.search(r'    const bool known=([^;]+);',s).group(1)
         # Verbatim PIX driver and its timer helpers. Host command dispatch is
         # excluded, as it also requires unrelated analytical model state.
         s=s[:s.index('void set_options(')]+'}\n'+s[s.index('bool solve_extended_twoport_network('):s.index('bool analyze_extended_twoport(')]+'}\n'
         needle='    stop(ind_time,o);start(node_time,o);remove_geometry_shape(s.shapes,clone,memory);'
         assert s.count(needle)==1
-        return s.replace(needle,'    if(options.snapshot){options.snapshot("ZC.out",capacitance,options.snapshot_user);options.snapshot("YM.out",inductance,options.snapshot_user);}\n'+needle)
+        s=s.replace(needle,'    if(options.snapshot){options.snapshot("ZC.out",capacitance,options.snapshot_user);options.snapshot("YM.out",inductance,options.snapshot_user);}\n'+needle)
+        # Keep command dispatch distinct from the direct PIX driver. The
+        # original 2PORTX recognizes a smaller set of actual shape kinds.
+        end=s.rindex('}')
+        return s[:end]+'bool recognized_port_shape(int kind){return '+predicate+';}\nint numerical_port_model(int kind,bool extended){return kind==4?2:extended&&recognized_port_shape(kind)?1:0;}\n'+s[end:]
     if name=='port_sweep':
         s=(ROOT/'vendor/asitic/src/port_commands.cpp').read_text()
         return s[:s.index('int parse_port_parameter_format(')]+s[s.index('void run_port_frequency_sweep('):]

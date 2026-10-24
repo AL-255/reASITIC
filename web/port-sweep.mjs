@@ -3,7 +3,7 @@ import {transformerMetricsCSV} from './transformer.mjs';
 import {threePortMatrixCSV,threePortMetricsCSV} from './three-port.mjs';
 
 export function portSampleSummary(result){
-  const {capacitance_matrix,inductance_admittance_matrix,inductance_impedance_matrix,node_capacitance_matrix,currents,voltages,pad_capacitance_matrix,with_pad_admittance_matrix,system_before,system_matrix,...summary}=result;
+  const {capacitance_matrix,inductance_admittance_matrix,inductance_impedance_matrix,node_capacitance_matrix,potential_matrix,currents,voltages,pad_capacitance_matrix,with_pad_admittance_matrix,system_before,system_matrix,...summary}=result;
   return summary;
 }
 const modelOf=sample=>Array.isArray(sample.names)?'3PORT':sample.transformer?'CALCTRANS':sample.model??'PI2';

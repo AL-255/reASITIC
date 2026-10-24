@@ -396,6 +396,7 @@ node tests/maxnw-ports.mjs
 node tests/worker-maxnw.mjs
 node tests/worker-automatic-cells.mjs
 node tests/port-sweep.mjs
+node tests/port-dispatch.mjs
 node tests/worker-port-sweep.mjs
 node tests/portable-three-port.mjs
 node tests/three-port-sweep.mjs
@@ -603,6 +604,30 @@ A failed solve stops the sweep with its sample/frequency diagnostic; completed
 samples remain exportable. Native numerical exports concatenate the original
 header once and every completed record in frequency order. S and metrics CSVs
 include the selected model and retain SI units and undefined values.
+
+Direct PIX and stepped `2PORTX` are different original command paths. Direct
+PIX always calls the extended solver. Numerical `2PORTX` selects PIX only for
+actual kinds 0, 1, 16, 17 and 18; other conductor records use PI2 and emit the
+original compatibility warning. This predicate is extracted from the pinned
+C++ dispatcher. Selection follows the constructed shape, not the creator's
+label: `MMSQUARE` and `CAPACITOR` join their parts into kind 21 and consequently
+use PI2 in a `2PORTX` sweep. Every worker sample retains its selected command,
+shape kind and model in `dispatch`; CSV model labels follow the actual solver.
+The `2PORTGND` reference is acquired through native argument type 8, including
+an implicit device reference in the workbench. Its mesh reset is distinct from
+an omitted optional `2PORTX` ground. Explicit self-ground retains its own path.
+
+Fourteen repeated original cases across CMOS/BiCMOS verify these choices,
+including wire, ring, joined/stacked shapes, both symmetric coil families,
+capacitor construction, and omitted versus explicit self-ground. Read-only
+driver/writer observations provide 336 original Y words and 56 complete S/Y
+files; independent 80-digit circuit reductions check production matrices.
+All 92 model selections over the 37 creator/process variants are checked too.
+The separate kind-4 capacitive dispatcher preserves the original 2x2 conversion
+and exports defined S/Y records; it does not manufacture a new Pi scalar bank
+from the previous command's history. The current original capacitor creator
+does not produce kind 4. An analytical 2x2 matrix checks this conversion and its
+export/recovery boundaries without relabeling any native geometry.
 
 Five repeated unmodified original sweeps cover PI2, PIX, PI4, CALCTRANS and
 decimal-step input rounding: all 15 saved frequencies and 20 complete numerical

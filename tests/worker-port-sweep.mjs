@@ -25,10 +25,11 @@ try{
     for(const [i,frame] of frames.entries()){
       assert.equal('capacitance_matrix' in frame[target],i===frames.length-1,'Full matrices only for final sample');
       const single=await send({...request,action:target,frequency:frame[target].frequency_hz});assert.ok(!single.error,single.error);
-      assert.deepEqual(portSampleSummary(frame[target]),portSampleSummary(single[target]),'Sweep sample differs from the same saved native single frequency');
+      const {dispatch,...sample}=portSampleSummary(frame[target]);assert.deepEqual(sample,portSampleSummary(single[target]),'Sweep sample differs from the same saved native single frequency');
+      if(target==='network'&&request.model!=='PI4')assert.equal(dispatch.model,request.model);
     }
     const samples=frames.map(frame=>portSampleSummary(frame[target]));assert.ok(portSweepRecord(samples,'s').startsWith('\n# GHZ S RI '));assert.equal(portSweepScatteringCSV(samples).trimEnd().split('\n').length,1+4*samples.length);assert.equal(portSweepMetricsCSV(samples).trimEnd().split('\n').length,1+samples.length);
-    lastRequest=request;lastResult=frames.at(-1)[target];
+    lastRequest=request;const {dispatch,...last}=frames.at(-1)[target];lastResult=last;
   }
   for(const change of [{step_ghz:0},{step_ghz:-1},{step_ghz:1e-30,stop_ghz:1},{start_ghz:2,stop_ghz:1},{sample_limit:1},{sample_limit:1.5},{port_kind:'invalid'}]){
     const result=await send({...lastRequest,action:'port-sweep',start_ghz:1,stop_ghz:2,step_ghz:.5,...change});assert.ok(result.error,JSON.stringify(change));

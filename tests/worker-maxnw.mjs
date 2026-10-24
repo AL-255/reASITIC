@@ -37,7 +37,7 @@ try{
   assert.deepEqual((await checked({...cap,max_width_cells:3})).capacitance,expectedCAP,'MAXNW changed the electrostatic solve');
   for(const [target,field]of [['network','network'],['transformer','transformer'],['three-port','three_port']]){
     const request={...base,action:target,model:'PI2',max_width_cells:4};worker.postMessage({id:++id,...request,action:'port-sweep',port_kind:target,start_ghz:1,stop_ghz:1.5,step_ghz:.5});let count=0;
-    while(true){const r=await next();assert.equal(r.id,id);assert.ok(!r.error,r.error);assert.deepEqual(portSampleSummary(r[field]),portSampleSummary(direct(request,r[field].frequency_hz)));count++;if(r.port_sweep.done)break;}
+    while(true){const r=await next();assert.equal(r.id,id);assert.ok(!r.error,r.error);const {dispatch,...sample}=portSampleSummary(r[field]);assert.deepEqual(sample,portSampleSummary(direct(request,r[field].frequency_hz)));if(target==='network')assert.equal(dispatch.model,'PI2');count++;if(r.port_sweep.done)break;}
     assert.equal(count,2);
   }
   const auto={...base,action:'simulate',automatic_cells:{alpha:.03,beta:.6},max_width_cells:3},automatic=(await checked(auto)).simulation;assert.equal(automatic.filaments,3);assert.deepEqual(automatic,direct(auto));

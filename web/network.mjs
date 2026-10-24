@@ -6,6 +6,10 @@ export function networkMatrixCSV(result){
   return ['frequency_hz,row,column,real_siemens,imag_siemens',...native.flatMap((row,i)=>row.map((z,j)=>[result.frequency_hz,i,j,...z].map(number).join(',')))].join('\n')+'\n';
 }
 export function networkMetricsCSV(result){
+  if(result?.model==='CAP'&&result.matrix){
+    const columns=['frequency_hz',...['Y11','Y12','Y21','Y22'].flatMap(key=>[key+'_real_siemens',key+'_imag_siemens'])];
+    return [columns.join(','),[result.frequency_hz,...result.matrix.flat(2)].map(number).join(',')].join('\n')+'\n';
+  }
   if(!result?.pi)throw Error('Run the combined network before exporting the pi model.');
   const values={...result.pi,resonance_hz:result.resonance_hz,eddy_mode:result.eddy.mode,eddy_layer_count:result.eddy.layer_count,eddy_layers:result.eddy.indices.join(';'),green_evaluations:result.eddy.evaluations,quadpack_diagnostics:result.eddy.quadrature_status.reduce((a,b)=>a+b,0)};
   const columns=Object.keys(values).map(key=>['resistance','resistance_first','resistance_second','shunt_single','shunt_differential'].includes(key)?key+'_ohm':key);

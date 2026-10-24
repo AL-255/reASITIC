@@ -1,5 +1,6 @@
 #include "asitic/analysis_commands.hpp"
 #include "json.hpp"
+#include "two_port_records.hpp"
 #ifdef __EMSCRIPTEN__
 #include "x87_port.hpp"
 #include <setjmp.h>
@@ -75,12 +76,28 @@ extern "C" const char* self_resonance_plan(double first,double second,double ste
 
 // The capacitor branch of the original grounded analysis uses this conversion
 // rather than the inductive PI2 node system. Input is a row-major 2x2 C matrix.
-extern "C" const char* capacitor_port_matrix(const double* values){
+namespace {
+const char* capacitor_ports(const double* values,asitic::TwoPortAdmittance& ports){
     if(!values)return "{\"error\":\"Supply the folded 2x2 capacitor matrix\"}";
     for(int i=0;i<8;++i)if(!__builtin_isfinite(values[i]))return "{\"error\":\"Capacitor admittance must be finite\"}";
     asitic::ComplexValue cells[]={{values[0],values[1]},{values[4],values[5]},{values[2],values[3]},{values[6],values[7]}};
-    const asitic::ComplexMatrix cap{cells,4,0,2,2,2,0};asitic::TwoPortAdmittance ports{};asitic::capacitor_port_admittance(cap,ports);
-    static char output[512];const auto* p=reinterpret_cast<const double*>(&ports);
+    const asitic::ComplexMatrix cap{cells,4,0,2,2,2,0};asitic::capacitor_port_admittance(cap,ports);
+    const auto* p=reinterpret_cast<const double*>(&ports);
     for(int i=0;i<8;++i)if(!__builtin_isfinite(p[i]))return "{\"error\":\"Capacitor port conversion overflowed\"}";
+    return nullptr;
+}
+}
+extern "C" const char* capacitor_port_matrix(const double* values){
+    asitic::TwoPortAdmittance ports{};const auto* error=capacitor_ports(values,ports);if(error)return error;
+    static char output[512];const auto* p=reinterpret_cast<const double*>(&ports);
     sprintf(output,"{\"matrix\":[[[%.17g,%.17g],[%.17g,%.17g]],[[%.17g,%.17g],[%.17g,%.17g]]]}",p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);return output;
+}
+extern "C" const char* capacitor_port_response(const double* values,double frequency){
+    if(!__builtin_isfinite(frequency)||frequency<=0)return "{\"error\":\"Use a positive finite capacitor port frequency\"}";
+    asitic::TwoPortAdmittance ports{};const auto* error=capacitor_ports(values,ports);if(error)return error;
+    static char output[16384];const auto* p=reinterpret_cast<const double*>(&ports);char* out=output;
+    out+=sprintf(out,"{\"model\":\"CAP\",\"frequency_hz\":%.17g,\"matrix\":[[[%.17g,%.17g],[%.17g,%.17g]],[[%.17g,%.17g],[%.17g,%.17g]]],\"two_port\":",frequency,p[0],p[1],p[2],p[3],p[4],p[5],p[6],p[7]);
+    // Capacitive dispatch updates Y but leaves the command's previous Pi
+    // scalar bank untouched. Export only the S/Y records defined by this solve.
+    out=reasitic::two_port_json(out,ports,nullptr,false,frequency,false);sprintf(out,"}");return output;
 }

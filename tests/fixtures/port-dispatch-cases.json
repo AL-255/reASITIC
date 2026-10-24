@@ -1,0 +1,384 @@
+{
+  "cases": [
+    {
+      "name": "wire-extended",
+      "technology": "CMOS",
+      "command": "WIRE NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        8,
+        8
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "square-extended",
+      "technology": "CMOS",
+      "command": "SQUARE NAME=A:LEN=200:WID=220:W=32:S=16:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        32,
+        32
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "joined-extended",
+      "technology": "CMOS",
+      "command": "WIRE NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "CP A B M2\nMOVE B 0 96\nJOIN A B",
+      "winding": "A",
+      "grid": [
+        16,
+        16
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "stacked-extended",
+      "technology": "CMOS",
+      "command": "MMSQUARE NAME=A:LEN=200:WID=220:W=32:S=16:N=1.5:METAL=M4:EXIT=M3:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        32,
+        32
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "ring-extended",
+      "technology": "CMOS",
+      "command": "RING NAME=A:RAD=100:W=32:GAP=30:SIDES=8:METAL=M4:XORG=200:YORG=200",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        32,
+        32
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "polygon-extended",
+      "technology": "CMOS",
+      "command": "SPIRAL NAME=A:RAD=120:SIDES=6:W=32:S=16:N=1:METAL=M4:XORG=200:YORG=200",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        32,
+        32
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "symmetric-square-extended",
+      "technology": "CMOS",
+      "command": "SYMSQ NAME=A:LEN=240:ILEN=48:W=32:S=16:N=1:METAL=M4:METAL2=M3:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        32,
+        32
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "symmetric-polygon-extended",
+      "technology": "CMOS",
+      "command": "SYMPOLY NAME=A:RAD=128:ILEN=48:SIDES=6:W=32:S=16:N=1:METAL=M4:METAL2=M3:XORG=200:YORG=200",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        32,
+        32
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "capacitor-extended",
+      "technology": "CMOS",
+      "command": "CAPACITOR NAME=A:LEN=100:WID=80:METAL1=M4:METAL2=M3:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        16,
+        16
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "capacitor-grounded",
+      "technology": "CMOS",
+      "command": "CAPACITOR NAME=A:LEN=100:WID=80:METAL1=M4:METAL2=M3:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        16,
+        16
+      ],
+      "model": "PI2",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "bicmos-wire-extended",
+      "technology": "BiCMOS",
+      "command": "WIRE NAME=A:LEN=100:WID=40:METAL=M2:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        8,
+        8
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "bicmos-capacitor-extended",
+      "technology": "BiCMOS",
+      "command": "CAPACITOR NAME=A:LEN=100:WID=80:METAL1=M3:METAL2=M2:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        16,
+        16
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ]
+    },
+    {
+      "name": "wire-extended-explicit-self",
+      "technology": "CMOS",
+      "command": "WIRE NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        8,
+        8
+      ],
+      "model": "PIX",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "explicit_ground": true
+    },
+    {
+      "name": "wire-grounded-default-reference",
+      "technology": "CMOS",
+      "command": "WIRE NAME=A:LEN=100:WID=40:METAL=M1:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "",
+      "winding": "A",
+      "grid": [
+        8,
+        8
+      ],
+      "model": "PI2",
+      "range_ghz": [
+        1,
+        1.5,
+        0.25
+      ],
+      "cells": [
+        1000,
+        1000,
+        1000
+      ],
+      "contact_cells": [
+        1000,
+        1000
+      ],
+      "default_ground": true
+    }
+  ]
+}

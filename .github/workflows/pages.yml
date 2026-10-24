@@ -11,7 +11,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: mymindstorm/setup-emsdk@v14
@@ -55,6 +55,7 @@ jobs:
           node tests/worker-maxnw.mjs
           node tests/worker-automatic-cells.mjs
           node tests/port-sweep.mjs
+          node tests/port-dispatch.mjs
           node tests/worker-port-sweep.mjs
           node tests/portable-three-port.mjs
           node tests/three-port-sweep.mjs

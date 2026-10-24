@@ -31,6 +31,7 @@ extern "C" int vsnprintf(char*,unsigned,const char*,__builtin_va_list);
 extern "C" char* strtok(char*,const char*);
 extern "C" double strtod(const char*,char**);
 namespace asitic { bool create_native_geometry(int,CommandArguments&,ConsoleGeometryState&,bool&); }
+namespace asitic { bool recognized_port_shape(int);int numerical_port_model(int,bool); }
 extern "C" void abort();
 using namespace asitic;
 namespace {
@@ -163,6 +164,13 @@ void clear_diagnostics() { warning_length=0;warnings[0]=0; }
 }
 extern "C" {
 int shape_kind(int index) { if(index<0)return -1;auto* shape=head;while(shape && index--)shape=shape->next;return shape?integer(*shape,0x50):-1; }
+const char* port_analysis_plan(int index,int extended){
+    static char output[512];const int kind=shape_kind(index);
+    if(kind<0||(extended!=0&&extended!=1))return "{\"error\":\"Select an existing winding and a valid port command\"}";
+    const int model=asitic::numerical_port_model(kind,extended!=0);const char* models[]={"PI2","PIX","CAP"};
+    const char* warning=kind!=4&&!asitic::recognized_port_shape(kind)?"Warning:  User defined structure type may not be compatible with 2port command.":"";
+    char* out=output;out+=sprintf(out,"{\"command\":\"%s\",\"shape_kind\":%d,\"model\":\"%s\",\"warning\":",extended?"2PORTX":"2PORTGND",kind,models[model]);out=reasitic::json_string(out,warning);sprintf(out,"}");return output;
+}
 int set_max_width_cells(int value) { if(value<=0)return 0;max_width_cells=value;return 1; }
 void reset_technology() {
     clear();const double rules[2]={0,0};
