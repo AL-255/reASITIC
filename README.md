@@ -26,8 +26,8 @@ normalization and native comma/tab delimiters. The original catalog's mixed-case
 use 3DMIRRORTRANS for that creator. Add devices
 to a shared layout to construct independent ground conductors and coil assemblies;
 new devices require unique names and the same technology. Rejected additions,
-including late export failures, preserve the previous layout and solver state. Parameters use micrometres. The original `RESIS` DC resistance, `INDUCTANCE` conductor estimate and `RESISHF`
-high-frequency resistance paths run inside the C++ kernel. These are the original
+including late export failures, preserve the previous layout and solver state. Parameters use micrometres. The original `RESIS` DC resistance, `INDUCTANCE` conductor estimate, `RESISHF`
+high-frequency resistance, low-frequency `Q` and `METALAREA` paths run inside the C++ kernel. These are the original
 conductor estimates; the original LMAT filament solver is available in the workbench,
 with disabled eddy currents, native shape selection, or segment folding.
 The original layered CAP solver is also available, with substrate conductivity
@@ -113,7 +113,24 @@ An independent GDS reader checks all resulting ribbons, via cuts and landing
 pads. Non-grid minima, negative/default/signed-zero rules, keyword behavior and
 request/reset recovery are covered separately.
 
-The original `COUPLING` conductor estimate is available alongside L and R(f).
+The conductor estimates include the original low-frequency extrapolated `Q`,
+computed from the unrounded extended-precision inductance and DC resistance.
+It is distinct from the distributed network's high-frequency Q. Undefined Q,
+including a zero-resistance via, is returned as `null` and displayed as undefined.
+`METALAREA` sums three-dimensional segment length times width in µm², following
+the primary chain and its original length threshold. Secondary shunts are
+excluded, and overlapping ribbons are counted separately. The estimate panel
+exports all winding metrics and the actual normalized frequency as CSV.
+Thirty-nine original geometry cases in both process stacks supply 528 captured
+binary64 metric words from two repeated original runs per case. Historical
+arithmetic reproduces these words; production retains the stable geometry
+integral and agrees with the original L/Q to better than `1e-12` relative error.
+DC resistance, high-frequency resistance and area match the original words.
+An independent 80-digit physical DC/area calculation and Q equation, two shunt
+controls, 71 retained-intermediate witnesses, worker parity and recovery checks
+are included in `tests/conductor-metrics.mjs`.
+
+The original `COUPLING` conductor estimate is available alongside L, R(f) and Q.
 Select two windings to report the mutual inductance in nH and coupling coefficient.
 It uses the original segment-pair estimate and self-inductance normalization;
 the full transformer/network solvers remain available for distributed substrate
@@ -396,6 +413,7 @@ node tests/original-creator-binary.mjs
 node tests/parity.mjs
 node tests/original-geometry.mjs
 node tests/estimates.mjs
+node tests/conductor-metrics.mjs
 node tests/connected-analysis.mjs
 node tests/coupling.mjs
 node tests/potential-memo.mjs
@@ -459,7 +477,7 @@ Current measured evidence:
   checks, and 4,125 numeric fields match the i386 build exactly. Capacitor join,
   balun reflection/phase and mirror-transformer prompt composition are retained.
 - All 6,972 numeric fields in 20 i386/WASM construction cases match exactly.
-- All 120 conductor-estimate fields across 50 frequency cases match exactly.
+- All 300 conductor-estimate fields across 50 frequency cases match the native audit build exactly.
 - All 33,836 LMAT fields across 33 native/WASM cases match exactly, including
   coarse, cross-section and unequal longitudinal meshes, phase and rotation.
 - Two fresh unmodified original-executable runs per winding case produced

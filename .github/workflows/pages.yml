@@ -74,6 +74,7 @@ jobs:
           node tests/original-geometry.mjs
           node tests/parity.mjs
           node tests/estimates.mjs
+          node tests/conductor-metrics.mjs
           node tests/connected-analysis.mjs
           node tests/coupling.mjs
           node tests/potential-memo.mjs

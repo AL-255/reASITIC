@@ -1,0 +1,20 @@
+{
+  "cases": [
+    {
+      "name": "cmos-shunt-primary-chain",
+      "technology": "CMOS",
+      "command": "WIRE NAME=A:LEN=40:WID=5:METAL=M1:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "CP A B M3\nJOINSHUNT A B",
+      "names": ["A"]
+    },
+    {
+      "name": "bicmos-shunt-primary-chain",
+      "technology": "BiCMOS",
+      "command": "WIRE NAME=A:LEN=40:WID=5:METAL=M2:XORG=100:YORG=100",
+      "answers": "",
+      "edits": "CP A B MSUB\nJOINSHUNT A B",
+      "names": ["A"]
+    }
+  ]
+}

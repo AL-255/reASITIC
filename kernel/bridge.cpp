@@ -15,6 +15,7 @@ extern "C" [[noreturn]] void longjmp(int*,int);
 #include "asitic/transformer3d.hpp"
 #include "asitic/resistance.hpp"
 #include "asitic/analysis_commands.hpp"
+#include "asitic/geometry_reporting.hpp"
 #ifdef __EMSCRIPTEN__
 #include "x87_port.hpp"
 using Real=SoftReal;
@@ -241,11 +242,20 @@ const char* analyze(double frequency_hz) {
     if(!head || !__builtin_isfinite(frequency_hz) || frequency_hz<=0)return "{\"error\":\"Generate a layout and supply a positive frequency\"}";
     char* out=result;out+=sprintf(out,"{\"frequency_hz\":%.17g,\"windings\":[",frequency_hz);int index=0;
     for(auto* shape=head;shape;shape=shape->next,++index) {
+        if(out-result>static_cast<int>(sizeof(result))-1024)return "{\"error\":\"Conductor estimates exceed the output buffer\"}";
         ResistanceTechnology tech{metals,vias,metal_count};
-        const double l=x87::binary64(shape_inductance_estimate(shape->filaments,tech,{warn,nullptr}));
+        const Real inductance=shape_inductance_estimate(shape->filaments,tech,{warn,nullptr});
+        const Real resistance=shape_resistance_dc(shape->filaments,tech);
+        const double l=x87::binary64(inductance),dc=x87::binary64(resistance);
         const double r=x87::binary64(shape_resistance_high_frequency(shape->filaments,frequency_hz,tech));
-        if(!__builtin_isfinite(l) || !__builtin_isfinite(r))return "{\"error\":\"Original estimate produced a nonfinite result\"}";
-        out+=sprintf(out,"%s{\"name\":",index?",":"");out=reasitic::json_string(out,reinterpret_cast<const char*>(shape->filaments.prefix));out+=sprintf(out,",\"inductance_nh\":%.17g,\"resistance_hf\":%.17g}",l,r);
+        const double area=x87::binary64(geometry_metal_area(*shape));
+        // Original Q keeps L and Rdc in extended precision until the final
+        // quotient. Its constant includes both 2*pi and nH-to-H conversion.
+        const Real numerator=(Real(0x1.afc6f70213be5p-28L)*frequency_hz)*inductance;
+        const double quality=x87::binary64(numerator/resistance);
+        if(!__builtin_isfinite(l) || !__builtin_isfinite(r) || !__builtin_isfinite(dc) || !__builtin_isfinite(area))return "{\"error\":\"Original estimate produced a nonfinite result\"}";
+        out+=sprintf(out,"%s{\"name\":",index?",":"");out=reasitic::json_string(out,reinterpret_cast<const char*>(shape->filaments.prefix));out+=sprintf(out,",\"inductance_nh\":%.17g,\"resistance_hf\":%.17g,\"resistance_dc\":%.17g,\"metal_area_um2\":%.17g,\"quality_low_frequency\":",l,r,dc,area);
+        out+=__builtin_isfinite(quality)?sprintf(out,"%.17g}",quality):sprintf(out,"null}");
     }
     sprintf(out,"]}");return result;
 }

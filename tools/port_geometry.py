@@ -7,7 +7,7 @@ from pathlib import Path
 import re,json
 from implicit_stores import expose
 ROOT=Path(__file__).resolve().parents[1]
-SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','two_port_output','port_sweep','port_records','extended_node','extended_driver','extended_analysis','frequency_geometry','geometry_parser','geometry_edit','geometry_dispatch','self_resonance','capacitor_ports','optimization','optimization_radius','optimization_plan']
+SOURCES=['geometry','shape_construction','spiral_construction','symmetric_construction','winding_construction','transformer3d','composite_geometry','resistance','numerics','rectangular','separation','parallel','intersection','canonicalize','planar','spatial','segment','estimate','metal_area','filaments','filament_setup','impedance','vias','complex','symmetric','blocked','general','solver','argument_value','input_normalization','shape_prompts','shape_prompt_symmetric','shape_prompt_transformer','shape_prompt_ring_via','shape_creation_commands','shape_creation_primitives','shape_creation_symmetric','shape_creation_sympoly','shape_creation_transformer','shape_creation_mirror','native_creators','legacy_complex','potential','potential_tables','potential_cache','contacts','potential_solver','green','green_integration','quadrature','quadrature_wrappers','oscillatory','eddy','technology','network','node_equations','combined_network','later_analysis','three_port','three_port_analysis','three_port_transforms','two_port_output','port_sweep','port_records','extended_node','extended_driver','extended_analysis','frequency_geometry','geometry_parser','geometry_edit','geometry_dispatch','self_resonance','capacitor_ports','optimization','optimization_radius','optimization_plan']
 
 def translate(name,s):
     if name=='optimization_radius':
@@ -63,6 +63,14 @@ def translate(name,s):
     s=s.replace('asm volatile("fmull %2" : "=t"(out) : "0"(x),"m"(y));','out=x*y;')
     s=s.replace('asm("fld1; fxch; fyl2xp1" : "=t"(logarithm) : "0"(delta) : "st(1)");','logarithm=x87::log2p1(delta);')
     s=s.replace('asm("fld1; fxch; fyl2x" : "=t"(logarithm) : "0"((long double)x) : "st(1)");','logarithm=x87::log2(static_cast<long double>(x));')
+    if name=='metal_area':
+        begin=s.index('    asm volatile(',s.index('void segment_length_width('));end=s.index('\n}',begin)
+        s=s[:begin]+'''    const long double dx=static_cast<long double>(s.endpoints[3])-s.endpoints[0],
+        dy=static_cast<long double>(s.endpoints[4])-s.endpoints[1],
+        dz=static_cast<long double>(s.endpoints[5])-s.endpoints[2];
+    length=x87::sqrt((dx*dx+dy*dy)+dz*dz);width=s.width;'''+s[end:]
+        for instruction,operator in [('fadd','+'),('fmul','*')]:
+            s=s.replace('asm volatile("'+instruction+' %%st(1),%%st":"=t"(r):"0"(a),"u"(b));','r=a'+operator+'b;')
     if name=='eddy':
         begin=s.index('int rounded_integer(');end=s.index('const ConductorSegment* next_segment',begin)
         s=s[:begin]+'int rounded_integer(long double value,unsigned short mode) { return x87::truncate_int(x87::binary64(mode==0x0800u?x87::ceil(value):x87::floor(value))); }\n'+s[end:]
@@ -195,6 +203,11 @@ using namespace asitic;
         needle='    using x87::binary64;\n    const long double x = dx, y = dy;'
         assert s.count(needle)==1
         return '#include "portable_gmd.hpp"\n#include "numerical_policy.hpp"\n'+s.replace(needle,'    if(!reasitic::reference_numerics())return reasitic::geometric_mean_distance(w1,w2,t1,t2,dx,dy).distance;\n'+needle)
+    if name=='metal_area':
+        s=(ROOT/'vendor/asitic/src/geometry_reporting.cpp').read_text()
+        helpers=s[s.index('void segment_length_width('):s.index('long double subtract(')]
+        body=s[s.index('long double geometry_metal_area('):s.index('void print_geometry_segments(')]
+        return '#include "asitic/geometry_reporting.hpp"\n#include "x87.hpp"\nnamespace asitic { namespace {\n'+helpers+'}\n'+body+'}\n'
     if name=='estimate':
         # Original INDUCTANCE/COUPLING commands and their shared helpers.
         # Exclude unrelated command dispatch to avoid pulling in the whole host.
