@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
-import createKernel from '../dist/asitic.js';
+import createKernel from './reference-kernel.mjs';
 import {parseTechnology,configureKernel,createGeometry} from '../web/technology.mjs';
 const cases=JSON.parse(readFileSync('tests/fixtures/capacitance-cases.json','utf8')).cases;
 const originals=JSON.parse(readFileSync('tests/fixtures/original-capacitance.json','utf8'));
