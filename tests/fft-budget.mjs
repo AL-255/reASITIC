@@ -35,7 +35,14 @@ if(!process.argv.includes('--admission-only')){
       assert.match(invoke(256,256).error,/collapses/);for(const grid of [[1024,1024],[2**30,2**30],[262144,1]])assert.match(invoke(...grid).error,/128 MiB/);
       assert.deepEqual(clean(editGeometry(k,'UNSELECT')),clean(before));const start=performance.now(),actual=invoke(...c.grid);assert.ok(!actual.error,actual.error);const directMs=performance.now()-start;assert.equal(actual.contacts,original.contacts);assert.equal(actual.green_table_hash,original.green_table_hash,c.name+' complete original raw Green payload');
       if(c.model==='CAP'){
-        const native=JSON.parse(execFileSync('build/native-geometry',['--cap',c.id,c.keywords,2,'',original.frequency_hz,...c.contact_cells,...c.grid,0,128].map(String),{encoding:'utf8'}));assert.deepEqual(actual,native,c.name+' native/WASM');originalMatrix(actual.potential_matrix,original.stages['Pmat.out'],c.name+' P');originalMatrix(actual.matrix,original.stages['YC.out'],c.name+' C');assert.equal(Number((actual.capacitance_f*1e15).toFixed(3)),original.capacitance_ff_printed);assert.equal(Number(actual.resistance.toFixed(3)),original.resistance_printed);
+        const native=JSON.parse(execFileSync('build/native-geometry',['--cap',c.id,c.keywords,2,'',original.frequency_hz,...c.contact_cells,...c.grid,0,128].map(String),{encoding:'utf8'}));
+        // Production raw tables are pinned to the original above. The host
+        // x87 harness can have processor-dependent table bytes; compare its
+        // complete matrices and observable CAP results, rather than using a
+        // host-table fingerprint as an accuracy test.
+        const {green_table_hash:nativeTableHash,...nativeResults}=native,{green_table_hash:originalTableHash,...actualResults}=actual;
+        assert.match(nativeTableHash,/^[a-f0-9]{16}$/);assert.deepEqual(actualResults,nativeResults,c.name+' native/WASM results');
+        originalMatrix(actual.potential_matrix,original.stages['Pmat.out'],c.name+' P');originalMatrix(actual.matrix,original.stages['YC.out'],c.name+' C');assert.equal(Number((actual.capacitance_f*1e15).toFixed(3)),original.capacitance_ff_printed);assert.equal(Number(actual.resistance.toFixed(3)),original.resistance_printed);
       }else{
         const native=JSON.parse(execFileSync('build/native-geometry',['--network',c.id,c.keywords,2,'',original.frequency_hz,...c.cells,...c.contact_cells,...c.grid,128,128,0,0,0,0,250000].map(String),{encoding:'utf8'}));assert.ok(!native.error,native.error);
         for(const [key,name]of [['capacitance_matrix','ZC.out'],['inductance_admittance_matrix','YM.out'],['node_capacitance_matrix','Ycap.out']]){originalMatrix(actual[key],original.stages[name],c.name+' '+name);assert.ok(matrixNorm(actual[key],native[key])<1e-12,c.name+' native stage '+key);}

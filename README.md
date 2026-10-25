@@ -263,6 +263,26 @@ original port-1 Q is 5.441 at 20 GHz, 4.615 at 30 GHz and 0.195 at 40 GHz with
 20/40 GHz also agree with independent 80-digit circuit reductions. A 5–10 GHz
 peak is therefore not a universal requirement of the CMOS technology file.
 
+The webpage initializes the sample processes at a 256×256 CAP FFT grid: their
+technology-file setting of 128×128 collapses the default 3 µm coil contacts.
+Imported technologies keep their specified FFT setting. Generating or editing a
+layout preserves the chosen grid; loading a process initializes it again.
+The sweep shows which sample is being solved before starting its network solve,
+and streams completed points into the plot. Fine grids can take substantial time
+per sample. The mesh, solver budgets and numerical model are not coarsened to
+make the sweep run.
+
+`python3 tests/browser-pi2-q.py` exercises the packaged page in headless Chrome
+(requires `pip install playwright==1.63.0`, Chrome or Playwright Chromium, and a
+built `dist`). It clicks **Sweep PI2 Q** with untouched defaults, completes all
+20 samples, checks the rise and fall, compares 40 exported PI2 values with the
+original blob, and switches all three port-Q definitions. It also checks visible
+coarse-grid failure, recovery, manual-grid preservation through generation/edits,
+and the original 7.5 GHz peak for the medium coil. Screenshots, downloaded CSV and
+results are saved under `build/evidence/browser-pi2-q`. This browser job is a
+required deployment gate; `--url https://al-255.github.io/reASITIC/` runs the same
+test against the published page.
+
 The original `COUPLING` conductor estimate is available alongside L, R(f) and Q.
 Select two windings to report the mutual inductance in nH and coupling coefficient.
 It uses the original segment-pair estimate and self-inductance normalization;

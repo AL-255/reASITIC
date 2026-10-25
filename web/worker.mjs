@@ -189,6 +189,7 @@ self.onmessage=async({data})=>{
       const solvePort=target==='three-port'?solveThreePort:target==='transformer'?solveTransformer:solveNetwork,field=target==='three-port'?'three_port':target;
       for(const [index,hz] of frequencies.entries()){
         if(task!==epoch)return;let result;
+        if(direct&&data.report_progress===true)postMessage({id:data.id,port_sweep_progress:{index,total:frequencies.length,frequency_hz:hz}});
         // Repeated PI2 commands retain the omitted-ground mesh semantics.
         // The historical 2PORTGND sweep acquires/reset its reference instead.
         try{result=target==='network'?solveNetwork(data,hz,undefined,!direct):await solvePort(data,hz,task);}catch(error){throw Error(`Port sample ${index+1}/${plan.frequencies_hz.length} at ${hz} Hz: ${error.message}`);}

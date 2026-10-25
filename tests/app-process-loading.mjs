@@ -62,13 +62,13 @@ try{
   assert.equal($('process').disabled,false,'A pending download prevented choosing another process');assert.equal($('technology-file').disabled,false);
   assert.equal(await $('technology-file').onchange({target:{files:[{name:'bad-startup.tek',text:async()=>'<layer>\nt=0'}]}}),false);assert.equal(sent.length,0);assert.equal($('generate').disabled,true,'Generation enabled before a first valid technology');
   const file=deferred(),importing=$('technology-file').onchange({target:{files:[{name:'my-process.tek',text:()=>file.promise}]}});
-  file.resolve(text.BiCMOS);assert.equal(await importing,true);let result=await response(++applied);assert.equal(sent.at(-1).technology,text.BiCMOS);assert.equal(result.technology.source,text.BiCMOS);assert.equal($('process').value,'custom');assert.equal($('metal').options.length,3);assert.equal($('generate').disabled,false);
+  file.resolve(text.BiCMOS);assert.equal(await importing,true);let result=await response(++applied);assert.equal(sent.at(-1).technology,text.BiCMOS);assert.equal(result.technology.source,text.BiCMOS);assert.equal($('process').value,'custom');assert.equal($('metal').options.length,3);assert.equal($('generate').disabled,false);assert.equal($('cap-fftx').value,'128','Imported FFT setting was replaced');assert.equal($('cap-ffty').value,'128');
   fetchResult(0,text.CMOS);await settle();assert.equal(sent.length,applied,'Stale startup process replaced the imported file');assert.equal($('process').value,'custom');
 
   // Overlap two actual selector handlers; the older fetch may fail after the
   // newest model is already generated. Neither its data nor error may publish.
   $('process').value='CMOS';const old=$('process').onchange();$('process').value='BiCMOS';const current=$('process').onchange();assert.equal($('generate').disabled,true);assert.equal($('simulate').disabled,true);
-  fetchResult(2,text.BiCMOS);assert.equal(await current,true);result=await response(++applied);assert.equal(result.technology.source,text.BiCMOS);const status=$('status').textContent;
+  fetchResult(2,text.BiCMOS);assert.equal(await current,true);result=await response(++applied);assert.equal(result.technology.source,text.BiCMOS);assert.equal($('cap-fftx').value,'256','Sample process has an unusable initial grid');assert.equal($('cap-ffty').value,'256');const status=$('status').textContent;
   fetches[1].reject(Error('obsolete request failed'));assert.equal(await old,false);assert.equal($('status').textContent,status);assert.equal($('process').value,'BiCMOS');assert.equal(sent.length,applied);
 
   const before=structuredClone(result.layout),count=sent.length;
@@ -89,10 +89,14 @@ try{
   assert.deepEqual(result.layout.shapes.map(physical),original.shapes.map(physical));
   $('download').onclick();const downloaded=new Uint8Array(await (await fetch(downloads.at(-1).href)).arrayBuffer()),expected=writeGDS({...result.layout,shapes:original.shapes},parseTechnology(text.CMOS));assert.deepEqual(downloaded,expected,'Form GDS differs from captured original physical records');
   const qualityCase=JSON.parse(readFileSync('tests/fixtures/quality-sweep-cases.json','utf8')).cases[0],qualityReference=JSON.parse(readFileSync('tests/fixtures/original-quality-sweep.json','utf8')).cases[0];
+  $('cap-fftx').value=64;$('cap-ffty').value=64;
   $('native-command').value=qualityCase.command;$('native-command').oninput();$('controls').onsubmit({preventDefault(){}});await response(++applied);
+  assert.equal($('cap-fftx').value,'64','Generating geometry reset the selected FFT grid');assert.equal($('cap-ffty').value,'64');
+  $('edit-commands').value='UNSELECT';$('apply-edit').onclick();await response(++applied);assert.equal($('cap-fftx').value,'64','Editing geometry reset the selected FFT grid');assert.equal($('cap-ffty').value,'64');
   for(const [id,value]of Object.entries({'cell-length':1000,'cell-width':1000,'cell-thickness':1000,'cap-length':1000,'cap-width':1000,'cap-fftx':64,'cap-ffty':64,'eddy-mode':0,'eddy-layer-count':0,'network-start':5,'network-end':10,'network-step':2.5}))$(id).value=value;
-  $('network-quality-sweep').onclick();let qualitySamples=0;
-  while(true){result=await response(++applied);qualitySamples++;assert.equal(result.port_sweep.command,'PI2');if(result.port_sweep.done)break;}
+  $('network-quality-sweep').onclick();let qualitySamples=0,qualityProgress=0;
+  while(true){result=await response(++applied);if(result.port_sweep_progress){qualityProgress++;assert.equal(result.port_sweep_progress.index,qualitySamples);assert.match($('network-sweep-state').textContent,/Solving PI2 Q sample/);continue;}qualitySamples++;assert.equal(result.port_sweep.command,'PI2');if(result.port_sweep.done)break;}
+  assert.equal(qualityProgress,3,'No progress was shown before the expensive sample solves');
   assert.equal(qualitySamples,3);assert.equal(sent.at(-1).action,'quality-sweep');assert.equal($('network-q-label').textContent,'Port 1 Q');assert.match($('network-q-note').textContent,/7\.5[0-9]* GHz/);assert.equal($('network-q-plot').children.filter(n=>n.tag==='circle').length,3);
   const expectedQuality=qualityReference.samples.find(s=>s.frequency_ghz===10).quality_printed;assert.ok(Math.abs(Number($('network-q').textContent)-expectedQuality[0])<.00051);
   $('network-q-definition').value='quality_second';$('network-q-definition').onchange();assert.equal($('network-q-label').textContent,'Port 2 Q');assert.ok(Math.abs(Number($('network-q').textContent)-expectedQuality[1])<.00051);

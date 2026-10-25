@@ -247,8 +247,36 @@ jobs:
           name: analysis-200-${{ matrix.shard }}
           path: build/evidence/analysis-200-*.json
           if-no-files-found: error
+  browser-pi2-q:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: '6.0.6'
+          actions-cache-folder: emsdk-cache
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python tools/build.py
+      - name: Install browser test runtime
+        run: |
+          pip install playwright==1.63.0
+          python -m playwright install --with-deps chromium
+      - name: Sweep PI2 Q through the webpage with untouched defaults
+        run: python tests/browser-pi2-q.py
+      - name: Retain browser screenshots, CSV and original comparisons
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-pi2-q
+          path: build/evidence/browser-pi2-q
   deploy:
-    needs: [build, numerical-budget-audit, analysis-regression]
+    needs: [build, numerical-budget-audit, analysis-regression, browser-pi2-q]
     runs-on: ubuntu-latest
     permissions:
       contents: read

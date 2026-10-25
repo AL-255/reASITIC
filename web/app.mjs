@@ -54,13 +54,23 @@ function setBusy(value,stoppable=false){
   $('loaded-calculate').disabled=!ready||value||!($('loaded-source').value==='network'?networkResult:transformerResult);$('loaded-csv').disabled=value||!loadedPortResult;
   $('matrix-csv').disabled=value||!selectedSimulation?.matrix;$('results-csv').disabled=value||!samples.length;
 }
-function failure(message){if(activeOptimization){activeOptimization=false;$('opt-state').textContent=`Search stopped after ${optimizationSamples.length} completed candidates. ${message}`;}if(activeSelfResonance)$('selfres-state').textContent=`Search stopped after an error. ${selfResonanceSamples.length} analyses retained.`;activePortSweep=null;activeSelfResonance=false;$('status').textContent=message;$('loading').textContent='';setBusy(false);}
+function failure(message){
+  if(activeOptimization){activeOptimization=false;$('opt-state').textContent=`Search stopped after ${optimizationSamples.length} completed candidates. ${message}`;}
+  if(activeSelfResonance)$('selfres-state').textContent=`Search stopped after an error. ${selfResonanceSamples.length} analyses retained.`;
+  if(activePortSweep){const key={network:'network',transformer:'trans','three-port':'three'}[activePortSweep];$(key+'-sweep-state').textContent=`Sweep stopped after ${portSamples[activePortSweep].length} completed samples. ${message}`;}
+  activePortSweep=null;activeSelfResonance=false;$('status').textContent=message;$('loading').textContent='';setBusy(false);
+}
 worker.onerror=event=>{revealReload(document,location.href);ready=false;$('engine').textContent='Kernel unavailable';failure(event.message||'Unable to load the WebAssembly kernel.');};
 worker.onmessage=({data})=>{
   if(data.ready){ready=true;$('engine').textContent='● C++ / WASM ready';setBusy(false);if(technologyText)generate();return;}
   if(data.id!==request)return;
   if(data.cancelled){if(activeOptimization){activeOptimization=false;setBusy(false);$('opt-state').textContent=`Search stopped after ${optimizationSamples.length} completed candidates.`;$('status').textContent='Coil-design search stopped.';return;}const search=activeSelfResonance,count=search?selfResonanceSamples.length:activePortSweep?portSamples[activePortSweep].length:samples.length;activePortSweep=null;activeSelfResonance=false;setBusy(false);$('status').textContent=`${search?'Search':'Sweep'} stopped. ${count} completed samples retained.`;if(search)$('selfres-state').textContent=`Search stopped after ${count} analyses.`;return;}
   if(data.error){if(data.action==='generate' && !data.append){layout=undefined;view=initialView=undefined;$('download').disabled=true;$('preview').replaceChildren();for(const id of ['footprint','segments','resistance'])$(id).textContent='—';clearEstimates();clearSimulation();clearCapacitance();clearNetwork();clearTransformer();clearThreePort();clearSelfResonance();}failure(data.error);return;}
+  if(data.port_sweep_progress){
+    const p=data.port_sweep_progress;
+    $('network-sweep-state').textContent=`Solving PI2 Q sample ${p.index+1}/${p.total} at ${(p.frequency_hz/1e9).toPrecision(7)} GHz · ${portSamples.network.length} completed samples retained.`;
+    $('status').textContent='Solving the distributed PI2 network. Completed samples appear below; Stop finishes the current sample.';return;
+  }
   if(data.resonance){
     selfResonanceResult=data.resonance;selfResonanceSamples.push(data.resonance.sample);activeSelfResonance=!data.resonance.done;renderSelfResonance();setBusy(activeSelfResonance,activeSelfResonance);$('status').textContent=data.resonance.done?'SELFRES search finished.':'Searching with the original SELFRES algorithm…';return;
   }
@@ -150,7 +160,6 @@ worker.onmessage=({data})=>{
   $('trans-primary').value=Math.max(0,layout.shapes.findIndex(s=>s.name==='P'));$('trans-secondary').value=layout.shapes.some(s=>s.name==='S')?layout.shapes.findIndex(s=>s.name==='S'):Math.min(1,layout.shapes.length-1);
   $('coupling-first').value=Math.max(0,layout.shapes.findIndex(s=>s.name==='P'));$('coupling-second').value=layout.shapes.some(s=>s.name==='S')?layout.shapes.findIndex(s=>s.name==='S'):Math.min(1,layout.shapes.length-1);$('coupling-result').textContent='Select two windings for the original conductor COUPLING estimate.';
   for(const [i,id]of ['three-first','three-second','three-third'].entries()){$(id).replaceChildren();layout.shapes.forEach((shape,j)=>{const option=document.createElement('option');option.value=j;option.textContent=shape.name;$(id).append(option);});$(id).value=Math.min(i,layout.shapes.length-1);}
-  $('cap-fftx').value=technology.domain.cells_x;$('cap-ffty').value=technology.domain.cells_y;
   const primary=layout.shapes.findIndex(s=>s.name==='P');if(primary>=0){$('sim-winding').value=primary;$('cap-winding').value=primary;}
   $('download').disabled=!layout.shapes.length;setBusy(false);$('electrical').textContent='Choose a frequency and calculate the conductor estimates.';
   $('edit-state').textContent=layout.selected?`Selected: ${layout.selected} (use . in commands)`:'No selected shape.';
@@ -181,6 +190,11 @@ const loadTechnology=createTechnologyLoader({
   loading:value=>{processLoading=value;setBusy(busy);if(value)$('status').textContent='Loading technology…';},
   apply:({text,technology,selection})=>{
     updateMetals(text,technology);technologyText=text;$('append-layout').checked=false;
+    // The sample processes specify 128 cells, which collapse the starting
+    // 3 um coil contacts. Initialize usable UI defaults once per process;
+    // generating/editing a layout must retain the user's chosen resolution.
+    const minimumFFT=selection.value==='custom'?1:256;
+    $('cap-fftx').value=Math.max(minimumFFT,technology.domain.cells_x);$('cap-ffty').value=Math.max(minimumFFT,technology.domain.cells_y);
     if(selection.value==='custom'){
       importedText=text;let option=$('process').querySelector('[value="custom"]');
       if(!option){option=document.createElement('option');option.value='custom';$('process').append(option);}
@@ -286,7 +300,7 @@ function renderNetworkQuality(){
   $('network-q-note').textContent=peak?`Highest sampled ${label}: ${peak.quality.toPrecision(7)} at ${(peak.frequency_hz/1e9).toPrecision(5)} GHz.${boundary?' This is a sweep boundary; extend the range to locate a peak.':''} Q is signed; negative values can occur above resonance.`:'Port Q includes the distributed capacitance/substrate network. Its peak depends on geometry, process, mesh and the selected port definition.';
 }
 $('network-q-definition').onchange=renderNetworkQuality;
-$('network-quality-sweep').onclick=()=>{try{const config=portRequest('network');if(config.model!=='PI2')throw Error('Select PI2 for this Q sweep.');portSamples.network=[];networkResult=null;renderNetworkQuality();activePortSweep='network';$('network-sweep-state').textContent='No completed PI2 Q samples yet.';$('status').textContent='Sweeping the original PI2 port quality factors…';send({...config,action:'quality-sweep',start_ghz:Number($('network-start').value),stop_ghz:Number($('network-end').value),step_ghz:Number($('network-step').value)},true);}catch(e){failure(e.message);}};
+$('network-quality-sweep').onclick=()=>{try{const config=portRequest('network');if(config.model!=='PI2')throw Error('Select PI2 for this Q sweep.');portSamples.network=[];networkResult=null;renderNetworkQuality();activePortSweep='network';$('network-sweep-state').textContent='No completed PI2 Q samples yet.';$('status').textContent='Sweeping the original PI2 port quality factors…';send({...config,action:'quality-sweep',report_progress:true,start_ghz:Number($('network-start').value),stop_ghz:Number($('network-end').value),step_ghz:Number($('network-step').value)},true);}catch(e){failure(e.message);}};
 $('plot-metric').onchange=renderPlot;$('frequency-scale').onchange=renderPlot;
 $('preview').addEventListener('wheel',e=>{if(!view)return;e.preventDefault();const f=e.deltaY>0?1.15:1/1.15,cx=view[0]+view[2]/2,cy=view[1]+view[3]/2;view=[cx-view[2]*f/2,cy-view[3]*f/2,view[2]*f,view[3]*f];setView();},{passive:false});
 $('preview').onpointerdown=e=>{if(!view)return;drag={x:e.clientX,y:e.clientY,view:[...view]};$('preview').setPointerCapture(e.pointerId);};
