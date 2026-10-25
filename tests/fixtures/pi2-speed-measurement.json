@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "originalExecutableSHA256": "72bcb93444604b89a65cb64e5825bfcff0ac740a816120d0f171855206bd572f",
+  "wasmSHA256": "639a04b4f7b85c5dbaf55f6d3a0f6da9374d0148dfe581586af715a0f46badd5",
+  "technologySHA256": "11dd7421afad4c7b3904b4964624e92f07caa5d00d806eea03f32ec646a59268",
+  "inputScript": "CELL 50 1.5 0.5\nCCELL 50 20\nMAXNW 500\nEDDY FALSE\nSAVEMAT FALSE\nTEKIO FALSE\nSQUARE NAME=P:LEN=100:WID=90:W=3:S=2:N=2:METAL=M4:EXIT=M3:XORG=0:YORG=0:ORIENT=0:PHASE=1\nPI2 P 1\nPI2 P 3\nPI2 P 5\nPI2 P 7\nPI2 P 9\nPI2 P 11\nPI2 P 13\nPI2 P 15\nPI2 P 17\nPI2 P 19\nPI2 P 21\nPI2 P 23\nPI2 P 25\nPI2 P 27\nPI2 P 29\nPI2 P 31\nPI2 P 33\nPI2 P 35\nPI2 P 37\nPI2 P 39\n",
+  "task": "Identical default coil; direct PI2 at 1,3,...,39 GHz; 256x256 FFT; no cache reuse; 17 contacts and 34 filaments",
+  "measurement": "Fresh original processes first; fresh production workers second; elapsed includes startup and geometry; timing medians exclude debugger/profiler runs",
+  "originalProfile": {
+    "instrumentedWallSeconds": 12.532377886003815,
+    "functions": {
+      "two_dimensional_fft": {
+        "calls": 300,
+        "seconds": 1.8918419199762866
+      },
+      "green_tables_including_fft": {
+        "calls": 300,
+        "seconds": 12.45628366037272
+      }
+    }
+  },
+  "originalMedianSeconds": 12.422038169985171,
+  "wasmMedianSeconds": 4.153089621,
+  "wasmToOriginalRatio": 0.33433238283190353,
+  "matchedOriginalSpeed": true,
+  "originalSeconds": [
+    12.23599713598378,
+    12.422038169985171,
+    12.541622443997767
+  ],
+  "wasmSeconds": [
+    4.194159614,
+    4.153089621,
+    4.151515131
+  ],
+  "note": "Recorded paired measurement on one host; CI uses a 15-second full-browser guard. Re-run tools/benchmark_pi2.py for a fresh original-first comparison on another host."
+}

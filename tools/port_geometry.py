@@ -243,6 +243,10 @@ using namespace asitic;
             old='wrap_mul(rows[row],wrap_add(g.nx,1))'
             new='wrap_mul(rows[row],wrap_add(reasitic::reference_numerics()?g.nx:g.ny,1))'
         else:
+            signature='void generate_potential_tables(int source,int target,const PotentialTableGeometry& g,PotentialTableOutput out,SolverMemory memory,WarningSink status) {'
+            assert s.count(signature)==1
+            s=s.replace(signature,signature+'\n#ifdef __EMSCRIPTEN__\n    if(!reasitic::reference_numerics()){reasitic::generate_portable_potential_tables(source,target,g,out,memory,status);return;}\n#endif\n')
+            s='#include "portable_potential.hpp"\n'+s
             old='out.xy[x*(g.nx+1)+y]'
             new='out.xy[x*((reasitic::reference_numerics()?g.nx:g.ny)+1)+y]'
             scratch='memory.arrays.get(static_cast<unsigned>(nx)*32u)'

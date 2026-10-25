@@ -268,9 +268,28 @@ technology-file setting of 128×128 collapses the default 3 µm coil contacts.
 Imported technologies keep their specified FFT setting. Generating or editing a
 layout preserves the chosen grid; loading a process initializes it again.
 The sweep shows which sample is being solved before starting its network solve,
-and streams completed points into the plot. Fine grids can take substantial time
-per sample. The mesh, solver budgets and numerical model are not coarsened to
-make the sweep run.
+and streams completed points into the plot. Production Green tables use the
+recovered layered equations and FFT in ordinary binary64 arithmetic. Software
+x87/binary128 instruction emulation is reserved for explicit historical audits;
+it is not used inside each production spectral sample or FFT butterfly.
+The mesh, solver budgets, layer model and frequency points are preserved.
+
+The same default 20-point task was measured first on the original executable:
+256×256 FFT, 50/1.5/0.5 µm filament cells, 50/20 µm contacts, eddy currents off,
+1, 3, …, 39 GHz, and no cache reuse. Three original runs took about 12–13 seconds
+total; the production worker took about 4.2 seconds total. Each has 17 contacts
+and 34 filaments. All 200 frozen cases still pass the unchanged strict 0.1%
+metric gate. These are paired measurements on one host, not CPU-specific
+numerical tolerances. Reproduce the comparison and original coarse profile with:
+
+```sh
+python3 tools/benchmark_pi2.py --profile-original --reference ~/github/asitic-re
+```
+
+The tool runs the pinned original binary first, then fresh production workers.
+It records every run, original reports, program hashes and the actual input
+script under `build/perf` and `build/evidence/pi2-speed.json`. It fails if the
+production median is slower than the original median on the same task.
 
 `python3 tests/browser-pi2-q.py` exercises the packaged page in headless Chrome
 (requires `pip install playwright==1.63.0`, Chrome or Playwright Chromium, and a
@@ -281,7 +300,9 @@ coarse-grid failure, recovery, manual-grid preservation through generation/edits
 and the original 7.5 GHz peak for the medium coil. Screenshots, downloaded CSV and
 results are saved under `build/evidence/browser-pi2-q`. This browser job is a
 required deployment gate; `--url https://al-255.github.io/reASITIC/` runs the same
-test against the published page.
+test against the published page. The default 20-point browser sweep also has a
+15-second CI performance budget, so the former minute-per-point regression
+cannot pass by merely producing the correct eventual curve.
 
 The original `COUPLING` conductor estimate is available alongside L, R(f) and Q.
 Select two windings to report the mutual inductance in nH and coupling coefficient.
@@ -450,7 +471,8 @@ automatic cells, budget admission and request isolation. The original zero-edge
 case (active grading with fewer than three width filaments) is rejected before
 its division by zero; a small limit with uniform placement remains valid.
 
-Production numerics use deterministic software arithmetic. The rectangular
+Production uses ordinary binary64 Green tables and guarded arithmetic where
+cancellation requires it. The rectangular
 cross-section integral is normalized by geometry scale, keeps guard precision
 through its cancelling terms, and rounds to binary64 once. It starts at binary128
 and increases precision when the conditioning or rounding interval requires it.

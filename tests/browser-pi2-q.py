@@ -11,6 +11,7 @@ import struct
 import threading
 import time
 from pathlib import Path
+from urllib.parse import urljoin
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,11 +40,15 @@ def main():
             browser = p.chromium.launch(executable_path=shutil.which('google-chrome'), headless=True, args=['--no-sandbox'])
             report['browserVersion'] = browser.version
             page = browser.new_page(viewport={'width': 1440, 'height': 1100}, accept_downloads=True)
+            loaded_wasm = []
+            page.context.on('response', lambda response: loaded_wasm.append(response.url) if response.url.split('?')[0].endswith('/asitic.wasm') else None)
             page.on('pageerror', lambda error: errors.append(str(error)))
             page.goto(url, wait_until='networkidle')
             page.wait_for_function("!document.getElementById('network-quality-sweep').disabled")
             field = lambda id: page.locator('#' + id)
-            report['release'] = page.request.get(url.rstrip('/') + '/build.json').json()['release']
+            report['release'] = page.request.get(urljoin(url, 'build.json') + '?verify=' + str(time.time_ns())).json()['release']
+            report['runtimeWasmURLs'] = loaded_wasm
+            assert loaded_wasm and all('/releases/' + report['release'] + '/asitic.wasm' in target for target in loaded_wasm), 'Page loaded a stale WASM release'
             assert field('process').input_value() == 'CMOS'
             defaults = {id: field(id).input_value() for id in ['cell-length', 'cell-width', 'cell-thickness', 'cap-length', 'cap-width', 'cap-fftx', 'cap-ffty', 'network-start', 'network-end', 'network-step']}
             assert defaults == dict(zip(defaults, ['50', '1.5', '0.5', '50', '20', '256', '256', '1', '40', '2'])), defaults
@@ -60,9 +65,10 @@ def main():
                     print(state, flush=True)
                     previous = state
                 assert not errors, errors
-                assert time.monotonic() - started < 1800, 'Default sweep timed out'
+                assert time.monotonic() - started < 15, 'Default 20-point sweep exceeded the 15-second performance budget'
                 page.wait_for_timeout(1000)
             assert 'solve complete' in field('status').inner_text(), field('status').inner_text()
+            assert time.monotonic()-started<15, 'The default 20-point sweep exceeded the 15-second CI performance budget'
             assert page.locator('#network-q-plot circle').count() == 20
             assert field('network-stop').is_disabled()
             assert field('generate').is_enabled()
